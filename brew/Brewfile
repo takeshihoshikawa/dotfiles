@@ -35,3 +35,6 @@ cask "session-manager-plugin"
 cask "tailscale"
 cask "teamviewer"
 cask "zoom"
+
+tap "homebrew/cask-fonts"
+cask "font-jetbrains-mono"
