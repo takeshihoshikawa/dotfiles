@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-USER_NAME=$(whoami)
-
 sudo apt update
 
 sudo apt install -y \
@@ -17,6 +15,7 @@ sudo apt install -y \
   zip \
   build-essential \
   cmake \
+  openssh-server \
   pkg-config \
   software-properties-common \
   dirmngr \
@@ -43,12 +42,24 @@ sudo apt install -y r-base r-base-dev
 sudo mkdir -p /work/projects
 sudo mkdir -p /work/data
 sudo mkdir -p /work/tmp
-sudo chown -R $USER_NAME:$USER_NAME /work
+sudo chown -R $USER:$USER /work
+
+sudo systemctl enable ssh
+sudo systemctl start ssh
+
+mkdir -p ~/R/library
+
+cat << 'EOF' >> ~/.Rprofile
+dir.create("~/R/library", recursive = TRUE, showWarnings = FALSE)
+.libPaths(c("~/R/library", .libPaths()))
+EOF
 
 R -q -e "options(repos='https://cloud.r-project.org'); install.packages('renv')"
 
 git clone https://github.com/hoshicurrey/dotfiles.git ~/dotfiles
 stow -d ~/dotfiles -t ~ .
+
+curl -fsSL https://tailscale.com/install.sh | sh
 
 sudo ubuntu-drivers autoinstall
 echo "Setup finished. Please reboot manually"
