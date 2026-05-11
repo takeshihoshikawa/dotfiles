@@ -171,9 +171,15 @@ cmd_add_proposal() {
 
   printf '==> add-proposal: %s/proposals/%s-%s/\n' "$target" "$year" "$gtype"
 
-  local sub
-  for sub in drafts 様式 figures refs budget output; do
-    local d="$target/proposals/$year-$gtype/$sub"
+  # proposal-skeleton/proposals/{{YEAR}}-{{GRANT_TYPE}}/ 配下のサブディレクトリ構造を反映。
+  # 雛形にディレクトリを追加すれば自動で取り込まれる（スクリプト改修不要）。
+  local skel_root="$SCRIPT_DIR/proposal-skeleton/proposals/{{YEAR}}-{{GRANT_TYPE}}"
+  [[ ! -d $skel_root ]] && err "add-proposal: proposal-skeleton not found at $skel_root"
+
+  local rel d
+  while IFS= read -r rel; do
+    [[ -z $rel || $rel == "." ]] && continue
+    d="$target/proposals/$year-$gtype/${rel#./}"
     if [[ ! -d $d ]]; then
       mkdir -p "$d"
       touch "$d/.gitkeep"
@@ -181,7 +187,7 @@ cmd_add_proposal() {
     else
       log "skip (exists): $d/"
     fi
-  done
+  done < <(cd "$skel_root" && find . -mindepth 1 -type d)
 
   # CLAUDE.md と README.md の {{YEAR}}/{{GRANT_TYPE}} を置換（プレースホルダが残っていれば）
   local f
