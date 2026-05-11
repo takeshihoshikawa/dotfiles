@@ -1,0 +1,27 @@
+# {{PROJECT_NAME}}
+
+<!-- TODO: プロジェクトの 1 行概要を書く -->
+
+## 現フェーズ
+
+{{PHASE}}（例: 学術変革領域研究B 申請書執筆）
+
+| マイルストーン | 日付 |
+|---|---|
+| {{MILESTONE_1}} | {{DATE_1}} |
+| {{MILESTONE_2}} | {{DATE_2}} |
+
+## ディレクトリ
+
+- `proposals/{{YEAR}}-{{GRANT_TYPE}}/drafts/`: 研究計画調書 markdown 原稿（真のソース）
+- `proposals/{{YEAR}}-{{GRANT_TYPE}}/output/`: pandoc で生成した .docx（gitignore）
+- `data/`: 解析データ（gitignore、実体は外部）
+- `src/`: 解析コード
+- `notebooks/`: 探索的実験
+- `reports/`, `papers/`: 採択後
+
+## 関連
+
+- Obsidian プロジェクトノート: `projects/{{PROJECT_NAME}}.md`
+- 提出版アーカイブ: `~/Documents/grant/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}/`
+- 規約: `~/.claude/CLAUDE.md`「研究プロジェクト規約」、Vault `notes/research-project-setup.md`

@@ -1,0 +1,356 @@
+#!/usr/bin/env bash
+# research-project/init.sh — 研究プロジェクトの立ち上げ補助
+#
+# サブコマンド:
+#   adopt              プロジェクトディレクトリを作成または既存ディレクトリを補完
+#   add-proposal       proposals/{YEAR}-{GRANT_TYPE}/ サブツリーを追加
+#   add-papis-lib      Papis ライブラリを登録
+#   add-obsidian-note  Obsidian プロジェクトノートを生成
+#   add-archive        iCloud 提出物アーカイブディレクトリを作成
+#
+# 設計方針:
+#   - 既存ファイルは絶対に上書きしない（cp -n、mkdir -p のみ使用）
+#   - 何回実行しても安全（冪等）
+#   - --name 以外はすべて省略可。未指定変数は {{VAR}} のまま残る
+#   - 構想を ChatGPT/Obsidian/FS で先行構築した運用にも対応
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECTS_ROOT="${PROJECTS_ROOT:-$HOME/work/projects}"
+VAULT_ROOT="${VAULT_ROOT:-$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main}"
+ARCHIVE_ROOT="${ARCHIVE_ROOT:-$HOME/Documents/grant}"
+PAPIS_CONFIG="${PAPIS_CONFIG:-$HOME/Library/Application Support/papis/config}"
+
+# ---------- 共通ヘルパー ----------
+
+log()  { printf '  %s\n' "$*"; }
+err()  { printf 'error: %s\n' "$*" >&2; exit 1; }
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# substitute_in_file FILE KEY1 VAL1 [KEY2 VAL2 ...]
+# {{KEY}} を VAL に置換。VAL が空文字なら置換しない（プレースホルダを残す）。
+substitute_in_file() {
+  local file=$1; shift
+  while [[ $# -gt 0 ]]; do
+    local key=$1
+    local val=${2-}
+    shift 2 || true
+    [[ -z $val ]] && continue
+    local esc
+    esc=$(printf '%s' "$val" | sed -e 's/[#&\\]/\\&/g')
+    sed -i.bak "s#{{${key}}}#${esc}#g" "$file"
+  done
+  rm -f "$file.bak"
+}
+
+# copy_template_file SRC DST KEY1 VAL1 ...
+# DST が既に存在すればスキップ。.template 拡張子を剥がし、変数置換も行う。
+copy_template_file() {
+  local src=$1; local dst=$2; shift 2
+  if [[ -e $dst ]]; then
+    log "skip (exists): $dst"
+    return 0
+  fi
+  mkdir -p "$(dirname "$dst")"
+  cp "$src" "$dst"
+  substitute_in_file "$dst" "$@"
+  log "added: $dst"
+}
+
+# detect_proposal DIR  — proposals/ 配下の最新の {YEAR}-{TYPE} を出力
+detect_proposal() {
+  local proj=$1
+  if [[ ! -d "$proj/proposals" ]]; then
+    return 1
+  fi
+  ls -1 "$proj/proposals" 2>/dev/null | grep -E '^[0-9]{4}-' | sort -r | head -n1
+}
+
+# ---------- adopt ----------
+
+cmd_adopt() {
+  local name= rep= proj_full=
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --name)           name=$2; shift 2 ;;
+      --representative) rep=$2; shift 2 ;;
+      --project-name)   proj_full=$2; shift 2 ;;
+      *) err "adopt: unknown option $1" ;;
+    esac
+  done
+  [[ -z $name ]] && err "adopt: --name required"
+
+  local target="$PROJECTS_ROOT/$name"
+  mkdir -p "$target"
+  printf '==> adopt: %s\n' "$target"
+
+  # .gitignore はそのままコピー
+  if [[ ! -e "$target/.gitignore" ]]; then
+    cp "$SCRIPT_DIR/skeleton/.gitignore" "$target/.gitignore"
+    log "added: $target/.gitignore"
+  else
+    log "skip (exists): $target/.gitignore"
+  fi
+
+  # .template ファイルを変数置換しつつコピー
+  copy_template_file \
+    "$SCRIPT_DIR/skeleton/CLAUDE.md.template" \
+    "$target/CLAUDE.md" \
+    PROJECT_NAME "$name" \
+    FULL_PROJECT_NAME "${proj_full:-}" \
+    REPRESENTATIVE "$rep"
+
+  copy_template_file \
+    "$SCRIPT_DIR/skeleton/README.md.template" \
+    "$target/README.md" \
+    PROJECT_NAME "$name" \
+    FULL_PROJECT_NAME "${proj_full:-}"
+
+  # 空ディレクトリを .gitkeep 付きで作成
+  local d
+  for d in data/raw data/processed src notebooks reports papers; do
+    if [[ ! -d "$target/$d" ]]; then
+      mkdir -p "$target/$d"
+      touch "$target/$d/.gitkeep"
+      log "added: $target/$d/"
+    else
+      log "skip (exists): $target/$d/"
+    fi
+  done
+
+  # git 初期化（既存 .git は触らない）
+  if [[ ! -d "$target/.git" ]]; then
+    (
+      cd "$target"
+      git init -q
+      git add .
+      git commit -q -m "Initial scaffold from research-project template"
+    )
+    log "git: initialized + initial commit"
+  else
+    log "git: already initialized (preserved)"
+  fi
+
+  cat <<EOF
+
+次のステップ:
+  1. ChatGPT や Obsidian で書いた構想メモを CLAUDE.md に貼り込む（{{...}} と <!-- TODO --> を埋める）
+  2. proposals/ を作る場合:
+       $0 add-proposal --name $name --year YYYY --grant-type 種別
+  3. Papis ライブラリを使う場合:
+       $0 add-papis-lib --name $name
+  4. Obsidian プロジェクトノートを作る場合:
+       $0 add-obsidian-note --name $name
+  5. 提出物アーカイブディレクトリを作る場合:
+       $0 add-archive --name $name --archive-date YYYYMMDD --short 略称 --grant-type 種別
+  6. GitHub private repo に push する場合（任意）:
+       cd $target && gh repo create --private $name --source=. --remote=origin --push
+
+EOF
+}
+
+# ---------- add-proposal ----------
+
+cmd_add_proposal() {
+  local name= year= gtype=
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --name)       name=$2; shift 2 ;;
+      --year)       year=$2; shift 2 ;;
+      --grant-type) gtype=$2; shift 2 ;;
+      *) err "add-proposal: unknown option $1" ;;
+    esac
+  done
+  [[ -z $name ]]  && err "add-proposal: --name required"
+  [[ -z $year ]]  && err "add-proposal: --year required"
+  [[ -z $gtype ]] && err "add-proposal: --grant-type required"
+
+  local target="$PROJECTS_ROOT/$name"
+  [[ ! -d $target ]] && err "add-proposal: $target does not exist (run adopt first)"
+
+  printf '==> add-proposal: %s/proposals/%s-%s/\n' "$target" "$year" "$gtype"
+
+  local sub
+  for sub in drafts 様式 figures refs budget output; do
+    local d="$target/proposals/$year-$gtype/$sub"
+    if [[ ! -d $d ]]; then
+      mkdir -p "$d"
+      touch "$d/.gitkeep"
+      log "added: $d/"
+    else
+      log "skip (exists): $d/"
+    fi
+  done
+
+  # CLAUDE.md と README.md の {{YEAR}}/{{GRANT_TYPE}} を置換（プレースホルダが残っていれば）
+  local f
+  for f in "$target/CLAUDE.md" "$target/README.md"; do
+    if [[ -f $f ]] && grep -q '{{YEAR}}\|{{GRANT_TYPE}}' "$f"; then
+      substitute_in_file "$f" YEAR "$year" GRANT_TYPE "$gtype"
+      log "substituted YEAR/GRANT_TYPE in: $f"
+    fi
+  done
+}
+
+# ---------- add-papis-lib ----------
+
+cmd_add_papis_lib() {
+  local name= proposal=
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --name)     name=$2; shift 2 ;;
+      --proposal) proposal=$2; shift 2 ;;  # YYYY-種別 形式
+      *) err "add-papis-lib: unknown option $1" ;;
+    esac
+  done
+  [[ -z $name ]] && err "add-papis-lib: --name required"
+
+  local target="$PROJECTS_ROOT/$name"
+  [[ ! -d $target ]] && err "add-papis-lib: $target does not exist (run adopt first)"
+
+  if [[ -z $proposal ]]; then
+    proposal=$(detect_proposal "$target") || err "add-papis-lib: no proposals/{YEAR}-{TYPE}/ found; specify --proposal"
+  fi
+
+  local lib_dir="$target/proposals/$proposal/refs/papis-lib"
+  if [[ ! -d $lib_dir ]]; then
+    mkdir -p "$lib_dir"
+    log "added: $lib_dir/"
+  else
+    log "skip (exists): $lib_dir/"
+  fi
+
+  # papis config に section を追記（既にあればスキップ）
+  mkdir -p "$(dirname "$PAPIS_CONFIG")"
+  touch "$PAPIS_CONFIG"
+  if grep -q "^\[$name\]" "$PAPIS_CONFIG" 2>/dev/null; then
+    log "skip (exists in papis config): [$name]"
+  else
+    printf '\n[%s]\ndir = %s\n' "$name" "$lib_dir" >> "$PAPIS_CONFIG"
+    log "papis: registered library [$name] -> $lib_dir"
+  fi
+
+  # CLAUDE.md の {{PAPIS_LIB_NAME}} を置換
+  local f="$target/CLAUDE.md"
+  if [[ -f $f ]] && grep -q '{{PAPIS_LIB_NAME}}' "$f"; then
+    substitute_in_file "$f" PAPIS_LIB_NAME "$name"
+    log "substituted PAPIS_LIB_NAME in: $f"
+  fi
+}
+
+# ---------- add-obsidian-note ----------
+
+cmd_add_obsidian_note() {
+  local name= rep= aff= phase=
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --name)           name=$2; shift 2 ;;
+      --representative) rep=$2; shift 2 ;;
+      --affiliation)    aff=$2; shift 2 ;;
+      --phase)          phase=$2; shift 2 ;;
+      *) err "add-obsidian-note: unknown option $1" ;;
+    esac
+  done
+  [[ -z $name ]] && err "add-obsidian-note: --name required"
+
+  local note="$VAULT_ROOT/projects/$name.md"
+
+  if [[ ! -d "$VAULT_ROOT/projects" ]]; then
+    err "add-obsidian-note: $VAULT_ROOT/projects/ does not exist"
+  fi
+
+  if [[ -e $note ]]; then
+    printf 'warning: %s already exists — preserving existing note (no changes)\n' "$note" >&2
+    return 0
+  fi
+
+  local today
+  today=$(date +%Y-%m-%d)
+
+  cp "$SCRIPT_DIR/obsidian-project-note.md.template" "$note"
+  substitute_in_file "$note" \
+    PROJECT_NAME "$name" \
+    REPRESENTATIVE "$rep" \
+    AFFILIATION "$aff" \
+    PHASE "$phase" \
+    TODAY "$today"
+
+  log "added: $note"
+}
+
+# ---------- add-archive ----------
+
+cmd_add_archive() {
+  local name= adate= short= gtype=
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --name)         name=$2; shift 2 ;;
+      --archive-date) adate=$2; shift 2 ;;
+      --short)        short=$2; shift 2 ;;
+      --grant-type)   gtype=$2; shift 2 ;;
+      *) err "add-archive: unknown option $1" ;;
+    esac
+  done
+  [[ -z $adate ]] && err "add-archive: --archive-date required (YYYYMMDD)"
+  [[ -z $short ]] && err "add-archive: --short required"
+  [[ -z $gtype ]] && err "add-archive: --grant-type required"
+
+  local archive="$ARCHIVE_ROOT/${adate}_${gtype}_${short}"
+  if [[ ! -d $archive ]]; then
+    mkdir -p "$archive"
+    log "added: $archive/"
+  else
+    log "skip (exists): $archive/"
+  fi
+
+  # CLAUDE.md と README.md のプレースホルダを置換
+  if [[ -n $name ]]; then
+    local target="$PROJECTS_ROOT/$name"
+    local f
+    for f in "$target/CLAUDE.md" "$target/README.md"; do
+      if [[ -f $f ]] && grep -q '{{ARCHIVE_DATE}}\|{{SHORT}}' "$f"; then
+        substitute_in_file "$f" ARCHIVE_DATE "$adate" SHORT "$short" GRANT_TYPE "$gtype"
+        log "substituted ARCHIVE_DATE/SHORT/GRANT_TYPE in: $f"
+      fi
+    done
+  fi
+}
+
+# ---------- usage / dispatch ----------
+
+usage() {
+  cat <<EOF
+Usage: $0 <subcommand> [options]
+
+Subcommands:
+  adopt              --name NAME [--representative "氏名"] [--project-name "正式名"]
+  add-proposal       --name NAME --year YYYY --grant-type 種別
+  add-papis-lib      --name NAME [--proposal YYYY-種別]
+  add-obsidian-note  --name NAME [--representative "氏名"] [--affiliation "所属"] [--phase 現フェーズ]
+  add-archive        [--name NAME] --archive-date YYYYMMDD --short 略称 --grant-type 種別
+
+Environment:
+  PROJECTS_ROOT  default: ~/work/projects
+  VAULT_ROOT     default: Obsidian iCloud Vault
+  ARCHIVE_ROOT   default: ~/Documents/grant
+  PAPIS_CONFIG   default: ~/Library/Application Support/papis/config
+
+EOF
+}
+
+main() {
+  [[ $# -eq 0 ]] && { usage; exit 0; }
+  local sub=$1; shift
+  case $sub in
+    adopt)             cmd_adopt "$@" ;;
+    add-proposal)      cmd_add_proposal "$@" ;;
+    add-papis-lib)     cmd_add_papis_lib "$@" ;;
+    add-obsidian-note) cmd_add_obsidian_note "$@" ;;
+    add-archive)       cmd_add_archive "$@" ;;
+    -h|--help|help)    usage ;;
+    *) err "unknown subcommand: $sub" ;;
+  esac
+}
+
+main "$@"
