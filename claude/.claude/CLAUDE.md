@@ -9,7 +9,7 @@ Folder structure:
 - `weekly/` — weekly notes (`weekly-YYYY-MM-DD.md`)
 - `courses/{年度}/` — course notes (`YYYY-MM-DD_科目名.md`、年度は4月始まり翌年3月終わり)
 - `meetings/` — meeting notes (`YYYY-MM-DD_タイトル.md`)
-- `projects/` — project notes（研究プロジェクトの場合は `projects/{プロジェクト名}/` サブディレクトリを作成し、解析レポート等を格納）
+- `projects/` — project notes（ファイル名は **kebab-case 英語**、例 `spread1000-application.md`。研究プロジェクトの場合は `projects/{プロジェクト名}/` サブディレクトリを作成し、解析レポート等を格納）
 - `notes/` — misc notes, workflow docs, ideas
 - `references/literature/` — 文献ノート（Zotero連携、ファイル名はcitekey）
 - `goals.md` — 長期目標・方針（/morningで毎朝表示）
