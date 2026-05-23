@@ -1,6 +1,7 @@
 ---
 name: my-courses
 description: 自分担当の授業一覧を最新順に表示
+model: haiku
 args:
   count:
     description: 表示する授業数（デフォルト5件）

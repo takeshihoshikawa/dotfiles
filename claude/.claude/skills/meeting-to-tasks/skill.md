@@ -1,6 +1,7 @@
 ---
 name: meeting-to-tasks
 description: ミーティングノートのアクションアイテムをTodoistタスクに登録
+model: haiku
 args:
   note:
     description: ミーティングノートのファイル名（拡張子なし、省略時は最新）

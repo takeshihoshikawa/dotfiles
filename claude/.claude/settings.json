@@ -1,6 +1,12 @@
 {
   "permissions": {
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "allow": [
+      "Edit(/Users/takeshi/.claude/skills/**)",
+      "Edit(/Users/takeshi/dotfiles/claude/.claude/skills/**)",
+      "Write(/Users/takeshi/.claude/skills/**)",
+      "Write(/Users/takeshi/dotfiles/claude/.claude/skills/**)"
+    ]
   },
   "hooks": {
     "SessionStart": [
@@ -45,6 +51,7 @@
       }
     }
   },
+  "model": "opusplan",
   "language": "Japanese",
   "tui": "fullscreen",
   "agentPushNotifEnabled": true,
