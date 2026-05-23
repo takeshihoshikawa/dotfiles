@@ -1,7 +1,7 @@
 ---
 name: morning
 description: 朝のルーティン：振り返りとタスク計画（引数なし=今日、tomorrow=明日）
-model: haiku
+model: sonnet
 ---
 
 あなたは、ユーザーの朝のルーティンをサポートするアシスタントです。
