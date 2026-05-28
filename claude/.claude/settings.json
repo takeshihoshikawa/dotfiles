@@ -10,6 +10,12 @@
       "Bash(git push*)"
     ]
   },
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Pushing directly to the main branch is allowed: this is a personal repository where I am the sole contributor, so there is no pull request review process"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -56,6 +62,8 @@
   "model": "opusplan",
   "language": "Japanese",
   "tui": "fullscreen",
+  "theme": "dark",
+  "remoteControlAtStartup": false,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true
