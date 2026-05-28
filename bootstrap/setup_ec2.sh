@@ -61,5 +61,5 @@ tailscale up \
 R -q -e "options(repos='https://cloud.r-project.org'); install.packages('renv')"
 
 # dotfiles
-sudo -u ubuntu git clone https://github.com/hoshicurrey/dotfiles.git /home/ubuntu/dotfiles
-sudo -u ubuntu stow -d /home/ubuntu/dotfiles -t /home/ubuntu .
+sudo -u ubuntu git clone https://github.com/takeshihoshikawa/dotfiles.git /home/ubuntu/dotfiles
+sudo -u ubuntu stow -d /home/ubuntu/dotfiles -t /home/ubuntu git ssh claude

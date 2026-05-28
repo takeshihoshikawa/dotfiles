@@ -56,8 +56,8 @@ EOF
 
 R -q -e "options(repos='https://cloud.r-project.org'); install.packages('renv')"
 
-git clone https://github.com/hoshicurrey/dotfiles.git ~/dotfiles
-stow -d ~/dotfiles -t ~ .
+git clone https://github.com/takeshihoshikawa/dotfiles.git ~/dotfiles
+stow -d ~/dotfiles -t ~ git ssh claude
 
 curl -fsSL https://tailscale.com/install.sh | sh
 

@@ -15,7 +15,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 echo "--- dotfiles ---"
 if [ ! -d ~/dotfiles ]; then
-  git clone https://github.com/hoshicurrey/dotfiles.git ~/dotfiles
+  git clone https://github.com/takeshihoshikawa/dotfiles.git ~/dotfiles
 else
   echo "~/dotfiles already exists. Skipping clone."
 fi
@@ -31,7 +31,7 @@ brew bundle --file ~/dotfiles/brew/Brewfile
 
 echo "--- stow ---"
 cd ~/dotfiles
-stow ssh aws git zsh brew
+stow ssh aws git zsh brew claude vscode
 
 echo "--- R packages ---"
 R -q -e "options(repos='https://cloud.r-project.org'); install.packages('renv')"
