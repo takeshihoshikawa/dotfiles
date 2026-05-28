@@ -56,7 +56,13 @@ EOF
 
 R -q -e "options(repos='https://cloud.r-project.org'); install.packages('renv')"
 
-git clone https://github.com/takeshihoshikawa/dotfiles.git ~/dotfiles
+if [ ! -d ~/dotfiles ]; then
+  git clone https://github.com/takeshihoshikawa/dotfiles.git ~/dotfiles
+else
+  echo "~/dotfiles already exists. Skipping clone."
+fi
+
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
 stow -d ~/dotfiles -t ~ git ssh claude
 
 curl -fsSL https://tailscale.com/install.sh | sh

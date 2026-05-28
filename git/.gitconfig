@@ -3,6 +3,9 @@
 	email = 46620655+takeshihoshikawa@users.noreply.github.com
 [core]
 	autocrlf = input
+	excludesfile = ~/.gitignore_global
+[pull]
+	rebase = true
 [alias]
 	lol = log --graph --decorate --pretty=oneline --all --abbrev-commit
 [push]
