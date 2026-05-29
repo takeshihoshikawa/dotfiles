@@ -42,6 +42,10 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 
 衝突が起きた場合は force push せず rebase で解消。両端末のどちらが authoritative かを個別判断する。
 
+## データ分析コーディング規約
+
+@data-analysis-coding-conventions.md
+
 ## 研究プロジェクト規約
 
 新規研究プロジェクトは以下 4 点を組み合わせて構成する。詳細・判断基準は Obsidian Vault の `notes/research-project-setup.md` を参照。
