@@ -48,9 +48,10 @@ model: sonnet
    - **Next（候補）**：`mcp__todoist__find-tasks` で `filter: "p3 & no date"` を使い最大10件取得
    - `@waiting` ラベルのタスクは表示しない
 
-4. **Todoist inboxの整理**（inboxにタスクがある場合のみ）：
+4. **Todoist inboxの整理**（任意・inboxにタスクがある場合のみ）：
    - `mcp__todoist__find-tasks` で `projectId: "inbox"` を指定してinboxのタスクを取得
-   - 各タスクをリスト表示し、プロジェクトへの振り分け・期日設定・削除をユーザーに確認
+   - 件数だけ表示し「整理しますか？」と確認する。ユーザーが skip/後でを選んだらすぐ次へ
+   - 整理する場合：各タスクをリスト表示し、プロジェクトへの振り分け・期日設定・削除をユーザーに確認
    - ユーザーの指示に従い `mcp__todoist__update-tasks` または `mcp__todoist__reschedule-tasks` で処理
 
 5. **期限切れタスクのトリアージ**（期限切れタスクがある場合のみ）：
