@@ -30,6 +30,8 @@ Folder structure:
 
 Course owner name: 星川（coursesディレクトリのフロントマター `owner` フィールドで使用）
 
+勤務時間: 8:00–16:45（月〜金）、昼休み 11:30–13:00
+
 ## Git リポでの作業ルール
 
 職場 PC と自宅 PC の 2 台で同じリポジトリを並行操作することがあるため、編集・コミット系の作業を始める前に必ず remote の divergence を確認する。
