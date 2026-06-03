@@ -151,10 +151,20 @@ obsidian tags counts                                 # タグと頻度
 
 タスク一覧・検索はrgで行う（`obsidian tasks` コマンドは存在しない）：
 ```bash
+VAULT=~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/main
+
 # vault全体の未完タスク
-rg "\- \[ \]" ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/main/
-# 期日でフィルタ
-rg "\- \[ \] .*due:: YYYY-MM-DD" ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/main/
+rg "\- \[ \]" $VAULT
+# 期日でフィルタ（YYYY-MM-DDは実際の日付に置換）
+rg "\- \[ \] .*due:: 2026-06-03" $VAULT
+# キーワードで絞り込み
+rg "\- \[ \]" $VAULT | rg "キーワード"
+```
+
+タスク完了・トグル（`obsidian task` 単数形、fileはvaultルートからの相対パス）：
+```bash
+obsidian task file="notes/admin.md" line=10 done    # 完了
+obsidian task file="notes/admin.md" line=10 toggle  # トグル
 ```
 
 ### 定型ワークフローとの分担
