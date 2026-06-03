@@ -18,9 +18,12 @@ Folder structure:
 
 | ツール | 役割 |
 |--------|------|
-| **Todoist** | 実行管理（期日・チェック）。細部のタスク |
+| **Obsidian Tasks** | 実行管理（期日・チェック）。各ノートに `- [ ]` チェックボックスとして配置 |
 | **Project note** (`projects/`) | 全体把握。どこまでやったかの確認 |
 | **Meeting note** (`meetings/`) | 会議の文脈・決定事項の記録 |
+
+タスク形式: `- [ ] タスク内容 [due:: YYYY-MM-DD] [priority:: high/medium/low]`  
+Todoistは廃止済み（2026-06-03移行完了）。Todoistツールは使用しない。
 
 - Meeting noteのアクションアイテムは「決定した事実」の記録（担当者・アクション・期限）。ステータス管理はしない
 - テンプレート: `templates/meeting-agenda-template.md`、`templates/project-note-template.md`
