@@ -147,7 +147,14 @@ obsidian move file="old.md" name="new.md"            # 移動/リネーム（リ
 obsidian delete file="path/to/note"                  # 削除
 obsidian property:set file="path" key="status" value="active"  # プロパティ設定
 obsidian tags counts                                 # タグと頻度
-obsidian tasks daily                                 # daily note のタスク一覧
+```
+
+タスク一覧・検索はgrepで行う（`obsidian tasks` コマンドは存在しない）：
+```bash
+# vault全体の未完タスク
+grep -rn "\- \[ \]" ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/main/ 2>/dev/null
+# 期日でフィルタ
+grep -rn "\- \[ \]" ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/main/ 2>/dev/null | grep "due:: YYYY-MM-DD"
 ```
 
 ### 定型ワークフローとの分担
