@@ -76,10 +76,15 @@ obsidian daily:append content="- HH:MM–HH:MM **内容**\n  - 詳細"
 - `DAILY_PATH=$(obsidian daily:path 2>/dev/null | grep -v "^[0-9]" | grep -v "^Your Obsidian")`
 - Editツールで `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/main/$DAILY_PATH` を全文更新
 
-### Todoist 完了マーク
+### タスク完了マーク
 
-- 「やったこと」から完了タスクを検出してリスト提示
-- 確認後に `mcp__todoist__complete-tasks` で完了にする
+- 「やったこと」から完了したと判断できるタスクをbashで検索してリスト提示：
+  ```bash
+  VAULT="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main"
+  rg --line-number --no-heading -- '- \[ \]' "$VAULT/projects" "$VAULT/notes" \
+  | grep -i "タスク名の一部"
+  ```
+- 確認後に `obsidian task ref="path:line" done` で完了にする
 - **新規タスクの追加はしない**
 
 ---

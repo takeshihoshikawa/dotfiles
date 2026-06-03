@@ -31,7 +31,7 @@ model: sonnet
    - 該当ファイルがない場合は「直近の日報がありません」と表示
 
 2. **Google Calendarの予定を取得**（並列実行）：
-   - `mcp__claude_ai_Google_Calendar__gcal_list_events` を使用して対象日と対象日の翌日の予定を取得
+   - `mcp__claude_ai_Google_Calendar__list_events` を使用して対象日と対象日の翌日の予定を取得
    - **必須**：`timeMin`/`timeMax` パラメータ（RFC3339形式、タイムゾーンなし）と `timeZone: "Asia/Tokyo"` を指定する
      - 例：対象日が2026-04-07なら `timeMin: "2026-04-07T00:00:00"`, `timeMax: "2026-04-07T23:59:59"`
    - 対象日・翌日それぞれ別のツール呼び出しで取得（並列実行可）
@@ -39,39 +39,50 @@ model: sonnet
    - 対象日の翌日の予定：開始時刻順に表示
    - 予定がない場合は「予定なし」と表示
 
-3. **Todoistからタスクを取得**：
-   - `mcp__todoist__get-overview` で全体像を把握する（並列実行可）
-   - **期限切れ・対象日期日タスク**の取得：
-     - `mcp__todoist__find-tasks-by-date` で `startDate: 今日, overdueOption: include-overdue, daysCount: 対象日が今日なら1・明日なら2` で取得
-     - ※ Todoist APIは現在日付基準でoverdue判定するため、`startDate: 対象日` だと今日期日のタスクが漏れる
-     - 取得結果から対象日より後の期日のタスクは除外して表示
-   - **Next（候補）**：`mcp__todoist__find-tasks` で `filter: "p3 & no date"` を使い最大10件取得
-   - `@waiting` ラベルのタスクは表示しない
+3. **タスクをファイルから取得**（bashツールで実行、並列実行可）：
 
-4. **Todoist inboxの整理**（任意・inboxにタスクがある場合のみ）：
-   - `mcp__todoist__find-tasks` で `projectId: "inbox"` を指定してinboxのタスクを取得
-   - 件数だけ表示し「整理しますか？」と確認する。ユーザーが skip/後でを選んだらすぐ次へ
-   - 整理する場合：各タスクをリスト表示し、プロジェクトへの振り分け・期日設定・削除をユーザーに確認
-   - ユーザーの指示に従い `mcp__todoist__update-tasks` または `mcp__todoist__reschedule-tasks` で処理
+   ```bash
+   VAULT="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main"
+   TODAY=$(date +%F)  # 対象日が今日でない場合はその日付を使う
 
-5. **期限切れタスクのトリアージ**（期限切れタスクがある場合のみ）：
+   echo "=== 期日あり（今日以前）==="
+   {
+     rg --line-number --no-heading -- '- \[ \].*\[due:: [0-9]{4}-[0-9]{2}-[0-9]{2}\]' "$VAULT/projects"
+     rg --line-number --no-heading --max-depth 1 -- '- \[ \].*\[due:: [0-9]{4}-[0-9]{2}-[0-9]{2}\]' "$VAULT/notes"
+   } | grep -v '#waiting' \
+     | while IFS= read -r line; do
+         due=$(echo "$line" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1)
+         [[ ! "$due" > "$TODAY" ]] && echo "$line"
+       done
+
+   echo "=== Next（日付なし）==="
+   {
+     rg --line-number --no-heading --max-depth 1 -- '- \[ \] ' "$VAULT/notes"
+     rg --line-number --no-heading -- '- \[ \] ' "$VAULT/projects"
+   } | grep -v '\[due::' | grep -v '#waiting' | head -15
+   ```
+
+   出力形式：`path/to/file.md:行番号:- [ ] タスク名 [due:: 日付] [priority:: ...]`
+   - ファイルパスと行番号は後でタスク操作（完了・延期）に使う
+
+4. **期限切れタスクのトリアージ**（期限切れタスクがある場合のみ）：
    - **トリアージ対象の判定**：
      - 引数なし（対象日=今日）：**期限切れ（前日以前）のタスクのみ**トリアージ。本日期日のタスクはトリアージ不要（今日取り組む候補として表示）。
      - `tomorrow`（対象日=明日）：**本日期日のタスクも**トリアージ対象に含める（明日からみると期限切れになるため）。
    - 各タスクを番号付きリストで表示し、各タスクについて選択を促す：
      ```
-     1. タスク名（プロジェクト）
+     1. タスク名（ファイル名）
         → 完了(c) / 延ばす(日付) / 削除(d)
      ```
    - ユーザーの回答をまとめて受け取り、一括で処理する：
-     - `完了`：`mcp__todoist__complete-tasks` で完了にする
-     - `延ばす`：`mcp__todoist__reschedule-tasks` で指定日に変更
-     - `削除`：`mcp__todoist__delete-object` で削除する
+     - `完了`：`obsidian task ref="path:line" done` で完了にする
+     - `延ばす`：Editツールで `[due:: 旧日付]` を `[due:: 新日付]` に変更
+     - `削除`：Editツールで該当行を削除
 
-6. **タスク計画のサポート**：
+5. **タスク計画のサポート**：
    - 「{対象日}はどのタスクに取り組みますか？」と質問（Nextから選ぶ）
    - ユーザーが選んだタスクがあれば、期日を対象日に設定するか確認
-   - 確認後、`mcp__todoist__reschedule-tasks` で期日を対象日に設定
+   - 確認後、Editツールで `[due:: 日付]` を追加または変更する
 
 ## 出力フォーマット
 
@@ -105,13 +116,13 @@ model: sonnet
 ## 📋 対象日のタスク
 
 ### 🔥 期限切れ（トリアージ対象）
-- タスク名（プロジェクト）※前日以前の期限切れのみ（tomorrowの場合は本日期日も含む）
+- タスク名（ファイル名）※前日以前の期限切れのみ
 
 ### ⏰ 本日期日（引数なしの場合のみ表示）
-- タスク名（プロジェクト）
+- タスク名（ファイル名）
 
 ### 📋 Next（候補）
-- タスク名（プロジェクト）※最大10件
+- タスク名（ファイル名）※最大10件
 
 ---
 
@@ -120,8 +131,8 @@ model: sonnet
 
 ## 注意事項
 
-- ReadツールとGoogle Calendar MCP、Todoist MCPを使用
+- タスク操作（完了・延期）は `obsidian task ref="path:line" done` またはEditツールを使う
 - タスク優先順位の更新はユーザーが明示的に依頼した場合のみ
-- `@waiting` ラベルのタスクは通常表示しない
-- Google Calendar / Todoistへのアクセスに失敗した場合もエラーにせず次のステップに進む
+- `#waiting` タグのタスクは表示しない
+- Google Calendar へのアクセスに失敗した場合もエラーにせず次のステップに進む
 - 簡潔で見やすい出力を心がける

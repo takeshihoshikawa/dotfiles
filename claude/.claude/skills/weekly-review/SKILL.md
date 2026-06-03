@@ -33,9 +33,12 @@ args:
 - `## 気づき` セクションを重点的に収集する（週次の「気づき・学び」の素材とする）
 
 ### 3. 完了タスクの取得
-- `mcp__todoist__find-completed-tasks` で対象週の完了タスクを取得
-  - `since`: 対象週の月曜日（YYYY-MM-DD）
-  - `until`: 対象週の日曜日（YYYY-MM-DD）
+- bashで projects・notes の `- [x]` 完了タスクを一覧取得（補足情報として使用）：
+  ```bash
+  VAULT="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main"
+  rg --no-heading -- '- \[x\]' "$VAULT/projects" "$VAULT/notes" --max-depth 1
+  ```
+- 日報（フェーズ1の2）の「やったこと」が主要な振り返り素材。完了タスク一覧は補完として使う
 
 ### 4. 今後2週間のGoogle Calendar予定の取得
 - Google Calendar MCPで来週・再来週（2週間分）の予定を取得
@@ -46,8 +49,13 @@ args:
 - 来週・再来週分のCLAUDE.mdで定義されたcourse ownerの担当授業を検索
 - フロントマター（topic、準備状況）を確認
 
-### 6. Inboxの確認
-- `mcp__todoist__find-tasks` で `filter: "#Inbox"` を使ってInboxタスクを取得
+### 6. #waitingタスクの確認
+- bashで `#waiting` タグのタスクを一覧取得：
+  ```bash
+  VAULT="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main"
+  rg --no-heading --with-filename -- '- \[ \].*#waiting' "$VAULT/projects" "$VAULT/notes"
+  ```
+- 週次レビューで各タスクの状況を確認し、必要なら `#waiting` を外すか期日を変更する
 
 ### 7. 中長期目標の読み込み
 - CLAUDE.mdのvault pathの `goals.md` をReadツールで読み込み、内部で保持する
@@ -156,7 +164,11 @@ goals.mdの内容を簡潔に提示した上で問いかけること（ユーザ
 ```
 
 「これらのタスクを追加しますか？不要なものは番号で除外してください。」と確認する。
-ユーザーの回答に従って `mcp__todoist__add-tasks` でタスクを追加する。
+ユーザーの回答に従い、各タスクを適切なファイルに追加する：
+- Teaching系 → `notes/teaching.md` の `## タスク` セクションに追記
+- Admin系 → `notes/admin.md` の `## タスク` セクションに追記
+- Research系 → 該当プロジェクトノート（`projects/xxx.md`）の `## タスク` セクションに追記
+- 追記フォーマット：`- [ ] タスク名 📅 YYYY-MM-DD 優先度マーク`
 
 追加後、「他に追加したいタスクはありますか？」と自由入力を促す。
 ユーザーが「なし」または終了を示したら次フェーズへ。
@@ -225,7 +237,9 @@ goals.mdの内容を簡潔に提示した上で問いかけること（ユーザ
 - **Write**: 週報ファイルの保存
 - **Bash**: ファイル検索、日付フィルタリング
 - **Google Calendar MCP**: 来週の予定取得
-- **Todoist MCP**: 完了タスク取得・Inbox確認・タスク追加・更新
+- **Bash**: 完了タスク取得・#waitingタスク確認（rg）
+- **obsidian task**: タスク完了マーク（`ref="path:line" done`）
+- **Edit**: タスク追加・日付変更・#waiting解除
 
 ## 出力スタイル
 
