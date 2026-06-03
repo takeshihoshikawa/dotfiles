@@ -149,12 +149,12 @@ obsidian property:set file="path" key="status" value="active"  # プロパティ
 obsidian tags counts                                 # タグと頻度
 ```
 
-タスク一覧・検索はgrepで行う（`obsidian tasks` コマンドは存在しない）：
+タスク一覧・検索はrgで行う（`obsidian tasks` コマンドは存在しない）：
 ```bash
 # vault全体の未完タスク
-grep -rn "\- \[ \]" ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/main/ 2>/dev/null
+rg "\- \[ \]" ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/main/
 # 期日でフィルタ
-grep -rn "\- \[ \]" ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/main/ 2>/dev/null | grep "due:: YYYY-MM-DD"
+rg "\- \[ \] .*due:: YYYY-MM-DD" ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/main/
 ```
 
 ### 定型ワークフローとの分担
