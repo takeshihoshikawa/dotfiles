@@ -1,6 +1,6 @@
 ---
 name: capture
-description: 思考を止めずに即Todoistへ。粒度チェックのみして1往復で完結
+description: 思考を止めずに即Obsidianへ。粒度チェックのみして1往復で完結
 model: haiku
 args:
   content:
@@ -18,7 +18,7 @@ args:
 
 ## 判断ロジック
 
-**全てTodoist Inboxに送る**。宛先の判断はユーザーが後でやる。
+**全て `notes/tasks.md` の inbox に追記する**。宛先の判断はユーザーが後でやる。
 
 以下のみ判断する：
 
@@ -27,19 +27,31 @@ args:
   - 例：`「lidRのvoxelize()メモ → メモリ効率の代替手法を調べてprojects/lidR-tips.mdに追記」`
 - **適切なタスク**：そのまま保存
 
+期日・優先度は**ユーザーが明示した場合のみ**付与する（明示がなければ追記しない）。
+
 ## 出力フォーマット
 
 判断後、確認なしで即保存する。保存後に1行だけ報告：
 
 ```
-✓ 「[保存した内容]」→ Inbox
+✓ 「[保存した内容]」→ inbox
 ```
 
 粒度を調整した場合のみ元の表現との差分を括弧で添える：
 ```
-✓ 「satellite-thermalの次のステップを確認・計画する」→ Inbox（「進める」→具体化）
+✓ 「satellite-thermalの次のステップを確認・計画する」→ inbox（「進める」→具体化）
 ```
 
 ## 保存コマンド
 
-`mcp__todoist__add-tasks` でInboxに追加（contentのみ、期日・プロジェクト指定なし）
+期日・優先度なし（標準）:
+```bash
+open -a Obsidian 2>/dev/null; sleep 2 && \
+obsidian append file="tasks" content="- [ ] タスク内容"
+```
+
+期日・優先度あり（明示された場合）:
+```bash
+open -a Obsidian 2>/dev/null; sleep 2 && \
+obsidian append file="tasks" content="- [ ] タスク内容 [due:: YYYY-MM-DD] [priority:: medium]"
+```
