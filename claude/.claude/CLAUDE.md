@@ -22,18 +22,28 @@ Folder structure:
 | **Project note** (`projects/`) | 全体把握。どこまでやったかの確認 |
 | **Meeting note** (`meetings/`) | 会議の文脈・決定事項の記録 |
 
-タスク形式: `- [ ] タスク内容 [due:: YYYY-MM-DD] [priority:: high/medium/low]`  
+タスク管理は2系統：
+
+| 系統 | 場所 | 記法 |
+|------|------|------|
+| **プロジェクトtask** | meeting / project note の発生場所（転記しない） | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]` |
+| **非プロジェクトtask** | `notes/tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD] [priority:: medium]` |
+
+`#project/{kebab-case}` のプロジェクト名は `projects/{kebab-case}.md` のファイル名と一致させる。  
+Claude Code は `rg "#project/X" projects meetings` で横断検索（plugin非依存）。  
 Todoistは廃止済み（2026-06-03移行完了）。Todoistツールは使用しない。
 
-タスク追加先：
+**非プロジェクトtask**の追加先：すべて `notes/tasks.md`（`obsidian append file="tasks"`）
 
-| ファイル | パス | 用途 |
-|---------|------|------|
-| `admin.md` | `notes/admin.md` | 大学事務・制度系（義務研修・補講・学内手続き） |
-| `teaching.md` | `notes/teaching.md` | 授業・学生対応（授業準備・採点・物品購入・学生PJ） |
-| `index.md` | `notes/index.md` | **デフォルト**。分類に迷ったら。週次レビューで移動 |
+| セクション | 用途 |
+|-----------|------|
+| `## inbox` | **デフォルト**。分類に迷ったら。週次レビューで移動 |
+| `## admin` | 大学事務・制度系（義務研修・補講・学内手続き） |
+| `## teaching` | 授業・学生対応（授業準備・採点・物品購入・学生PJ） |
 
-判断：「事務局・制度が起点」→ admin、「授業・学生が起点」→ teaching、「迷ったら」→ index
+判断：「事務局・制度が起点」→ admin、「授業・学生が起点」→ teaching、「迷ったら」→ inbox
+
+注意：`obsidian append` はファイル末尾に追記するため、appendしたタスクは週次レビューで適切なセクションに移動する。
 
 - Meeting noteのアクションアイテムは「決定した事実」の記録（担当者・アクション・期限）。ステータス管理はしない
 - テンプレート: `templates/meeting-agenda-template.md`、`templates/project-note-template.md`

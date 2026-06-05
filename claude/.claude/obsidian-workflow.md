@@ -49,7 +49,7 @@ obsidian tags counts                                     # タグと頻度
 
 ```bash
 open -a Obsidian 2>/dev/null; sleep 2 && \
-obsidian append file="admin" content="- [ ] タスク [due:: YYYY-MM-DD] [priority:: low]"
+obsidian append file="tasks" content="- [ ] タスク [due:: YYYY-MM-DD] [priority:: low]"
 ```
 
 ### 一覧（`obsidian tasks` 複数形）
@@ -61,8 +61,8 @@ obsidian tasks todo format=json              # JSON（status/text/file/line の4
 obsidian tasks done                          # 完了タスク
 obsidian tasks total                         # 件数のみ
 obsidian tasks daily todo                    # 今日のdailyノートのみ
-obsidian tasks path="notes/admin.md" todo    # 特定ファイル（vaultルート相対、フォルダ不可）
-obsidian tasks file="admin" todo             # 特定ファイル（ファイル名のみ）
+obsidian tasks path="notes/tasks.md" todo    # 特定ファイル（vaultルート相対、フォルダ不可）
+obsidian tasks file="tasks" todo             # 特定ファイル（ファイル名のみ）
 obsidian tasks active todo                   # 現在Obsidianで開いているファイル
 ```
 
@@ -81,9 +81,9 @@ VAULT=~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/main
 `tasks` のJSON出力の `file` フィールドをそのまま `path=` や `ref=` に使える。
 
 ```bash
-obsidian task path="notes/admin.md" line=10 done     # 完了
-obsidian task path="notes/admin.md" line=10 toggle   # トグル
-obsidian task ref="notes/admin.md:10" done           # ref形式（path:line）も可
+obsidian task path="notes/tasks.md" line=10 done     # 完了
+obsidian task path="notes/tasks.md" line=10 toggle   # トグル
+obsidian task ref="notes/tasks.md:10" done           # ref形式（path:line）も可
 ```
 
 `file=`（ファイル名のみ）と `path=`（vaultルート相対、フォルダ不可）の違いはタスク一覧と同様。
