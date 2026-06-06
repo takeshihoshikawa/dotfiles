@@ -22,7 +22,7 @@ model: sonnet
 ## タスク
 
 0. **長期目標・方針の表示**：
-   - Obsidian vault の `goals.md` を読み込み、内容をそのまま表示する
+   - Obsidian vault の `notes/goals.md` を読み込み、内容をそのまま表示する
    - ファイルがない場合はこのステップをスキップ
 
 1. **直近の日報を読み込み**：
@@ -39,31 +39,40 @@ model: sonnet
    - 対象日の翌日の予定：開始時刻順に表示
    - 予定がない場合は「予定なし」と表示
 
-3. **タスクをファイルから取得**（bashツールで実行、並列実行可）：
+3. **タスクをファイルから取得**（bashツールで実行）：
+
+   `obsidian tasks` で vault 全体の未完タスクを取得する（`meetings/` 配下の `#project/` タスクも拾える）。CLI 不調時は `rg` にフォールバックする。
 
    ```bash
-   VAULT="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main"
-   TODAY=$(date +%F)  # 対象日が今日でない場合はその日付を使う
+   # vault全体の未完タスクをJSON配列で取得（要素: {status, text, file, line}、file はルート相対）
+   open -a Obsidian 2>/dev/null; sleep 2
+   TASKS=$(obsidian tasks todo format=json 2>/dev/null)
+   if ! echo "$TASKS" | jq -e 'type=="array"' >/dev/null 2>&1; then
+     # フォールバック: Obsidian未起動/フォーマット変更時。templates・coursesは除外
+     VAULT="$HOME/vault"
+     TASKS=$( (cd "$VAULT" && rg -n --no-heading -- '- \[ \] ' -g '!templates/**' -g '!courses/**') \
+       | jq -R 'split(":") | {status:" ", text:(.[2:]|join(":")), file:.[0], line:.[1]}' | jq -s '.' )
+   fi
+   TODAY=$(date +%F)  # 対象日が今日でない場合はその日付に置き換える
 
-   echo "=== 期日あり（今日以前）==="
-   {
-     rg --line-number --no-heading -- '- \[ \].*\[due:: [0-9]{4}-[0-9]{2}-[0-9]{2}\]' "$VAULT/projects"
-     rg --line-number --no-heading --max-depth 1 -- '- \[ \].*\[due:: [0-9]{4}-[0-9]{2}-[0-9]{2}\]' "$VAULT/notes"
-   } | grep -v '#waiting' \
-     | while IFS= read -r line; do
-         due=$(echo "$line" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1)
-         [[ ! "$due" > "$TODAY" ]] && echo "$line"
-       done
+   echo "=== 期日あり（今日以前・#waiting除外）==="
+   echo "$TASKS" | jq -r --arg today "$TODAY" '
+     .[] | select(.text | test("#waiting") | not)
+         | select(.text | test("\\[due:: [0-9]{4}-[0-9]{2}-[0-9]{2}\\]"))
+         | (.text | capture("\\[due:: (?<d>[0-9]{4}-[0-9]{2}-[0-9]{2})\\]").d) as $due
+         | select($due <= $today)
+         | "\(.file):\(.line):\(.text)"'
 
-   echo "=== Next（日付なし）==="
-   {
-     rg --line-number --no-heading --max-depth 1 -- '- \[ \] ' "$VAULT/notes"
-     rg --line-number --no-heading -- '- \[ \] ' "$VAULT/projects"
-   } | grep -v '\[due::' | grep -v '#waiting' | head -15
+   echo "=== Next（日付なし・#waiting除外）==="
+   echo "$TASKS" | jq -r '
+     .[] | select(.text | test("\\[due::") | not)
+         | select(.text | test("#waiting") | not)
+         | "\(.file):\(.line):\(.text)"' | head -15
    ```
 
    出力形式：`path/to/file.md:行番号:- [ ] タスク名 [due:: 日付] [priority:: ...]`
-   - ファイルパスと行番号は後でタスク操作（完了・延期）に使う
+   - ファイルパス（vaultルート相対）と行番号は後でタスク操作（完了・延期）に使う
+   - 完了は `obsidian task ref="path:line" done`、延期はファイルを開いて Edit
 
 4. **期限切れタスクのトリアージ**（期限切れタスクがある場合のみ）：
    - **トリアージ対象の判定**：

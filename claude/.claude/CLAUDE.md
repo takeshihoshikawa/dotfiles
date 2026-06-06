@@ -2,7 +2,7 @@
 
 ## Obsidian Vault
 
-Vault path: `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/main`
+Vault path: `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/main`（`~/vault` シンボリックリンクからもアクセス可。未作成なら `ln -sfn "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main" "$HOME/vault"`）
 
 Folder structure:
 - `daily/` — daily notes (`YYYY-MM-DD.md`)
@@ -12,7 +12,7 @@ Folder structure:
 - `projects/` — project notes（ファイル名は **kebab-case 英語**、例 `spread1000-application.md`。研究プロジェクトの場合は `projects/{プロジェクト名}/` サブディレクトリを作成し、解析レポート等を格納）
 - `notes/` — misc notes, workflow docs, ideas
 - `references/literature/` — 文献ノート（ファイル名はcitekey）
-- `goals.md` — 長期目標・方針（/morningで毎朝表示）
+- `notes/goals.md` — 長期目標・方針（/morningで毎朝表示）
 
 ## ノート・タスク管理の使い分け
 
@@ -31,6 +31,7 @@ Folder structure:
 
 `#project/{kebab-case}` のプロジェクト名は `projects/{kebab-case}.md` のファイル名と一致させる。  
 Claude Code は `rg "#project/X" projects meetings` で横断検索（plugin非依存）。  
+定型スキル（morning / weekly-review / daily-report）はタスク取得に `obsidian tasks todo format=json`（vault全体・`meetings/` 含む。各要素 `{status, text, file, line}`、`file` はvaultルート相対）を使い、`rg` はフォールバック。  
 Todoistは廃止済み（2026-06-03移行完了）。Todoistツールは使用しない。
 
 **非プロジェクトtask**の追加先：すべて `notes/tasks.md`（`obsidian append file="tasks"`）

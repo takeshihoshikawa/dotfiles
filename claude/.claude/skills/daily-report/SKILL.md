@@ -76,17 +76,22 @@ obsidian daily:append content="- HH:MM–HH:MM **内容**\n  - 詳細"
 ### 保存
 
 - `DAILY_PATH=$(obsidian daily:path 2>/dev/null | grep -v "^[0-9]" | grep -v "^Your Obsidian")`
-- Editツールで `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/main/$DAILY_PATH` を全文更新
+- Editツールで `~/vault/$DAILY_PATH` を全文更新（`~/vault` は vault 実体へのシンボリックリンク）
 
 ### タスク完了マーク
 
-- 「やったこと」から完了したと判断できるタスクをbashで検索してリスト提示：
+- 「やったこと」から完了したと判断できるタスクを vault 全体から検索してリスト提示（`meetings/` 配下の `#project/` タスクも候補に入る）：
   ```bash
-  VAULT="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main"
-  rg --line-number --no-heading -- '- \[ \]' "$VAULT/projects" "$VAULT/notes" \
-  | grep -i "タスク名の一部"
+  open -a Obsidian 2>/dev/null; sleep 2
+  TASKS=$(obsidian tasks todo format=json 2>/dev/null)
+  if echo "$TASKS" | jq -e 'type=="array"' >/dev/null 2>&1; then
+    echo "$TASKS" | jq -r '.[] | "\(.file):\(.line):\(.text)"' | grep -i "タスク名の一部"
+  else
+    VAULT="$HOME/vault"
+    (cd "$VAULT" && rg -n --no-heading -- '- \[ \] ' -g '!templates/**' -g '!courses/**') | grep -i "タスク名の一部"
+  fi
   ```
-- 確認後に `obsidian task ref="path:line" done` で完了にする
+- 確認後に `obsidian task ref="path:line" done` で完了にする（`path` は vaultルート相対）
 - **新規タスクの追加はしない**
 
 ---

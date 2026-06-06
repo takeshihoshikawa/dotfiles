@@ -33,10 +33,17 @@ args:
 - `## 気づき` セクションを重点的に収集する（週次の「気づき・学び」の素材とする）
 
 ### 3. 完了タスクの取得
-- bashで projects・notes の `- [x]` 完了タスクを一覧取得（補足情報として使用）：
+- `obsidian tasks` で vault 全体の完了タスクを一覧取得（補足情報として使用。`meetings/` 配下の完了 `#project/` タスクも拾える）：
   ```bash
-  VAULT="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main"
-  rg --no-heading -- '- \[x\]' "$VAULT/projects" "$VAULT/notes" --max-depth 1
+  open -a Obsidian 2>/dev/null; sleep 2
+  DONE=$(obsidian tasks done format=json 2>/dev/null)
+  if echo "$DONE" | jq -e 'type=="array"' >/dev/null 2>&1; then
+    echo "$DONE" | jq -r '.[] | "\(.file):\(.line):\(.text)"'
+  else
+    # フォールバック
+    VAULT="$HOME/vault"
+    (cd "$VAULT" && rg -n --no-heading -- '- \[x\]' -g '!templates/**' -g '!courses/**')
+  fi
   ```
 - 日報（フェーズ1の2）の「やったこと」が主要な振り返り素材。完了タスク一覧は補完として使う
 
@@ -50,15 +57,21 @@ args:
 - フロントマター（topic、準備状況）を確認
 
 ### 6. #waitingタスクの確認
-- bashで `#waiting` タグのタスクを一覧取得：
+- `obsidian tasks` で vault 全体の `#waiting` タスクを一覧取得（素の `#waiting` と `[tag:: #waiting]` の両形式を拾う）：
   ```bash
-  VAULT="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main"
-  rg --no-heading --with-filename -- '- \[ \].*#waiting' "$VAULT/projects" "$VAULT/notes"
+  open -a Obsidian 2>/dev/null; sleep 2
+  TASKS=$(obsidian tasks todo format=json 2>/dev/null)
+  if echo "$TASKS" | jq -e 'type=="array"' >/dev/null 2>&1; then
+    echo "$TASKS" | jq -r '.[] | select(.text | test("#waiting")) | "\(.file):\(.line):\(.text)"'
+  else
+    VAULT="$HOME/vault"
+    (cd "$VAULT" && rg -n --no-heading -- '- \[ \].*#waiting' -g '!templates/**' -g '!courses/**')
+  fi
   ```
 - 週次レビューで各タスクの状況を確認し、必要なら `#waiting` を外すか期日を変更する
 
 ### 7. 中長期目標の読み込み
-- CLAUDE.mdのvault pathの `goals.md` をReadツールで読み込み、内部で保持する
+- CLAUDE.mdのvault pathの `notes/goals.md` をReadツールで読み込み、内部で保持する
 
 ---
 
@@ -164,11 +177,14 @@ goals.mdの内容を簡潔に提示した上で問いかけること（ユーザ
 ```
 
 「これらのタスクを追加しますか？不要なものは番号で除外してください。」と確認する。
-ユーザーの回答に従い、各タスクを適切なファイルに追加する：
-- Teaching系 → `notes/tasks.md` の `## teaching` セクションに追記
-- Admin系 → `notes/tasks.md` の `## admin` セクションに追記
-- Research系 → 該当プロジェクトノート（`projects/xxx.md`）の適切なセクションに追記
-- 追記フォーマット：`- [ ] タスク名 [due:: YYYY-MM-DD] [priority:: medium]`
+ユーザーの回答に従い、各タスクを**発生場所**の適切なファイルに追加する（転記せず source of truth に置く）：
+- Teaching系 → `notes/tasks.md` の `## teaching` セクションに追記（`#project/` タグなし）
+  - `- [ ] タスク名 [due:: YYYY-MM-DD] [priority:: medium]`
+- Admin系 → `notes/tasks.md` の `## admin` セクションに追記（同上、`#project/` タグなし）
+- Research/プロジェクト系 → 発生場所（該当 project note の Next Actions、または関連 meeting note）に **`#project/{kebab-case}` タグ付き**で追記：
+  - `- [ ] タスク名 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]`
+  - `#project/{kebab-case}` は `projects/{kebab-case}.md` のファイル名と一致させる
+  - project note の `## Task Dashboard`（Tasks プラグイン）がタグで自動集約するので、project note 内に重ねて転記しない
 
 追加後、「他に追加したいタスクはありますか？」と自由入力を促す。
 ユーザーが「なし」または終了を示したら次フェーズへ。
@@ -235,9 +251,8 @@ goals.mdの内容を簡潔に提示した上で問いかけること（ユーザ
 ### ツール使用
 - **Read**: 日報・授業ファイルの読み込み
 - **Write**: 週報ファイルの保存
-- **Bash**: ファイル検索、日付フィルタリング
+- **Bash**: ファイル検索、日付フィルタリング、完了タスク取得、#waitingタスク確認
 - **Google Calendar MCP**: 来週の予定取得
-- **Bash**: 完了タスク取得・#waitingタスク確認（rg）
 - **obsidian task**: タスク完了マーク（`ref="path:line" done`）
 - **Edit**: タスク追加・日付変更・#waiting解除
 
