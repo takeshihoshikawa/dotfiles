@@ -1,7 +1,6 @@
 {
   "permissions": {
     "defaultMode": "auto",
-    "additionalDirectories": ["/Users/takeshi/vault"],
     "allow": [
       "Edit(~/.claude/skills/**)",
       "Edit(~/dotfiles/claude/.claude/skills/**)",
