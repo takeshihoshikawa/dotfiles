@@ -37,6 +37,11 @@ def main():
     if not cmd:
         sys.exit(0)
 
+    # git commands cannot directly modify vault files; skip to avoid false
+    # positives from commit messages that describe vault operations.
+    if re.match(r"\s*git\b", cmd):
+        sys.exit(0)
+
     if not DESTRUCTIVE.search(cmd):
         sys.exit(0)
 
