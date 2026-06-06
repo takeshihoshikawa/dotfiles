@@ -12,13 +12,14 @@ import json
 import re
 import sys
 
-# Substrings that identify a path inside the Obsidian vault.
-# Scoped this way so mv/rm elsewhere (code repos, /tmp, etc.) is unaffected.
-VAULT_HINTS = [
-    "iCloud~md~obsidian",   # iCloud-synced Obsidian container (very distinctive)
-    "/vault/",              # the ~/vault symlink
-    "/vault\"",             # quoted form, e.g. mv "~/vault" ...
-]
+# The iCloud container path is so distinctive that a plain substring match is safe.
+ICLOUD_HINT = "iCloud~md~obsidian"
+
+# The ~/vault symlink, anchored to the home root so unrelated dirs named "vault"
+# elsewhere (e.g. ~/code/vault) are NOT matched. Trailing slash is optional, so
+# both `rm ~/vault/foo.md` and `cd ~/vault && rm foo.md` are caught.
+# Known limit: env-var indirection like `cd "$VAULT" && rm` can't be detected.
+VAULT_ROOT = re.compile(r"(?:~|\$HOME|/Users/[^/\s]+)/vault(?:/|\b)")
 
 DESTRUCTIVE = re.compile(r"\b(mv|rm|rmdir|trash|trash-put)\b")
 
@@ -39,7 +40,7 @@ def main():
     if not DESTRUCTIVE.search(cmd):
         sys.exit(0)
 
-    if not any(h in cmd for h in VAULT_HINTS):
+    if ICLOUD_HINT not in cmd and not VAULT_ROOT.search(cmd):
         sys.exit(0)  # destructive, but not targeting the vault -> allow
 
     sys.stderr.write(

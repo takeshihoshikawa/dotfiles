@@ -34,7 +34,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ -f \"$HOME/.claude/hooks/guard-obsidian.py\" ] && python3 \"$HOME/.claude/hooks/guard-obsidian.py\" || exit 0"
+            "command": "if [ -f \"$HOME/.claude/hooks/guard-obsidian.py\" ]; then python3 \"$HOME/.claude/hooks/guard-obsidian.py\"; else exit 0; fi"
           }
         ]
       }
