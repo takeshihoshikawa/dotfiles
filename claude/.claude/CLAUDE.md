@@ -32,7 +32,6 @@ Folder structure:
 `#project/{kebab-case}` のプロジェクト名は `projects/{kebab-case}.md` のファイル名と一致させる。  
 Claude Code は `rg "#project/X" projects meetings` で横断検索（plugin非依存）。  
 定型スキル（morning / weekly-review / daily-report）はタスク取得に `obsidian tasks todo format=json`（vault全体・`meetings/` 含む。各要素 `{status, text, file, line}`、`file` はvaultルート相対）を使い、`rg` はフォールバック。  
-Todoistは廃止済み（2026-06-03移行完了）。Todoistツールは使用しない。
 
 **非プロジェクトtask**の追加先：すべて `notes/tasks.md`（`obsidian append file="tasks"`）
 

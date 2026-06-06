@@ -63,7 +63,7 @@ else
 fi
 
 mkdir -p ~/.ssh && chmod 700 ~/.ssh
-stow -d ~/dotfiles -t ~ git ssh claude
+stow -d ~/dotfiles -t ~ git ssh claude codex
 
 curl -fsSL https://tailscale.com/install.sh | sh
 

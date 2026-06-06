@@ -32,10 +32,9 @@ brew bundle --file ~/dotfiles/brew/Brewfile
 
 echo "--- stow ---"
 cd ~/dotfiles
-stow ssh aws git zsh brew claude vscode
+stow ssh aws git zsh brew claude codex vscode
 
 echo "--- R packages ---"
 R -q -e "options(repos='https://cloud.r-project.org'); install.packages('renv')"
 
 echo "=== Setup complete ==="
-

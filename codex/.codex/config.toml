@@ -1,0 +1,21 @@
+personality = "pragmatic"
+project_doc_fallback_filenames = ["CLAUDE.md"]
+project_doc_max_bytes = 65536
+
+[projects."/Users/takeshi"]
+trust_level = "trusted"
+
+[projects."/Users/takeshi/work/projects/admin"]
+trust_level = "trusted"
+
+[projects."/Users/takeshi/work/projects/cultural-heritage-digital-twin"]
+trust_level = "trusted"
+
+[projects."/Users/takeshi/work/projects/forest-instance-annotation"]
+trust_level = "trusted"
+
+[projects."/Users/takeshi/work/projects/portable-lidar-forest-slam"]
+trust_level = "trusted"
+
+[projects."/Users/takeshi/work/projects/learning/point-cloud-transformer"]
+trust_level = "trusted"

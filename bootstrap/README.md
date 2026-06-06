@@ -5,12 +5,13 @@
 | `git` | 全OS | `.gitconfig` |
 | `ssh` | 全OS | `.ssh/config` |
 | `claude` | 全OS | `.claude/` |
+| `codex` | 全OS | `.codex/` |
 | `zsh` | mac のみ | `.zshrc` |
 | `brew` | mac のみ | `Brewfile` |
 | `aws` | mac のみ | `.aws/config` |
 | `vscode` | mac のみ | VSCode `settings.json` |
 
-> **注**: `~/.claude/settings.local.json` は gitignore 済みのため新マシンでは手動で作成すること（Todoist 書き込み権限等のローカル専用設定を記述）。
+> **注**: `~/.claude/settings.local.json` は gitignore 済みのため新マシンでは手動で作成すること（ローカル専用設定を記述）。
 
 ---
 
@@ -24,7 +25,7 @@ bash ~/dotfiles/bootstrap/setup_ubuntu.sh
 This script:
 - Installs system packages, R, development libraries
 - Sets up `/work/{projects,data,tmp}`
-- Links shared dotfiles via `stow` (git, ssh, claude)
+- Links shared dotfiles via `stow` (git, ssh, claude, codex)
 
 After setup:
 ```bash
@@ -54,5 +55,5 @@ This script:
 - Clones dotfiles to `~/dotfiles`
 - Creates `~/.ssh`, `~/.aws`, `~/work/{projects,data,tmp}` directories
 - Installs packages from Brewfile
-- Links dotfiles via `stow` (ssh, aws, git, zsh, brew, claude, vscode)
+- Links dotfiles via `stow` (ssh, aws, git, zsh, brew, claude, codex, vscode)
 - Installs R `renv` package

@@ -68,4 +68,4 @@ else
 fi
 
 mkdir -p /home/ubuntu/.ssh && chmod 700 /home/ubuntu/.ssh && chown ubuntu:ubuntu /home/ubuntu/.ssh
-sudo -u ubuntu stow -d /home/ubuntu/dotfiles -t /home/ubuntu git ssh claude
+sudo -u ubuntu stow -d /home/ubuntu/dotfiles -t /home/ubuntu git ssh claude codex
