@@ -1,6 +1,6 @@
 ---
 name: check-in
-description: 軌道修正チェックイン。直近の作業が朝の計画・長期方針と整合しているかを30秒で評価し、必要なら指摘する。セッション開始フックが60分間隔でloopを自動起動。/daily-reportと異なり記録ではなく客観視が目的
+description: 軌道修正チェックイン。直近の作業が朝の計画・長期方針と整合しているかを30秒で評価し、必要なら指摘する。セッション開始フックが30分間隔でcronを自動登録。/daily-reportと異なり記録ではなく客観視が目的
 model: haiku
 ---
 
@@ -83,9 +83,9 @@ model: haiku
 
 ## 想定される使い方
 
-- セッション開始フックが自動で `loop 60m /check-in` を起動 → 60分間隔で自動発火
+- セッション開始フックが `/check-in` の cron を 30分間隔で自動登録
 - 気になった時の手動呼び出し (`/check-in`) もOK
-- `/daily-report` と役割分担：記録は daily-report（1日1回）、軌道修正は check-in（60分間隔）
+- `/daily-report` と役割分担：記録は daily-report（1日1回）、軌道修正は check-in（30分間隔）
 
 ## 注意事項
 

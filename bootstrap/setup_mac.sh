@@ -34,6 +34,17 @@ echo "--- stow ---"
 cd ~/dotfiles
 stow ssh aws git zsh brew claude codex vscode
 
+echo "--- launchd (daily-report reminder) ---"
+SCRIPT_DST="$HOME/.local/bin/daily-report-reminder.sh"
+PLIST_DST="$HOME/Library/LaunchAgents/com.takeshi.daily-report-reminder.plist"
+mkdir -p "$HOME/.local/bin" "$HOME/Library/LaunchAgents"
+cp ~/dotfiles/launchd/daily-report-reminder.sh "$SCRIPT_DST"
+chmod +x "$SCRIPT_DST"
+sed "s|__SCRIPT_PATH__|$SCRIPT_DST|g" \
+  ~/dotfiles/launchd/com.takeshi.daily-report-reminder.plist > "$PLIST_DST"
+launchctl bootout "gui/$(id -u)" "$PLIST_DST" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$PLIST_DST"
+
 echo "--- R packages ---"
 R -q -e "options(repos='https://cloud.r-project.org'); install.packages('renv')"
 

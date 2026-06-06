@@ -22,8 +22,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"SessionStart\", \"additionalContext\": \"セッション開始時の自動タスク: (1) Skillツールで skill=\\\"loop\\\", args=\\\"60m /check-in\\\" を実行してcheck-inのloopを起動（check-in自体はすぐ実行しないこと）、(2) /daily-reportのcronがなければCronCreateで cron=\\\"33 16 * * 1-5\\\", prompt=\\\"/daily-report recap\\\", recurring=true で設定。いずれもスキル本体は今すぐ実行しないこと（セットアップのみ）。\"}}'",
-            "statusMessage": "check-in loop・日報cronをセットアップ中..."
+            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"SessionStart\", \"additionalContext\": \"セッション開始時の自動タスク: /check-in の cron がなければ CronCreate で cron=\\\"13,43 * * * *\\\", prompt=\\\"/check-in\\\", recurring=true を直接登録（loop スキルは使わない）。check-in 本体は今すぐ実行しないこと（セットアップのみ）。\"}}'",
+            "statusMessage": "check-in cronをセットアップ中..."
           }
         ]
       }

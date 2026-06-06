@@ -56,4 +56,5 @@ This script:
 - Creates `~/.ssh`, `~/.aws`, `~/work/{projects,data,tmp}` directories
 - Installs packages from Brewfile
 - Links dotfiles via `stow` (ssh, aws, git, zsh, brew, claude, codex, vscode)
+- Registers daily-report reminder (weekdays 16:33, notify only when Mac is awake) via launchd (not stowed — installed directly to `~/.local/bin/` and `~/Library/LaunchAgents/`)
 - Installs R `renv` package
