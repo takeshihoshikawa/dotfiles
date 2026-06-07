@@ -87,6 +87,11 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 
 **iCloud と git/.claude/ は相性が悪い**ため、ソースは必ず `~/work/projects/` に置く。提出物（.docx, .pdf）のみ iCloud `Documents/grant/` にコピーしてアーカイブする。
 
+### 計算リソース（EC2）
+
+- 重い処理は EC2 を一時起動 → 結果を S3 に sync → **terminate**（永続させない／ホームは破棄前提）
+- 接続は Tailscale 経由・ユーザー `ubuntu`（パブリックIPは不可）、GitHub push は `ssh -A`
+
 ### 標準ディレクトリ構造
 
 ```
