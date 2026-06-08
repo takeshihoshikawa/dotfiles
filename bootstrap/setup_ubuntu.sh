@@ -20,6 +20,8 @@ sudo apt install -y \
   software-properties-common \
   dirmngr \
   gpg \
+  pandoc \
+  tree \
   libgdal-dev \
   libgeos-dev \
   libproj-dev \
@@ -64,6 +66,19 @@ fi
 
 mkdir -p ~/.ssh && chmod 700 ~/.ssh
 stow -d ~/dotfiles -t ~ git ssh claude codex
+
+# gh (GitHub CLI)
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+  | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+  | sudo tee /etc/apt/sources.list.d/github-cli.list
+sudo apt update && sudo apt install -y gh
+
+# awscli v2
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+unzip /tmp/awscliv2.zip -d /tmp
+sudo /tmp/aws/install
+rm -rf /tmp/aws /tmp/awscliv2.zip
 
 curl -fsSL https://tailscale.com/install.sh | sh
 

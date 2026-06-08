@@ -21,6 +21,8 @@ apt install -y \
   software-properties-common \
   dirmngr \
   gpg \
+  pandoc \
+  tree \
   libgdal-dev \
   libgeos-dev \
   libproj-dev \
@@ -48,6 +50,13 @@ mkdir -p /work/projects
 mkdir -p /work/data
 mkdir -p /work/tmp
 chown -R ubuntu:ubuntu /work
+
+# gh (GitHub CLI)
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+  | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+  > /etc/apt/sources.list.d/github-cli.list
+apt update && apt install -y gh
 
 # Tailscale
 curl -fsSL https://tailscale.com/install.sh | sh
