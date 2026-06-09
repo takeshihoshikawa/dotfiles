@@ -1,0 +1,29 @@
+// Settings imported from Visual Studio Code
+{
+	"files.associations": {
+		"renv.lock": "json"
+	},
+	"editor.fontFamily": "SF Mono",
+	"editor.fontSize": 14,
+	"files.autoSave": "afterDelay",
+	"editor.formatOnPaste": true,
+	"positron.r.interpreters.default": "/opt/homebrew/bin/R",
+	"console.fontFamily": "'SF Mono', Menlo, Monaco, 'Courier New', monospace",
+	"console.fontSize": 14,
+	"terminal.integrated.fontFamily": "'SF Mono', Menlo, Monaco, 'Courier New', monospace",
+	"terminal.integrated.fontSize": 14,
+	"workbench.colorTheme": "Default Positron Dark",
+	"git.autofetch": true,
+	"chat.viewSessions.orientation": "stacked",
+	"remote.autoForwardPortsSource": "hybrid",
+	"positron.assistant.provider.snowflakeCortex.enable": false,
+	"workbench.activityBar.location": "top",
+	"claudeCode.preferredLocation": "panel",
+	"workbench.editorAssociations": {
+		"*.md": "vscode.markdown.preview.editor"
+	},
+	"files.hotExit": "off",
+	"claudeCode.useTerminal": true,
+	"assistant.enabled": true,
+	"positron.assistant.enable": true
+}
