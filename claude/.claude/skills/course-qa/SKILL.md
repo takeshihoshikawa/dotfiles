@@ -165,11 +165,16 @@ header-includes:
 
 ### 5-3. PDF生成
 
+出力先は**配布日（次回授業）のセッションノートのトピック**に対応する講義フォルダ。
+
+1. 配布日のセッションノートから `topic_id` を取得し、`_meta.md` の `topics[].lecture_folder` で対応フォルダ名を引く
+2. 出力先: `~/Documents/lecture/{lecture_dir}/{lecture_folder}/QA{YYYYMMDD}.pdf`
+
 ```bash
-cd /tmp/course-qa-build && pandoc qa.md -o ~/Downloads/QA{YYYYMMDD}.pdf --pdf-engine=xelatex
+cd /tmp/course-qa-build && pandoc qa.md -o ~/Documents/lecture/{lecture_dir}/{lecture_folder}/QA{YYYYMMDD}.pdf --pdf-engine=xelatex
 ```
 
-出力ファイル名は `QA{YYYYMMDD}.pdf`（例 `QA20260611.pdf`）。生成後、Read で目視確認し、フォント・折り返し・日付ヘッダー・URL併記が正しいか確かめる。
+出力ファイル名は `QA{YYYYMMDD}.pdf`（例 `QA20260618.pdf`）。生成後、Read で目視確認し、フォント・折り返し・日付ヘッダー・URL併記が正しいか確かめる。
 
 ## 設計上の勘所（なぜこの構成か）
 
@@ -183,5 +188,5 @@ cd /tmp/course-qa-build && pandoc qa.md -o ~/Downloads/QA{YYYYMMDD}.pdf --pdf-en
 - 回答内容の確定はユーザーの承認が必須。勝手に保存・PDF化しない
 - Obsidianのファイル作成は Write で直接行う（`head`/`cat` は使わない、移動・削除系のみ obsidian CLI）
 - 連番採番は必ず既存ファイルを `ls` で確認してから決める
-- PDFの出力先は `~/Downloads/`。別の場所を指定されたらそれに従う
+- PDFの出力先は配布日セッションのトピックに対応する `~/Documents/lecture/{lecture_dir}/{lecture_folder}/`。別の場所を指定されたらそれに従う
 - dotfiles等のリポでの作業ではないので git 操作は不要
