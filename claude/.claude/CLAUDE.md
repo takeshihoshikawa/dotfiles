@@ -45,7 +45,8 @@ Claude Code は `rg "#project/X" notes/tasks.md meetings` で横断検索（plug
 判断：「PJタスク（計画起点）」→ projects、「事務局・制度が起点」→ admin、「授業・学生が起点」→ teaching、「迷ったら」→ inbox
 
 注意：`obsidian append` はファイル末尾に追記するため、appendしたタスクは週次レビューで適切なセクションに移動する。  
-**tasks.mdのセクション順ルール：`## inbox` を常にファイル末尾に置く。** appendした新規タスクが自動的にinboxに入るようにするため。
+**tasks.mdのセクション順ルール：`## inbox` を常にファイル末尾に置く。** appendした新規タスクが自動的にinboxに入るようにするため。  
+**`## projects` へのタスク追加は `obsidian append` を使わず、Edit で当該セクションに直接書き込む。**（append は inbox 末尾にしか入らないため）
 
 - Meeting noteのアクションアイテムは「決定した事実」の記録（担当者・アクション・期限）。ステータス管理はしない
 - テンプレート: `templates/meeting-agenda-template.md`、`templates/project-note-template.md`
