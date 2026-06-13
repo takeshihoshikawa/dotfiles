@@ -26,22 +26,23 @@ Folder structure:
 
 | 系統 | 場所 | 記法 |
 |------|------|------|
-| **プロジェクトtask** | meeting / project note の発生場所（転記しない） | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]` |
+| **プロジェクトtask** | `notes/tasks.md`（計画起点）または `meetings/`（会議起点）。転記しない | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]` |
 | **非プロジェクトtask** | `notes/tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD] [priority:: medium]` |
 
 `#project/{kebab-case}` のプロジェクト名は `projects/{kebab-case}.md` のファイル名と一致させる。  
-Claude Code は `rg "#project/X" projects meetings` で横断検索（plugin非依存）。  
+Claude Code は `rg "#project/X" notes/tasks.md meetings` で横断検索（plugin非依存）。  
 定型スキル（morning / weekly-review / daily-report）はタスク取得に `obsidian tasks todo format=json`（vault全体・`meetings/` 含む。各要素 `{status, text, file, line}`、`file` はvaultルート相対）を使い、`rg` はフォールバック。  
 
-**非プロジェクトtask**の追加先：すべて `notes/tasks.md`（`obsidian append file="tasks"`）
+タスクの追加先：すべて `notes/tasks.md`（`obsidian append file="tasks"`）
 
 | セクション | 用途 |
 |-----------|------|
-| `## inbox` | **デフォルト**。分類に迷ったら。週次レビューで移動 |
+| `## projects` | `#project/X` タグ付きタスク（計画起点）。meetingノート起点はそちらに残す |
 | `## admin` | 大学事務・制度系（義務研修・補講・学内手続き） |
 | `## teaching` | 授業・学生対応（授業準備・採点・物品購入・学生PJ） |
+| `## inbox` | **デフォルト**。分類に迷ったら。週次レビューで移動 |
 
-判断：「事務局・制度が起点」→ admin、「授業・学生が起点」→ teaching、「迷ったら」→ inbox
+判断：「PJタスク（計画起点）」→ projects、「事務局・制度が起点」→ admin、「授業・学生が起点」→ teaching、「迷ったら」→ inbox
 
 注意：`obsidian append` はファイル末尾に追記するため、appendしたタスクは週次レビューで適切なセクションに移動する。  
 **tasks.mdのセクション順ルール：`## inbox` を常にファイル末尾に置く。** appendした新規タスクが自動的にinboxに入るようにするため。
