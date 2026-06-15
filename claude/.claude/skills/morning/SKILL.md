@@ -21,6 +21,18 @@ model: sonnet
 
 ## タスク
 
+-1. **gitリポジトリ同期**（ステップ0と並列実行）：
+
+   `~/work/projects/` 直下の全gitリポジトリ + `~/dotfiles` を対象に fetch し、**behind のみ・clean** なリポジトリを自動pull する。
+
+   ```bash
+   REPOS=$(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
+   for repo in $REPOS; do git -C "$repo" fetch --quiet 2>/dev/null; done
+   ```
+
+   - pulled があればその旨を1行で出力。全synced なら省略
+   - dirty / diverged は `/sync-repos` で別途対処する旨を1行で添える
+
 0. **長期目標・方針の表示**：
    - Obsidian vault の `notes/goals.md` を読み込み、内容をそのまま表示する
    - ファイルがない場合はこのステップをスキップ
