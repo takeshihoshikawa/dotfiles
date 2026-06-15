@@ -67,6 +67,7 @@
     }
   },
   "language": "Japanese",
+  "advisorModel": "opus",
   "tui": "fullscreen",
   "voice": {
     "enabled": true,
