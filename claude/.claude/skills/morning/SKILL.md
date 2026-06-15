@@ -21,6 +21,19 @@ model: sonnet
 
 ## タスク
 
+-1. **gitリポジトリ同期**（ステップ0と並列実行）：
+
+   `~/work/projects/` 直下の全gitリポジトリ + `~/dotfiles` を対象に `git fetch` を実行し、**behind のみ・clean** なリポジトリを `git pull --rebase` する。
+
+   ```bash
+   REPOS=$(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
+   for repo in $REPOS; do git -C "$repo" fetch --quiet 2>/dev/null; done
+   ```
+
+   - pulled があれば出力フォーマットの末尾に `## 🔄 Git同期` セクションを追加
+   - dirty / diverged / ahead は同セクションに1行で列挙するだけ（朝の作業の邪魔をしない）
+   - 要対応なし・全synced なら Git同期セクションは省略
+
 0. **長期目標・方針の表示**：
    - Obsidian vault の `notes/goals.md` を読み込み、内容をそのまま表示する
    - ファイルがない場合はこのステップをスキップ
@@ -136,6 +149,17 @@ model: sonnet
 ---
 
 {対象日}はどのタスクに取り組みますか？
+```
+
+## 出力フォーマット（Git同期セクション）
+
+要対応がある場合のみ、末尾に追加する：
+
+```markdown
+## 🔄 Git同期
+⬇️ pulled:  tree-species-classification (+2)
+📝 dirty:   cultural-heritage-digital-twin (CLAUDE.md 他1件)  → 手動で確認
+🔀 diverged: harvest-accessibility (ahead 13 / behind 13)  → 内容確認が必要
 ```
 
 ## 注意事項
