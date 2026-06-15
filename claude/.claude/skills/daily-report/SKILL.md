@@ -94,38 +94,25 @@ obsidian daily:append content="- HH:MM–HH:MM **内容**\n  - 詳細"
 - 確認後に `obsidian task ref="path:line" done` で完了にする（`path` は vaultルート相対）
 - **新規タスクの追加はしない**
 
-### gitリポジトリ同期（タスク完了マークの後に実行）
+### gitコミット履歴の取り込み（カレンダー・会話履歴と並列で収集）
 
-`~/work/projects/` 直下の全gitリポジトリ + `~/dotfiles` を対象に実行する。
+`~/work/projects/` 直下の全gitリポジトリ + `~/dotfiles` の当日コミットを収集し、「やったこと」に反映する。
 
 ```bash
+TODAY=$(date +%F)
 REPOS=$(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
-for repo in $REPOS; do git -C "$repo" fetch --quiet 2>/dev/null; done
+for repo in $REPOS; do
+  git -C "$repo" log --since="$TODAY 00:00" --until="$TODAY 23:59" \
+    --format="%ai %s" 2>/dev/null | while read line; do
+    echo "[$(basename $repo)] $line"
+  done
+done
 ```
 
-状態別の処理：
-
-| 状態 | 処理 |
-|------|------|
-| **pullable**（behind のみ・clean） | `git pull --rebase` を自動実行 |
-| **ahead**（behind なし） | `git push` を自動実行 |
-| **dirty**（未コミット変更あり） | `git diff` で変更確認 → コミット可能なら commit+push |
-| **diverged** | 報告のみ（触れない） |
-
-**dirty の auto-commit**：
-- `git diff` の内容と今日の「やったこと」（recap済みの内容）を照合し、関連する作業をコミットメッセージに反映する
-- WIP・デバッグ痕跡・秘密情報がなければ commit → push
-- コミットメッセージ例：`Update cultural-heritage-digital-twin: 申請書LaTeX執筆`
-- 判断できない場合は報告のみ
-
-**結果報告**（日報の後に追記ではなく、チャットに出力）：
-
-```
-## 🔄 Git同期
-⬇️ pulled:    tree-species-classification (+2)
-📤 committed: cultural-heritage-digital-twin — "申請書LaTeX執筆"  → pushed
-✅ 3件 synced
-```
+- コミット時刻（`%ai`）を日報の時刻推定に使う
+- 会話履歴に記録がないコミットは「やったこと」のエントリとして追加する（重複は統合）
+- コミットメッセージが英語・短縮形の場合は文脈から自然な日本語に変換して記述
+- dirty（未コミット）のリポジトリは「作業途中の変更あり」として気づきに添える程度でよい（コミットはしない）
 
 ---
 
