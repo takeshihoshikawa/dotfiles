@@ -34,24 +34,42 @@ git -C <repo> status -sb
 
 ### 2. 自動対応
 
-**pullable** のみ自動で `git pull --rebase` を実行する。他は手動対応を促す。
+#### pullable（behind のみ・clean）
+`git pull --rebase` を自動実行する。
+
+#### dirty（未コミット変更あり）
+`git diff` で差分を確認し、**コミット可能かどうかを判断する**：
+
+**コミット可能の条件**（以下をすべて満たす）：
+- 変更が一貫したまとまり（複数ファイルでも目的が統一されている）
+- 作業途中の痕跡がない（コメントアウトされたデバッグコード、TODO、WIPマーカーがない）
+- `.env` や秘密情報を含まない
+
+条件を満たす場合：適切なコミットメッセージを生成して `git commit` → `git push` まで行う。
+
+条件を満たさない場合：報告のみ。変更ファイル名と「途中と判断した理由」を1行で添える。
+
+#### ahead（pushのみ必要）
+`git push` を自動実行する。
+
+#### diverged（ahead かつ behind）
+触れない。内容を確認してからユーザーが対処する。
 
 ### 3. 出力
 
 ```
-✅ synced:   forest-instance-annotation
-⬇️  pulled:   tree-species-classification (+2)、portable-lidar-forest-slam (+7)
-📝 dirty:    cultural-heritage-digital-twin (CLAUDE.md, proposals/...)
-⚠️  ahead:   some-repo (+3)  → push推奨
-🔀 diverged: harvest-accessibility (ahead 13, behind 13)  → 内容確認してから対処
+✅ synced:    forest-instance-annotation
+⬇️  pulled:   tree-species-classification (+2)
+📤 committed: cultural-heritage-digital-twin — "Fix author initial K.→T."  → pushed
+⚠️  dirty:    some-repo (src/model.py 他2件) — WIPコメントあり、手動で確認
+🔀 diverged:  harvest-accessibility (ahead 13, behind 13)  → 内容確認してから対処
 ```
 
-- pulled は取り込んだコミット数を括弧で示す
-- dirty は変更ファイル名を列挙（長い場合は2〜3件＋「他X件」）
-- 手動対応が必要なものには次のアクション例を1行で添える
+- pulled / committed は件数やメッセージを括弧・ダッシュで示す
+- synced が多い場合は「✅ X件 synced」と束ねてよい
 
 ## 制約
 
-- `git pull` は **pullable（behind のみ・clean）** に限定。dirty/diverged には触れない
-- force push・reset は行わない（ユーザーに確認してから別途対応）
-- 出力は短く。synced が多い場合は「✅ X件 synced」と束ねてよい
+- force push・reset は行わない
+- diverged には触れない（ユーザーに確認してから別途対応）
+- 出力は短く、読んで3秒で状況が分かる粒度にする
