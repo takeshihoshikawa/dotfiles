@@ -53,51 +53,30 @@ obsidian daily:append content="- HH:MM–HH:MM **内容**\n  - 詳細"
 
 ## recap モード
 
-### やること
+### やること（順番厳守）
 
-1. `obsidian daily:read` で全文を読む
-2. Google Calendar でその日の予定を取得する（`list_events` ツール、終日イベントは除外）
-3. カレンダー予定・会話履歴の作業を合わせて1日分を再構成
-4. 下書きを提示し、ユーザー確認後に全文を書き直す
-5. タスク完了マーク
+1. **収集**（並列実行）
+2. **再構成** → ユーザー確認
+3. **保存**
+4. **タスク完了マーク**
+5. **git push（別マシン片づけ）**
 
-### 整理内容
+---
 
-**やったこと**
-- 全エントリを**時刻順**に並べ直す
-- 終了時刻が抜けているエントリを補完
-- カレンダー予定はギャップを埋める参照として使う：日報に記載がなければエントリとして追加し、すでに記載があれば時刻の補正に使う
-- チェック範囲：勤務開始〜 min(最後のエントリ終了時刻, 現在時刻)（勤務時間・昼休みはグローバル CLAUDE.md の User セクションを参照）
-- 30分以上の空白があれば「HH:MM–HH:MM は何をしていましたか？」と確認（カレンダーに予定があればそれを提示して確認）
+### ① 収集（並列実行）
 
-**気づき**
-- 全エントリから学び・気づき・教訓に相当する内容を読み取り、2–3文にまとめる（append 時に明示的なマークは不要）
+以下を同時に取得する：
 
-### 保存
+**a. 日報全文**
+```bash
+obsidian daily:read
+```
 
-- `DAILY_PATH=$(obsidian daily:path 2>/dev/null | grep -v "^[0-9]" | grep -v "^Your Obsidian")`
-- Editツールで `~/vault/$DAILY_PATH` を全文更新（`~/vault` は vault 実体へのシンボリックリンク）
+**b. Google Calendar**
+その日の予定を取得（`list_events` ツール、終日イベントは除外）
 
-### タスク完了マーク
-
-- 「やったこと」から完了したと判断できるタスクを vault 全体から検索してリスト提示（`meetings/` 配下の `#project/` タスクも候補に入る）：
-  ```bash
-  open -a Obsidian 2>/dev/null; sleep 2
-  TASKS=$(obsidian tasks todo format=json 2>/dev/null)
-  if echo "$TASKS" | jq -e 'type=="array"' >/dev/null 2>&1; then
-    echo "$TASKS" | jq -r '.[] | "\(.file):\(.line):\(.text)"' | grep -i "タスク名の一部"
-  else
-    VAULT="$HOME/vault"
-    (cd "$VAULT" && rg -n --no-heading -- '- \[ \] ' -g '!templates/**' -g '!courses/**') | grep -i "タスク名の一部"
-  fi
-  ```
-- 確認後に `obsidian task ref="path:line" done` で完了にする（`path` は vaultルート相対）
-- **新規タスクの追加はしない**
-
-### gitコミット履歴の取り込み（カレンダー・会話履歴と並列で収集）
-
-`~/work/projects/` 直下の全gitリポジトリ + `~/dotfiles` の当日コミットを収集し、「やったこと」に反映する。
-
+**c. gitコミット履歴**
+`~/work/projects/` 直下の全リポジトリ + `~/dotfiles` の当日コミットを収集：
 ```bash
 TODAY=$(date +%F)
 REPOS=$(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
@@ -109,12 +88,54 @@ for repo in $REPOS; do
 done
 ```
 
-- コミット時刻（`%ai`）を日報の時刻推定に使う
-- 会話履歴に記録がないコミットは「やったこと」のエントリとして追加する（重複は統合）
-- コミットメッセージが英語・短縮形の場合は文脈から自然な日本語に変換して記述
-- dirty（未コミット）のリポジトリは後述の「git push（別マシン片づけ）」で処理する
+---
 
-### git push（別マシン片づけ、タスク完了マークの後に実行）
+### ② 再構成 → ユーザー確認
+
+3つのソース（日報・カレンダー・gitログ）と会話履歴を統合して1日分を組み立てる。
+
+**やったこと**
+- 全エントリを**時刻順**に並べ直す
+- 終了時刻が抜けているエントリを補完
+- カレンダー予定はギャップを埋める参照として使う（記載なければ追加、あれば時刻補正）
+- gitコミット：会話履歴にないものはエントリとして追加。コミット時刻を時刻推定に使う。英語・短縮形は日本語に変換
+- チェック範囲：勤務開始〜 min(最後のエントリ終了時刻, 現在時刻)
+- 30分以上の空白があれば確認（カレンダーに予定があればそれを提示）
+
+**気づき**
+- 全エントリから学び・気づき・教訓を読み取り、2–3文にまとめる
+
+下書きをユーザーに提示し、確認を得てから保存に進む。
+
+---
+
+### ③ 保存
+
+```bash
+DAILY_PATH=$(obsidian daily:path 2>/dev/null | grep -v "^[0-9]" | grep -v "^Your Obsidian")
+```
+Editツールで `~/vault/$DAILY_PATH` を全文更新。
+
+---
+
+### ④ タスク完了マーク
+
+「やったこと」から完了と判断できるタスクを vault 全体から検索してリスト提示：
+```bash
+open -a Obsidian 2>/dev/null; sleep 2
+TASKS=$(obsidian tasks todo format=json 2>/dev/null)
+if echo "$TASKS" | jq -e 'type=="array"' >/dev/null 2>&1; then
+  echo "$TASKS" | jq -r '.[] | "\(.file):\(.line):\(.text)"' | grep -i "タスク名の一部"
+else
+  VAULT="$HOME/vault"
+  (cd "$VAULT" && rg -n --no-heading -- '- \[ \] ' -g '!templates/**' -g '!courses/**') | grep -i "タスク名の一部"
+fi
+```
+確認後に `obsidian task ref="path:line" done` で完了にする。**新規タスクの追加はしない。**
+
+---
+
+### ⑤ git push（別マシン片づけ）
 
 当日作業の締めとして、全リポジトリを別マシンから取得できる状態にする。
 
@@ -124,17 +145,14 @@ REPOS=$(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 
 
 | 状態 | 処理 |
 |------|------|
-| **dirty**（未コミット変更あり） | `git diff` で確認 → コミット可能ならcommit+push |
+| **dirty**（未コミット変更あり） | `git diff` で確認 → コミット可能なら commit+push |
 | **ahead** | `git push` |
-| **pullable** | `git pull --rebase`（他マシンの変更が先に入った場合） |
+| **pullable** | `git pull --rebase` |
 | **diverged** | 報告のみ（触れない） |
 
-**dirty のコミット判断**：
-- WIP・デバッグ痕跡・秘密情報がなく、変更が一貫したまとまりであればcommit+push
-- コミットメッセージは `git diff` の内容から生成（今日の「やったこと」も参照）
-- 判断できない場合は報告のみ
+dirty のコミット判断：WIP・デバッグ痕跡・秘密情報がなく変更が一貫したまとまりであれば commit+push。コミットメッセージは diff の内容と②の「やったこと」を参照して生成。判断できない場合は報告のみ。
 
-結果はチャットに出力（日報には書かない）
+結果はチャットに出力（日報には書かない）。
 
 ---
 
