@@ -76,11 +76,18 @@ obsidian daily:read
 その日の予定を取得（`list_events` ツール、終日イベントは除外）
 
 **c. gitコミット履歴**
-`~/work/projects/` 直下の全リポジトリ + `~/dotfiles` の当日コミットを収集：
+`~/work/projects/` 直下の全リポジトリ + `~/dotfiles` の当日コミットを収集する。
+別マシンのコミットを拾うため、**fetch → clean なら pull → log** の順で実行する：
 ```bash
 TODAY=$(date +%F)
 REPOS=$(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
 for repo in $REPOS; do
+  git -C "$repo" fetch --quiet 2>/dev/null
+  STATUS=$(git -C "$repo" status --porcelain 2>/dev/null)
+  BEHIND=$(git -C "$repo" rev-list HEAD..@{u} --count 2>/dev/null)
+  if [ -z "$STATUS" ] && [ "${BEHIND:-0}" -gt 0 ]; then
+    git -C "$repo" pull --rebase --quiet 2>/dev/null
+  fi
   git -C "$repo" log --since="$TODAY 00:00" --until="$TODAY 23:59" \
     --format="%ai %s" 2>/dev/null | while read line; do
     echo "[$(basename $repo)] $line"
