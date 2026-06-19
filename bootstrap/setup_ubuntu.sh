@@ -82,5 +82,11 @@ rm -rf /tmp/aws /tmp/awscliv2.zip
 
 curl -fsSL https://tailscale.com/install.sh | sh
 
+# Claude Code CLI (native installer, no Node.js required)
+curl -fsSL https://claude.ai/install.sh | sh
+
 sudo ubuntu-drivers autoinstall
+
+echo "NOTE: ~/.claude/settings.local.json is gitignored and not stowed."
+echo "      Create it manually for local-only Claude settings."
 echo "Setup finished. Please reboot manually"
