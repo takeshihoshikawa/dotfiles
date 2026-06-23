@@ -48,7 +48,7 @@
   },
   "enabledPlugins": {
     "obsidian@obsidian-skills": true,
-    "microsoft-docs@claude-plugins-official": true,
+    "microsoft-docs@claude-plugins-official": false,
     "document-skills@anthropic-agent-skills": true,
     "clangd-lsp@claude-plugins-official": true
   },
