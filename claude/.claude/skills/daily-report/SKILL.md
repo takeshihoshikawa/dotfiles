@@ -75,7 +75,18 @@ obsidian daily:read
 **b. Google Calendar**
 その日の予定を取得（`list_events` ツール、終日イベントは除外）
 
-**c. gitコミット履歴**
+**c. GitHub Issues（当日close）**
+```bash
+TODAY=$(date +%F)
+gh search issues --author @me --state closed --json repository,number,title,closedAt --limit 50 2>/dev/null \
+  | jq -r --arg today "$TODAY" '
+      .[] | select(.closedAt | startswith($today)) |
+      "[\(.repository.nameWithOwner | split("/")[1])] #\(.number): \(.title)"' \
+  || true
+```
+取得できない場合はスキップ。
+
+**d. gitコミット履歴**
 `~/work/projects/` 直下の全リポジトリ + `~/dotfiles` の当日コミットを収集する。
 別マシンのコミットを拾うため、**fetch → clean なら pull → log** の順で実行する：
 ```bash
@@ -99,13 +110,14 @@ done
 
 ### ② 再構成 → ユーザー確認
 
-3つのソース（日報・カレンダー・gitログ）と会話履歴を統合して1日分を組み立てる。
+4つのソース（日報・カレンダー・GitHub closedイシュー・gitログ）と会話履歴を統合して1日分を組み立てる。
 
 **やったこと**
 - 全エントリを**時刻順**に並べ直す
 - 終了時刻が抜けているエントリを補完
 - カレンダー予定はギャップを埋める参照として使う（記載なければ追加、あれば時刻補正）
 - gitコミット：会話履歴にないものはエントリとして追加。コミット時刻を時刻推定に使う。英語・短縮形は日本語に変換
+- GitHub closed Issues：会話履歴にないサーバー作業の完了証跡として追加。closeした時刻を時刻推定に使う
 - チェック範囲：勤務開始〜 min(最後のエントリ終了時刻, 現在時刻)
 - 30分以上の空白があれば確認（カレンダーに予定があればそれを提示）
 

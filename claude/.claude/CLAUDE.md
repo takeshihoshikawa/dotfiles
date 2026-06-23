@@ -13,6 +13,8 @@ Folder structure:
 - `notes/` — misc notes, workflow docs, ideas
 - `references/literature/` — 文献ノート（ファイル名はcitekey）
 - `notes/goals.md` — 長期目標・方針（/morningで毎朝表示）
+- `tasks.md` — タスク一元管理（vaultルート直下）
+- `dashboard.md` — タスクダッシュボード（vaultルート直下）
 
 ## ノート・タスク管理の使い分け
 
@@ -26,14 +28,16 @@ Folder structure:
 
 | 系統 | 場所 | 記法 |
 |------|------|------|
-| **プロジェクトtask** | `notes/tasks.md`（計画起点）または `meetings/`（会議起点）。転記しない | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]` |
-| **非プロジェクトtask** | `notes/tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD] [priority:: medium]` |
+| **プロジェクトtask** | `tasks.md`（計画起点）または `meetings/`（会議起点）。転記しない | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]` |
+| **非プロジェクトtask** | `tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD] [priority:: medium]` |
+
+**プロジェクトノート（`projects/`）にはチェックボックスを置かない。** 概要・進捗・文脈の記述のみ。次のステップを書く場合は箇条書き（チェックなし）で記載し、実行管理は `tasks.md` に任せる。
 
 `#project/{kebab-case}` のプロジェクト名は `projects/{kebab-case}.md` のファイル名と一致させる。  
-Claude Code は `rg "#project/X" notes/tasks.md meetings` で横断検索（plugin非依存）。  
+Claude Code は `rg "#project/X" tasks.md meetings` で横断検索（plugin非依存）。  
 定型スキル（morning / weekly-review / daily-report）はタスク取得に `obsidian tasks todo format=json`（vault全体・`meetings/` 含む。各要素 `{status, text, file, line}`、`file` はvaultルート相対）を使い、`rg` はフォールバック。  
 
-タスクの追加先：すべて `notes/tasks.md`（`obsidian append file="tasks"`）
+タスクの追加先：すべて `tasks.md`（`obsidian append file="tasks"`）
 
 | セクション | 用途 |
 |-----------|------|
@@ -49,6 +53,7 @@ Claude Code は `rg "#project/X" notes/tasks.md meetings` で横断検索（plug
 **`## projects` へのタスク追加は `obsidian append` を使わず、Edit で当該セクションに直接書き込む。**（append は inbox 末尾にしか入らないため）
 
 - Meeting noteのアクションアイテムは「決定した事実」の記録（担当者・アクション・期限）。ステータス管理はしない
+- Project noteはチェックボックス禁止。タスク重複の温床になるため
 - テンプレート: `templates/meeting-agenda-template.md`、`templates/project-note-template.md`
 - 詳細: `notes/meeting-project-workflow.md`
 

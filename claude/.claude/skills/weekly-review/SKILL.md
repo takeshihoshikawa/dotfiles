@@ -74,6 +74,15 @@ args:
 ### 7. 中長期目標の読み込み
 - CLAUDE.mdのvault pathの `notes/goals.md` をReadツールで読み込み、内部で保持する
 
+### 8. GitHub Issues の確認
+- 自分担当のopen Issueを取得し、未完研究タスクの補完情報として内部保持する（解析サーバー上の作業状態の見える化）：
+  ```bash
+  gh search issues --author @me --state open --json repository,number,title,updatedAt --limit 30 2>/dev/null \
+    | jq -r 'sort_by(.repository.nameWithOwner, .number) | .[] | "[\(.repository.nameWithOwner)] #\(.number): \(.title)"' \
+    || echo "(取得失敗またはIssueなし)"
+  ```
+- 取得できない場合はスキップ（エラーで止まらない）
+
 ---
 
 ## 【フェーズ2】振り返り（対話）
@@ -157,6 +166,10 @@ goals.mdの内容を簡潔に提示した上で問いかけること（ユーザ
 ## 📥 Inbox（{n}件）
 
 {Inboxタスクのリスト}
+
+## 🐙 GitHub Issues（open）
+
+{リポジトリ別にIssue一覧。取得できない場合は省略}
 ```
 
 ### タスク提案

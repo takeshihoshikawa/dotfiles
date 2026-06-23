@@ -51,7 +51,22 @@ model: sonnet
    - 対象日の翌日の予定：開始時刻順に表示
    - 予定がない場合は「予定なし」と表示
 
-3. **タスクをファイルから取得**（bashツールで実行）：
+3. **タスクをファイルから取得 + GitHub Issues**（bashツールで実行）：
+
+   Obsidianタスクと並行して、GitHub Issuesも取得する（解析サーバー上の作業状態の見える化）：
+
+   ```bash
+   echo "=== GitHub Issues（プロジェクト別概要）==="
+   gh search issues --author @me --state open --json repository,number,title --limit 50 2>/dev/null \
+     | jq -r 'group_by(.repository.nameWithOwner) | .[] |
+         (.[0].repository.nameWithOwner | split("/")[1]) as $repo |
+         (length) as $count |
+         (sort_by(.number) | .[0]) as $next |
+         "\($repo): \($count)件 open → 次: #\($next.number) \($next.title)"' \
+     || echo "(取得失敗またはIssueなし)"
+   ```
+
+   取得できない場合はスキップ（エラーで止まらない）。
 
    `obsidian tasks` で vault 全体の未完タスクを取得する（`meetings/` 配下の `#project/` タスクも拾える）。CLI 不調時は `rg` にフォールバックする。
 
@@ -144,6 +159,9 @@ model: sonnet
 
 ### 📋 Next（候補）
 - タスク名（ファイル名）※最大10件
+
+### 🐙 GitHub Issues（open）
+- [repo名] #番号: タイトル ※新しい順、取得できない場合は省略
 
 ---
 
