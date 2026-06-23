@@ -5,6 +5,36 @@ __pycache__/
 *.pem
 
 aws/.aws/credentials
+aws/.aws/login/
 
-/.claude/
+# Claude Code — runtime/auto-generated (ランタイム自動生成)
+claude/.claude/.credentials.json
+claude/.claude/.last-cleanup
+claude/.claude/backups/
+claude/.claude/file-history/
+claude/.claude/ide/
+claude/.claude/plans/
+claude/.claude/plugins/
+claude/.claude/projects/
+claude/.claude/sessions/
+claude/.claude/shell-snapshots/
+
+# Codex — runtime/auto-generated
+codex/.codex/auth.json
+codex/.codex/.personality_migration
+codex/.codex/.tmp/
+codex/.codex/cache/
+codex/.codex/goals_*.sqlite
+codex/.codex/installation_id
+codex/.codex/logs_*.sqlite
+codex/.codex/logs_*.sqlite-shm
+codex/.codex/logs_*.sqlite-wal
+codex/.codex/memories_*.sqlite
+codex/.codex/models_cache.json
+codex/.codex/plugins/
+codex/.codex/session_index.jsonl
+codex/.codex/sessions/
+codex/.codex/skills/
+codex/.codex/state_*.sqlite
+codex/.codex/tmp/
 
