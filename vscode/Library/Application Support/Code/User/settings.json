@@ -1,6 +1,5 @@
 {
     "claudeCode.preferredLocation": "panel",
-    "claudeCode.useTerminal": true,
     "workbench.editorAssociations": {
         "*.md": "vscode.markdown.preview.editor"
     },
