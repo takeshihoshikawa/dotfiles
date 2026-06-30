@@ -145,3 +145,7 @@ renv/library/
 ## Obsidian vault の取り扱い
 
 @obsidian-workflow.md
+
+## Quarto 原稿レンダリングパターン
+
+@quarto-manuscript-rendering-patterns.md
