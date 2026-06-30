@@ -93,11 +93,12 @@ gh search issues --author @me --state closed --json repository,number,title,clos
 TODAY=$(date +%F)
 REPOS=$(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
 for repo in $REPOS; do
-  git -C "$repo" fetch --quiet 2>/dev/null
+  git -C "$repo" fetch origin 2>/dev/null || echo "⚠ fetch失敗: $(basename $repo)"
+  BRANCH=$(git -C "$repo" branch --show-current 2>/dev/null)
   STATUS=$(git -C "$repo" status --porcelain 2>/dev/null)
-  BEHIND=$(git -C "$repo" rev-list HEAD..@{u} --count 2>/dev/null)
+  BEHIND=$(git -C "$repo" rev-list "HEAD..origin/$BRANCH" --count 2>/dev/null || echo 0)
   if [ -z "$STATUS" ] && [ "${BEHIND:-0}" -gt 0 ]; then
-    git -C "$repo" pull --rebase --quiet 2>/dev/null
+    git -C "$repo" pull --rebase --quiet 2>/dev/null && echo "pulled: $(basename $repo) (+$BEHIND)"
   fi
   git -C "$repo" log --since="$TODAY 00:00" --until="$TODAY 23:59" \
     --format="%ai %s" 2>/dev/null | while read line; do

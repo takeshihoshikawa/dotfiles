@@ -27,10 +27,18 @@ model: sonnet
 
    ```bash
    REPOS=$(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
-   for repo in $REPOS; do git -C "$repo" fetch --quiet 2>/dev/null; done
+   for repo in $REPOS; do
+     git -C "$repo" fetch origin 2>/dev/null || echo "⚠ fetch失敗: $(basename $repo)"
+     BRANCH=$(git -C "$repo" branch --show-current 2>/dev/null)
+     STATUS=$(git -C "$repo" status --porcelain 2>/dev/null)
+     BEHIND=$(git -C "$repo" rev-list "HEAD..origin/$BRANCH" --count 2>/dev/null || echo 0)
+     [ -z "$STATUS" ] && [ "${BEHIND:-0}" -gt 0 ] && \
+       git -C "$repo" pull --rebase --quiet 2>/dev/null && echo "pulled: $(basename $repo)"
+   done
    ```
 
    - pulled があればその旨を1行で出力。全synced なら省略
+   - fetch失敗（⚠）が出たら `/sync-repos` で別途対処する旨を添える
    - dirty / diverged は `/sync-repos` で別途対処する旨を1行で添える
 
 0. **長期目標・方針の表示**：
