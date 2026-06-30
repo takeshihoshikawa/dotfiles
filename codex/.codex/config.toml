@@ -28,5 +28,8 @@ trust_level = "trusted"
 [projects."/Users/takeshi/work/projects/hamaclu"]
 trust_level = "trusted"
 
+[projects."/work/projects/forest-instance-annotation"]
+trust_level = "trusted"
+
 [tui.model_availability_nux]
 "gpt-5.5" = 2

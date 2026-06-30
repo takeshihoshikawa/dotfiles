@@ -26,6 +26,8 @@ codex/.codex/.personality_migration
 codex/.codex/.tmp/
 codex/.codex/cache/
 codex/.codex/goals_*.sqlite
+codex/.codex/goals_*.sqlite-shm
+codex/.codex/goals_*.sqlite-wal
 codex/.codex/installation_id
 codex/.codex/logs_*.sqlite
 codex/.codex/logs_*.sqlite-shm
@@ -35,7 +37,9 @@ codex/.codex/models_cache.json
 codex/.codex/plugins/
 codex/.codex/session_index.jsonl
 codex/.codex/sessions/
+codex/.codex/shell_snapshots/
 codex/.codex/skills/
 codex/.codex/state_*.sqlite
+codex/.codex/state_*.sqlite-shm
+codex/.codex/state_*.sqlite-wal
 codex/.codex/tmp/
-
