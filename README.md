@@ -104,7 +104,11 @@ gh repo create --private research-project-template --source=. --remote=origin --
 │   ├── CLAUDE.md.template
 │   ├── README.md.template
 │   ├── .gitignore
-│   └── data/、src/、notebooks/、reports/、papers/（.gitkeep 付き）
+│   ├── scripts/utilities/sync_with_{nas,s3}.sh.template  # NAS/S3 同期スクリプト雛形
+│   └── data/{raw,interim,processed,outputs}/、src/、notebooks/、
+│       scripts/{pipeline,experiments,publication,utilities}/、
+│       config/{datasets,models,paths}/、results/、
+│       outputs/{papers,presentations,reports}/、docs/（.gitkeep 付き）
 ├── proposal-skeleton/           # add-proposal が使う雛形
 │   └── proposals/{{YEAR}}-{{GRANT_TYPE}}/{drafts,様式,figures,refs,budget,output}/
 └── obsidian-project-note.md.template   # add-obsidian-note が使う

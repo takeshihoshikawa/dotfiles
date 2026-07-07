@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+# Run from project root:
+#   bash scripts/utilities/sync_with_nas.sh [check|push|pull] [raw|processed|results|outputs|all] [--dryrun] [--delete] [--no-las]
+#
+# NAS (mounted at /Volumes/Public) is the persistent Single Source of Truth
+# for this project's data (see ~/vault/notes/data-management-policy.md).
+# S3 (sync_with_s3.sh) is used only as a transit store when running on EC2,
+# which has no direct NAS access -- do not treat S3 as authoritative.
+#
+# Modes:
+#   check        Show local -> NAS differences only (default; dry-run)
+#   push         Sync local -> NAS
+#   pull         Sync NAS -> local
+#
+# Targets:
+#   raw          data/raw/       (edit sync_raw below per dataset)
+#   processed    data/processed/
+#   results      results/
+#   outputs      data/outputs/
+#   all          all targets (default)
+#
+# Environment overrides:
+#   {{ENV_PREFIX}}_NAS_ROOT        default: /Volumes/Public
+#   {{ENV_PREFIX}}_ALLOW_RAW_PUSH  default: false
+#
+# Options:
+#   --dryrun     Preview without copying. Useful with push/pull.
+#   --delete     Delete destination files absent from source.
+#   --no-las     Exclude .las / .laz / .lax files.
+set -euo pipefail
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$PROJECT_ROOT"
+
+NAS_ROOT="${{{ENV_PREFIX}}_NAS_ROOT:-/Volumes/Public}"
+NAS_RAW="${NAS_ROOT}/raw"
+NAS_PROJECT="${NAS_ROOT}/projects/{{PROJECT_NAME}}"
+ALLOW_RAW_PUSH="${{{ENV_PREFIX}}_ALLOW_RAW_PUSH:-false}"
+
+MODE="check"
+TARGET="all"
+DRYRUN=()
+DELETE=()
+RSYNC_OPTIONS=(-a --info=stats2,progress2 --exclude ".DS_Store" --exclude ".gitkeep")
+NO_LAS=()
+
+usage() {
+  sed -n '2,29p' "$0" >&2
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    check|push|pull) MODE="$arg" ;;
+    raw|processed|results|outputs|all) TARGET="$arg" ;;
+    --dryrun) DRYRUN=(--dry-run) ;;
+    --delete) DELETE=(--delete) ;;
+    --no-las) NO_LAS=(--exclude "*.las" --exclude "*.laz" --exclude "*.lax") ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage; exit 1 ;;
+  esac
+done
+
+if [[ "$MODE" == "check" ]]; then
+  DRYRUN=(--dry-run)
+fi
+
+require_nas() {
+  [[ -d "$NAS_ROOT" ]] || {
+    echo "error: NAS not mounted at ${NAS_ROOT}. Mount smb://192.168.70.241/Public first." >&2
+    exit 1
+  }
+}
+
+run_sync() {
+  local label="$1"
+  local source="$2"
+  local destination="$3"
+  shift 3
+
+  echo "=== ${MODE}: ${label} ==="
+  if [[ ! -d "$source" ]]; then
+    echo "skip: missing source: $source"
+    return
+  fi
+  if [[ ${#DRYRUN[@]} -eq 0 ]]; then
+    mkdir -p "$destination"
+  fi
+  rsync "${RSYNC_OPTIONS[@]}" ${DELETE[@]+"${DELETE[@]}"} "${DRYRUN[@]}" "$@" "${source%/}/" "${destination%/}/"
+}
+
+sync_pair() {
+  local label="$1"
+  local local_path="$2"
+  local nas_path="$3"
+  shift 3
+
+  if [[ "$MODE" == "pull" ]]; then
+    run_sync "$label" "$nas_path" "$local_path" "$@"
+  else
+    run_sync "$label" "$local_path" "$nas_path" "$@"
+  fi
+}
+
+sync_raw() {
+  if [[ "$MODE" == "push" && "$ALLOW_RAW_PUSH" != "true" ]]; then
+    echo "Refusing to push raw data to shared ${NAS_RAW}/." >&2
+    echo "Set {{ENV_PREFIX}}_ALLOW_RAW_PUSH=true only for intentional raw-data registration." >&2
+    exit 1
+  fi
+  # TODO: map local data/raw/ subdirs to shared NAS raw/ datasets, one line each:
+  #   sync_pair "raw: koboriya" "data/raw/koboriya" "${NAS_RAW}/20260526_koboriya" ${NO_LAS[@]+"${NO_LAS[@]}"}
+  echo "sync_raw: no datasets configured yet -- edit sync_raw() in $0" >&2
+}
+
+sync_processed() {
+  sync_pair "processed" "data/processed" "${NAS_PROJECT}/processed" ${NO_LAS[@]+"${NO_LAS[@]}"}
+}
+
+sync_results() {
+  sync_pair "results" "results" "${NAS_PROJECT}/results"
+}
+
+sync_outputs() {
+  sync_pair "outputs" "data/outputs" "${NAS_PROJECT}/outputs"
+}
+
+require_nas
+
+case "$TARGET" in
+  raw)       sync_raw ;;
+  processed) sync_processed ;;
+  results)   sync_results ;;
+  outputs)   sync_outputs ;;
+  all)       sync_raw; sync_processed; sync_results; sync_outputs ;;
+esac
+
+echo "Done."

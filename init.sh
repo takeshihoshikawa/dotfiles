@@ -107,9 +107,13 @@ cmd_adopt() {
     PROJECT_NAME "$name" \
     FULL_PROJECT_NAME "${proj_full:-}"
 
-  # 空ディレクトリを .gitkeep 付きで作成
+  # 空ディレクトリを .gitkeep 付きで作成（構造の正本: vault notes/research-project-setup.md）
   local d
-  for d in data/raw data/processed src notebooks reports papers; do
+  for d in data/raw data/interim data/processed data/outputs \
+           src notebooks \
+           scripts/pipeline scripts/experiments scripts/publication scripts/utilities \
+           config/datasets config/models config/paths \
+           results outputs/papers outputs/presentations outputs/reports docs; do
     if [[ ! -d "$target/$d" ]]; then
       mkdir -p "$target/$d"
       touch "$target/$d/.gitkeep"
@@ -117,6 +121,19 @@ cmd_adopt() {
     else
       log "skip (exists): $target/$d/"
     fi
+  done
+
+  # NAS/S3 同期スクリプト（ENV_PREFIX は kebab-case 名の頭文字、例: tree-species-classification -> TSC）
+  local env_prefix
+  env_prefix=$(printf '%s' "$name" | awk -F- '{for (i = 1; i <= NF; i++) printf "%s", toupper(substr($i, 1, 1))}')
+  local s
+  for s in sync_with_nas.sh sync_with_s3.sh; do
+    copy_template_file \
+      "$SCRIPT_DIR/skeleton/scripts/utilities/$s.template" \
+      "$target/scripts/utilities/$s" \
+      PROJECT_NAME "$name" \
+      ENV_PREFIX "$env_prefix"
+    chmod +x "$target/scripts/utilities/$s"
   done
 
   # git 初期化（既存 .git は触らない）

@@ -54,12 +54,17 @@ proposals/{{YEAR}}-{{GRANT_TYPE}}/
   ├── refs/        # BibTeX, 引用メモ, papis-lib/
   ├── budget/      # budget.R, budget.xlsx
   └── output/      # pandoc 生成物（gitignore）
-data/              # 巨大データ（gitignore、実体は外部）
-src/               # 解析コード（採択後）
+data/{raw,interim,processed,outputs}/  # 巨大データ（gitignore、実体は NAS）
+src/               # 再利用可能な関数（テスト対象）
 notebooks/         # 探索的実験
-reports/           # 中間・最終報告（採択後）
-papers/            # 論文ドラフト（将来）
+scripts/{pipeline,experiments,publication,utilities}/
+config/{datasets,models,paths}/
+results/           # 解析成果（gitignore）
+outputs/{papers,presentations,reports}/  # 公開・提出する最終成果物
+docs/              # 設計メモ・データ入出力仕様
 ```
+
+構造の正本は Vault `notes/research-project-setup.md`。データ保存・NAS/S3 同期は Vault `notes/data-management-policy.md` と `scripts/utilities/sync_with_{nas,s3}.sh`（要: sync_raw() のデータセット定義）に従う。
 
 ## ワークフロー
 

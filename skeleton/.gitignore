@@ -1,9 +1,12 @@
 # OS
 .DS_Store
 
-# 大型データ
+# 大型データ（実体は NAS、data-management-policy 参照）
 data/raw/
+data/interim/
 data/processed/
+data/outputs/
+results/
 *.las
 *.laz
 *.ply
