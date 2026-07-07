@@ -8,7 +8,7 @@ aws/.aws/credentials
 aws/.aws/login/
 
 # Claude Code — runtime/auto-generated (ランタイム自動生成)
-.claude/
+/.claude/
 claude/.claude/.credentials.json
 claude/.claude/.last-cleanup
 claude/.claude/backups/

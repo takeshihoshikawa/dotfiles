@@ -79,6 +79,10 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 
 @data-analysis-coding-conventions.md
 
+## データ管理ポリシー
+
+@data-management-policy.md
+
 ## 研究プロジェクト規約
 
 新規研究プロジェクトは以下 4 点を組み合わせて構成する。詳細・判断基準は Obsidian Vault の `notes/research-project-setup.md` を参照。
