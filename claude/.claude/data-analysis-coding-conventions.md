@@ -12,22 +12,29 @@
 
 ## ファイル構成
 
-```         
+研究プロジェクトの完全な標準構造は Obsidian vault の `notes/research-project-setup.md` が正本。本規約に関わる骨格は以下。
+
+```
 project/
 ├── data/
-│   ├── raw/        # 読み取り専用・変更禁止
-│   └── processed/  # 加工済みデータ
+│   ├── raw/          # 読み取り専用・変更禁止
+│   ├── interim/      # 一時領域（消えてよいもののみ）
+│   ├── processed/    # 加工済み・再利用する安定データ
+│   └── outputs/      # 外部共有用データ成果物
 ├── scripts/
-│   ├── pipeline/   # 前処理〜モデリング（番号付き・順番あり）
-│   ├── explore/    # 集計・統計量・可視化（探索的・順番なし）
-│   └── paper/      # 論文用の最終出力（表・図）
-└── src/            # 再利用可能な関数（R / Python）
+│   ├── pipeline/     # 安定版パイプライン（番号付き・順番あり）
+│   ├── experiments/  # 探索的解析・試行錯誤（完成後 pipeline へ昇格）
+│   ├── publication/  # 論文・投稿用の最終出力（表・図）
+│   └── utilities/    # sync・変換・検証等の補助
+└── src/              # 再利用可能な関数（R / Python）
 ```
+
+旧分類 `explore/`→`experiments/`、`paper/`→`publication/`（2026-07-07 統一）。既存プロジェクトのディレクトリは遡及リネームしない。
 
 ## スクリプト命名
 
 - `pipeline/` 内は番号付きで実行順を明示：`01_preprocess.R`、`02_model.R`
-- `explore/`・`paper/` 内は内容で命名：`point_statistics.R`、`visualize_results.R`
+- `experiments/`・`publication/`・`utilities/` 内は内容で命名：`point_statistics.R`、`build_fig1.R`
 
 ## パス管理
 
@@ -46,7 +53,7 @@ project/
 ## 環境管理
 
 - R：`renv` で依存パッケージを記録
-- Python：`requirements.txt` または `pyproject.toml` で依存パッケージを記録
+- Python：`uv` で依存パッケージを記録
 
 ## AIエージェントとの協働
 

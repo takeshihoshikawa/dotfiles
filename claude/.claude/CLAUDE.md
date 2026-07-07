@@ -99,25 +99,29 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 - 重い処理は EC2 を一時起動 → 結果を S3 に sync → **terminate**（永続させない／ホームは破棄前提）
 - 接続は Tailscale 経由・ユーザー `ubuntu`（パブリックIPは不可）、GitHub push は `ssh -A`
 
-### 標準ディレクトリ構造
+### 標準ディレクトリ構造（要約）
+
+**正本は Vault の `notes/research-project-setup.md`**（フルツリー・責務の詳細はそちら）。骨格：
 
 ```
 ~/work/projects/{name}/
-├── CLAUDE.md
-├── README.md
-├── .gitignore
+├── CLAUDE.md / README.md / .gitignore
 ├── proposals/{YYYY}-{種別}/    # 申請書フェーズ（drafts/*.md, 様式/, figures/, refs/, budget/, output/）
-├── data/                       # gitignore（実体は外部）
-├── src/                        # 解析コード
+├── data/{raw,interim,processed,outputs}/   # gitignore（実体は NAS、data-management-policy 参照）
+├── src/                        # 再利用可能な関数（テスト対象）
 ├── notebooks/                  # 探索的実験
-├── reports/                    # 中間・最終報告（採択後）
-└── papers/                     # 論文ドラフト（将来）
+├── scripts/{pipeline,experiments,publication,utilities}/
+├── config/{datasets,models,paths}/
+├── results/                    # 解析成果（metrics・models・figures）
+└── outputs/{papers,presentations,reports}/  # 公開・提出する最終成果物
 ```
+
+旧構成のルート直下 `reports/`・`papers/`、`scripts/{explore,paper}` は 2026-07-07 に上記へ統一（既存プロジェクトは遡及リネームしない）。
 
 ### ワークフロー
 
 1. **申請書執筆**: `proposals/{YYYY}-{種別}/drafts/*.md` を真のソースとし、pandoc で .docx 生成 → 提出版を `~/Documents/grant/...` にコピー
-2. **採択後**: `data/`・`src/`・`notebooks/` で本研究、`reports/`・`papers/` で成果物
+2. **採択後**: `data/`・`src/`・`notebooks/`・`scripts/` で本研究、`results/` → `scripts/publication/` → `outputs/` で成果物
 3. **GitHub remote**: 長期/多端末/将来の共有が見込まれるプロジェクトは private repo を推奨
 
 ### .gitignore 雛形
