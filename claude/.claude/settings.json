@@ -71,5 +71,6 @@
       "Pushing directly to the main branch is allowed: this is a personal repository where I am the sole contributor, so there is no pull request review process"
     ]
   },
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "model": "claude-fable-5[1m]"
 }
