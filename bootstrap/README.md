@@ -23,7 +23,10 @@ bash ~/dotfiles/bootstrap/setup_ubuntu.sh
 ```
 
 This script:
-- Installs system packages (incl. `cifs-utils`), R, development libraries
+- Installs system packages (incl. `cifs-utils`, `fonts-noto-cjk`), R (+`renv`), Python `uv`, development libraries
+- Installs Docker + NVIDIA Container Toolkit（GPU コンテナ解析用。reboot 後に `nvidia-ctk runtime configure` が必要、スクリプト末尾の NOTE 参照）
+- Installs Quarto + `texlive-full`（論文原稿の PDF/DOCX レンダリング用。texlive-full は数GB级のダウンロード）
+- Sets `vm.swappiness=10`（解析ワークロードでスワップを避けるチューニング）
 - Sets up `/work/{projects,data,tmp}`
 - Links shared dotfiles via `stow` (git, ssh, claude, codex)
 - Sets up NAS CIFS automount via `setup_nas_mount.sh`（下記参照）
