@@ -13,6 +13,7 @@ sudo apt install -y \
   curl \
   unzip \
   zip \
+  cifs-utils \
   build-essential \
   cmake \
   openssh-server \
@@ -81,6 +82,11 @@ sudo /tmp/aws/install
 rm -rf /tmp/aws /tmp/awscliv2.zip
 
 curl -fsSL https://tailscale.com/install.sh | sh
+
+# NAS (QNAP Public share) を Tailscale 経由で CIFS automount。
+# 資格情報テンプレを作るだけで、パスワード記入までマウントは失敗する（スクリプト末尾の NOTE 参照）。
+# tailscale 導入後に呼ぶ（automount は tailscaled.service に依存）。失敗しても bootstrap 全体は止めない。
+bash "$(dirname "$0")/setup_nas_mount.sh" || echo "WARN: setup_nas_mount.sh failed — 後で個別に実行してください"
 
 # Claude Code CLI (native installer, no Node.js required)
 curl -fsSL https://claude.ai/install.sh | sh

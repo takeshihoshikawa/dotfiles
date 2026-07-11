@@ -23,9 +23,10 @@ bash ~/dotfiles/bootstrap/setup_ubuntu.sh
 ```
 
 This script:
-- Installs system packages, R, development libraries
+- Installs system packages (incl. `cifs-utils`), R, development libraries
 - Sets up `/work/{projects,data,tmp}`
 - Links shared dotfiles via `stow` (git, ssh, claude, codex)
+- Sets up NAS CIFS automount via `setup_nas_mount.sh`（下記参照）
 
 After setup:
 ```bash
@@ -41,6 +42,21 @@ Login to Tailscale:
 ```bash
 sudo tailscale up
 ```
+
+### NAS mount (`setup_nas_mount.sh`)
+
+QNAP の `Public` 共有を **Tailscale MagicDNS 名経由**で `/mnt/public` に CIFS automount する（在宅・外出どちらでも同じアドレス、LAN 内は直結。アクセス時マウント＋アイドル自動アンマウント）。`setup_ubuntu.sh` から自動で呼ばれるが、単体でも再実行できる:
+
+```bash
+bash ~/dotfiles/bootstrap/setup_nas_mount.sh
+```
+
+> **注（必須手順）**: 資格情報ファイル `/etc/cifs-tsc.cred` は**テンプレのみ生成**される（平文パスワードは git に置けないため）。マウントには `sudo tailscale up` の後、パスワードの記入が必要:
+> ```bash
+> sudoedit /etc/cifs-tsc.cred     # password=CHANGE_ME を実パスワードに
+> ls /mnt/public && findmnt /mnt/public   # アクセスで自動マウント発火 → 確認
+> ```
+> NAS ホスト・共有名・マウント先・SMB ユーザー等はスクリプト冒頭の変数（`TSC_NAS_HOST` 等の env でも上書き可）で調整する。`TSC_NAS_ROOT=/mnt/public` は `~/.bashrc` に追記され、各プロジェクトの `sync_with_nas.sh`（既定は Mac の `/Volumes/Public`）がマウント先を吸収する。
 
 ---
 
