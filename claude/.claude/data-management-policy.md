@@ -73,6 +73,15 @@ AWS利用時は、S3を永続ストレージとの受け渡し用として利用
 
 同期は各プロジェクトの `scripts/utilities/sync_with_nas.sh`・`sync_with_s3.sh` で行う（標準パターンは vaultの `notes/research-project-setup.md` の「データ同期スクリプト」を参照。`check` デフォルト・`push raw` 拒否等の安全設計を含む）。
 
+> [!warning] `sync_with_nas.sh` は CIFS/SMB マウント経由の rsync を使わない
+> CIFS 越しに書き込んだファイルは mtime が保持されず「書き込んだ瞬間の時刻」に上書きされる。これにより rsync のデフォルト差分判定（サイズ+mtime）が既存ファイルまで「変更あり」と誤検知し続ける（2026-07-11、tree-species-classification で発覚：CIFS 経由 push 直後のファイルの NAS 側 mtime が push 実行時刻と一致していた）。
+>
+> 対策：`sync_with_nas.sh` の実転送は **SSH 経由の rsync（`rsync -e ssh`）** で行う。NAS 上に SSH ログイン可能なユーザー（QNAP なら SSH サービスを有効化し、鍵認証で `ssh-agent` に登録）を用意し、`~/.ssh/config` にホストエイリアス（例: `qnap`）を切る。CIFS/SMB マウントは QGIS・Finder 等の閲覧用途に残してよいが、rsync の転送先には使わない。
+>
+> SSH 経由でも「hash・ファイル名を変えずに中身だけ再生成した」場合（コード修正で `REVIEW_CODE_CHANGED` 相当の再解析をしたときなど）はサイズが偶然一致すると `--size-only` でも検知できない。該当パスに絞って `--checksum` を使うか、明示的に強制上書きする。
+>
+> 実装は tree-species-classification の `scripts/utilities/sync_with_nas.sh`（`qnap` エイリアス例つき）を参照。他プロジェクトでも CIFS 経由の同期を使っている場合は同じ問題が起きうるため、順次 SSH 方式へ移行を検討する。vaultの `notes/research-project-setup.md`「データ同期スクリプト」標準パターン側への反映は未実施（Mac からの次回作業で対応予定）。
+
 ---
 
 ## ディレクトリ構成
