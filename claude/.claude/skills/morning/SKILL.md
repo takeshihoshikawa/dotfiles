@@ -81,7 +81,7 @@ model: sonnet
 
    ```bash
    # vault全体の未完タスクをJSON配列で取得（要素: {status, text, file, line}、file はルート相対）
-   open -a Obsidian 2>/dev/null; sleep 2
+   pgrep -x Obsidian >/dev/null || { open -a Obsidian; sleep 2; }
    TASKS=$(obsidian tasks todo format=json 2>/dev/null)
    if ! echo "$TASKS" | jq -e 'type=="array"' >/dev/null 2>&1; then
      # フォールバック: Obsidian未起動/フォーマット変更時。templates・coursesは除外

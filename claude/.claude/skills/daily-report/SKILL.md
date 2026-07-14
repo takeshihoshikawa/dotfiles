@@ -144,7 +144,7 @@ Editツールで `~/vault/$DAILY_PATH` を全文更新。
 
 「やったこと」から完了と判断できるタスクを vault 全体から検索してリスト提示：
 ```bash
-open -a Obsidian 2>/dev/null; sleep 2
+pgrep -x Obsidian >/dev/null || { open -a Obsidian; sleep 2; }
 TASKS=$(obsidian tasks todo format=json 2>/dev/null)
 if echo "$TASKS" | jq -e 'type=="array"' >/dev/null 2>&1; then
   echo "$TASKS" | jq -r '.[] | "\(.file):\(.line):\(.text)"' | grep -i "タスク名の一部"

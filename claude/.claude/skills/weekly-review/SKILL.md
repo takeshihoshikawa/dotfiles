@@ -35,7 +35,7 @@ args:
 ### 3. 完了タスクの取得
 - `obsidian tasks` で vault 全体の完了タスクを一覧取得（補足情報として使用。`meetings/` 配下の完了 `#project/` タスクも拾える）：
   ```bash
-  open -a Obsidian 2>/dev/null; sleep 2
+  pgrep -x Obsidian >/dev/null || { open -a Obsidian; sleep 2; }
   DONE=$(obsidian tasks done format=json 2>/dev/null)
   if echo "$DONE" | jq -e 'type=="array"' >/dev/null 2>&1; then
     echo "$DONE" | jq -r '.[] | "\(.file):\(.line):\(.text)"'
@@ -60,7 +60,7 @@ args:
 ### 6. #waitingタスクの確認
 - `obsidian tasks` で vault 全体の `#waiting` タスクを一覧取得（素の `#waiting` と `[tag:: #waiting]` の両形式を拾う）：
   ```bash
-  open -a Obsidian 2>/dev/null; sleep 2
+  pgrep -x Obsidian >/dev/null || { open -a Obsidian; sleep 2; }
   TASKS=$(obsidian tasks todo format=json 2>/dev/null)
   if echo "$TASKS" | jq -e 'type=="array"' >/dev/null 2>&1; then
     echo "$TASKS" | jq -r '.[] | select(.text | test("#waiting")) | "\(.file):\(.line):\(.text)"'
