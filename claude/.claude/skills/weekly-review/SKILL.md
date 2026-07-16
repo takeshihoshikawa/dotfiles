@@ -54,9 +54,18 @@ args:
 - 来週のうち「研究コアブロック」タイトルのイベントが登録されている日を内部でメモしておく（フェーズ3で使用）
 
 ### 5. 今後2週間の担当授業の確認
-- ディレクトリ: CLAUDE.mdのvault pathの `courses/{最新年度}/`（年度は4月始まり翌年3月終わり）
-- 来週・再来週分のCLAUDE.mdで定義されたcourse ownerの担当授業を検索
-- フロントマター（topic、準備状況）を確認
+- セッションノートは `courses/{course_id}/sessions/YYYY-MM-DD_科目名.md`（年度ディレクトリは存在しない。年度はファイル名の日付で表す）。科目一覧・course_id の入口は `courses/registry.md`
+- CLAUDE.mdで定義された course owner の担当授業を、来週・再来週の日付範囲で検索する：
+  ```bash
+  FROM={来週月曜 YYYY-MM-DD}; TO={再来週日曜 YYYY-MM-DD}
+  (cd ~/vault/courses && find . -path "*/sessions/*.md" 2>/dev/null | while IFS= read -r f; do
+    d=$(basename "$f" | cut -c1-10)
+    [[ "$d" < "$FROM" || "$d" > "$TO" ]] && continue
+    grep -q "^owner: 星川" "$f" || continue
+    echo "$d | $(grep -m1 '^course:' "$f" | sed 's/^course: *//') | $(grep -m1 '^topic:' "$f" | sed 's/^topic: *//') | $(grep -m1 '^prepared:' "$f" | sed 's/^prepared: *//') | $f"
+  done | sort)
+  ```
+- フロントマター（`topic`、`prepared`）で準備状況を確認する
 
 ### 6. #waitingタスクの確認
 - `obsidian tasks` で vault 全体の `#waiting` タスクを一覧取得（素の `#waiting` と `[tag:: #waiting]` の両形式を拾う）：

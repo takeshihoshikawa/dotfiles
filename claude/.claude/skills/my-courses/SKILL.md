@@ -20,18 +20,30 @@ args:
    - システムコンテキストから今日の日付を取得（YYYY-MM-DD形式）
    - 今日以降の授業のみを対象とする
 
-2. **授業ファイルの検索**：
-   - ディレクトリ: CLAUDE.mdのvault pathの `courses/{最新年度}/`
-   - 最新年度は今日の日付から算出する（4月始まり翌年3月終わり。例: 2026-04-06 → 2026年度 → `courses/2026/`）
-   - Bashツールで今日以降の日付のファイルを検索
-   - `YYYY-MM-DD_*.md`形式のファイルで、日付が今日以降のもののみ
-   - 昇順（古い日付から新しい日付）でソート
-   - インデックスファイル（`_`で始まるファイル）は除外
+2. **授業ファイルの検索と自分担当の抽出**：
 
-3. **自分担当の授業を抽出と詳細読み込み**：
-   - CLAUDE.mdの `Course owner name` の値（自分の名前）を取得する
-   - Bashツールで `grep -l "owner: {自分の名前}"` を使い、対象ファイルのパス一覧を取得
-   - 取得したファイルを指定件数（デフォルト5件）分、Readツールで1件ずつ読み込む
+   セッションノートは `courses/{course_id}/sessions/YYYY-MM-DD_科目名.md` に格納されている（年度ディレクトリは存在しない。年度はファイル名の日付で表す）。科目の一覧・course_id は `courses/registry.md` が入口。
+
+   CLAUDE.mdの `Course owner name` の値（自分の名前）で絞り込み、今日以降の授業を昇順で取得する：
+
+   ```bash
+   TODAY=$(date +%F)
+   (cd ~/vault/courses && find . -path "*/sessions/*.md" 2>/dev/null | while IFS= read -r f; do
+     d=$(basename "$f" | cut -c1-10)
+     [[ "$d" < "$TODAY" ]] && continue
+     grep -q "^owner: 星川" "$f" || continue
+     course=$(grep -m1 "^course:" "$f" | sed 's/^course: *//')
+     class=$(grep -m1 "^class:" "$f" | sed 's/^class: *//')
+     topic=$(grep -m1 "^topic:" "$f" | sed 's/^topic: *//')
+     echo "$d | $course | $class | $topic | $f"
+   done | sort | head -5)
+   ```
+
+   - `head -5` の件数は引数 `count`（デフォルト5件）に合わせる
+   - インデックスファイル（`_meta.md` 等 `_` 始まり）は `*/sessions/*` の絞り込みで自然に除外される
+
+3. **詳細の読み込み**：
+   - 上で得たパスを指定件数分、Readツールで1件ずつ読み込む
    - `head` / `cat` などのコマンドは使用しない（Claude CodeのBashツールでブロックされるため）
 
 4. **授業概要の表示**：

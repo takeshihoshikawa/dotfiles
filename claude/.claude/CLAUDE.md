@@ -7,7 +7,10 @@ Vault path: `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/main`（`~/
 Folder structure:
 - `daily/` — daily notes (`YYYY-MM-DD.md`)
 - `weekly/` — weekly notes (`weekly-YYYY-MM-DD.md`)
-- `courses/{年度}/` — course notes (`YYYY-MM-DD_科目名.md`、年度は4月始まり翌年3月終わり)
+- `courses/registry.md` — 科目マスタ（course_id・科目名・別名・クラス・lecture_dir の対応表）。**科目を参照するときの入口**
+- `courses/{course_id}/sessions/` — 授業セッションノート（`YYYY-MM-DD_科目名.md`）。年度はディレクトリでなくファイル名の日付で表す
+- `courses/{course_id}/qa/` — 授業Q&A（1問1ファイル）
+- `courses/{course_id}/_meta.md` — 科目定義（topics と lecture_folder のマッピング）
 - `meetings/` — meeting notes (`YYYY-MM-DD_タイトル.md`)
 - `projects/` — project notes（ファイル名は **kebab-case 英語**、例 `spread1000-application.md`。研究プロジェクトの場合は `projects/{プロジェクト名}/` サブディレクトリを作成し、解析レポート等を格納）
 - `notes/` — misc notes, workflow docs, ideas
