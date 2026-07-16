@@ -14,7 +14,6 @@ Folder structure:
 - `meetings/` — meeting notes (`YYYY-MM-DD_タイトル.md`)
 - `projects/` — project notes（ファイル名は **kebab-case 英語**、例 `spread1000-application.md`。研究プロジェクトの場合は `projects/{プロジェクト名}/` サブディレクトリを作成し、解析レポート等を格納）
 - `notes/` — misc notes, workflow docs, ideas
-- `references/literature/` — 文献ノート（ファイル名はcitekey）
 - `notes/goals.md` — 長期目標・方針（/morningで毎朝表示）
 - `tasks.md` — タスク一元管理（vaultルート直下）
 - `dashboard.md` — タスクダッシュボード（vaultルート直下）
@@ -85,6 +84,11 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 ## データ管理ポリシー
 
 @data-management-policy.md
+
+## 文献管理
+
+文献（論文PDF・書誌情報）は papis で管理する。設定: `~/Library/Application Support/papis/config`。
+ライブラリ: `kb`（汎用、`~/Documents/papis/kb`）と、研究プロジェクトごとの `{project}/proposals/{年度-種別}/refs/papis-lib`。
 
 ## 研究プロジェクト規約
 
