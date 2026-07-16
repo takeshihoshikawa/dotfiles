@@ -44,10 +44,27 @@ git -C <repo> status -sb
 - 変更が一貫したまとまり（複数ファイルでも目的が統一されている）
 - 作業途中の痕跡がない（コメントアウトされたデバッグコード、TODO、WIPマーカーがない）
 - `.env` や秘密情報を含まない
+- `~/dotfiles` の `claude/.claude/settings.json` で**差分が `model` キーのみ**ではない（下記の例外を参照）
 
 条件を満たす場合：適切なコミットメッセージを生成して `git commit` → `git push` まで行う。
 
 条件を満たさない場合：報告のみ。変更ファイル名と「途中と判断した理由」を1行で添える。
+
+#### 例外: settings.json の model キーのみの差分
+
+`/model` のピッカーは Enter でデフォルトモデルを `~/.claude/settings.json`（= dotfiles 管理下）へ書き込む仕様（`s` がセッション限定）。`s` のつもりで Enter を誤爆すると意図しない変更が混入する。これをコミットすると別マシンのデフォルトを黙って書き換えるため、**一貫したまとまりに見えても自動コミットしない**。
+
+差分を提示して確認する：
+
+```
+settings.json の model が {旧} → {新} に変わっています。意図した変更ですか？違えば元に戻します。
+```
+
+- **意図していない** → 他に変更がなければ `git -C ~/dotfiles checkout claude/.claude/settings.json` で戻す
+- **意図した変更** → そのままコミットしてよい
+- **他の変更と混在** → checkout は他の変更ごと捨てるので使わない。`model` 部分だけ元の値に手で戻してからコミットする
+
+なお `model` キーが2箇所に定義されると JSON の後勝ちルールで後者が有効になり、前者の設定が黙って無効化される。コミット前に `python3 -c "import json; print(json.load(open('claude/.claude/settings.json'))['model'])"` で実効値を確認する。
 
 #### ahead（pushのみ必要）
 `git push` を自動実行する。
