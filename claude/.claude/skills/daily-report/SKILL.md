@@ -96,21 +96,22 @@ gh search issues --author @me --state closed --json repository,number,title,clos
 別マシンのコミットを拾うため、**fetch → clean なら pull → log** の順で実行する：
 ```bash
 TODAY=$(date +%F)
-REPOS=$(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
-for repo in $REPOS; do
-  git -C "$repo" fetch origin 2>/dev/null || echo "⚠ fetch失敗: $(basename $repo)"
+while IFS= read -r repo; do
+  git -C "$repo" fetch origin 2>/dev/null || echo "⚠ fetch失敗: $(basename "$repo")"
   BRANCH=$(git -C "$repo" branch --show-current 2>/dev/null)
   STATUS=$(git -C "$repo" status --porcelain 2>/dev/null)
   BEHIND=$(git -C "$repo" rev-list "HEAD..origin/$BRANCH" --count 2>/dev/null || echo 0)
   if [ -z "$STATUS" ] && [ "${BEHIND:-0}" -gt 0 ]; then
-    git -C "$repo" pull --rebase --quiet 2>/dev/null && echo "pulled: $(basename $repo) (+$BEHIND)"
+    git -C "$repo" pull --rebase --quiet 2>/dev/null && echo "pulled: $(basename "$repo") (+$BEHIND)"
   fi
   git -C "$repo" log --since="$TODAY 00:00" --until="$TODAY 23:59" \
-    --format="%ai %s" 2>/dev/null | while read line; do
-    echo "[$(basename $repo)] $line"
+    --format="%ai %s" 2>/dev/null | while IFS= read -r line; do
+    echo "[$(basename "$repo")] $line"
   done
-done
+done < <(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
 ```
+
+（`REPOS=$(...)` + `for repo in $REPOS` は使わない。zshは未クォート変数展開を単語分割しないため、全リポのパスが1つの文字列になりループが1回しか回らず、**gitログを黙って取りこぼす**。`while read` なら改行区切りを確実に処理できる。morning の同等処理も同じ形）
 
 ---
 
@@ -168,8 +169,19 @@ fi
 
 当日作業の締めとして、全リポジトリを別マシンから取得できる状態にする。
 
+まず全リポジトリの状態を一覧する（`REPOS=$(...)` + `for repo in $REPOS` は①dと同じ理由で使わない）：
+
 ```bash
-REPOS=$(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
+while IFS= read -r repo; do
+  echo "=== $(basename "$repo") ==="
+  BRANCH=$(git -C "$repo" branch --show-current 2>/dev/null)
+  git -C "$repo" fetch origin 2>/dev/null
+  STATUS=$(git -C "$repo" status --porcelain 2>/dev/null)
+  AHEAD=$(git -C "$repo" rev-list "origin/$BRANCH..HEAD" --count 2>/dev/null)
+  BEHIND=$(git -C "$repo" rev-list "HEAD..origin/$BRANCH" --count 2>/dev/null)
+  echo "branch=$BRANCH ahead=$AHEAD behind=$BEHIND"
+  [ -n "$STATUS" ] && { echo "--- dirty ---"; echo "$STATUS"; }
+done < <(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed 's|/.git||'; echo ~/dotfiles)
 ```
 
 | 状態 | 処理 |

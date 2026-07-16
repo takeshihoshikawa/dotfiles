@@ -1,6 +1,7 @@
 ---
 name: weekly-review
 description: 週次レビュー - 振り返り・タスク洗い出し・計画の3段階
+model: sonnet
 args:
   week_offset:
     description: 対象週（0=今週、-1=先週、デフォルト0）
@@ -191,14 +192,16 @@ goals.mdの内容を簡潔に提示した上で問いかけること（ユーザ
 ```
 
 「これらのタスクを追加しますか？不要なものは番号で除外してください。」と確認する。
-ユーザーの回答に従い、各タスクを**発生場所**の適切なファイルに追加する（転記せず source of truth に置く）：
-- Teaching系 → `notes/tasks.md` の `## teaching` セクションに追記（`#project/` タグなし）
+ユーザーの回答に従い、各タスクを**発生場所**の適切なファイルに追加する（転記せず source of truth に置く）。タスクの正本は vault ルート直下の `tasks.md`：
+- Teaching系 → `tasks.md` の `## teaching` セクションに追記（`#project/` タグなし）
   - `- [ ] タスク名 [due:: YYYY-MM-DD] [priority:: medium]`
-- Admin系 → `notes/tasks.md` の `## admin` セクションに追記（同上、`#project/` タグなし）
-- Research/プロジェクト系 → 発生場所（該当 project note の Next Actions、または関連 meeting note）に **`#project/{kebab-case}` タグ付き**で追記：
+- Admin系 → `tasks.md` の `## admin` セクションに追記（同上、`#project/` タグなし）
+- Research/プロジェクト系 → `tasks.md` の `## projects` セクションに **`#project/{kebab-case}` タグ付き**で追記：
   - `- [ ] タスク名 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]`
   - `#project/{kebab-case}` は `projects/{kebab-case}.md` のファイル名と一致させる
-  - project note の `## Task Dashboard`（Tasks プラグイン）がタグで自動集約するので、project note 内に重ねて転記しない
+  - **Edit で当該セクションへ直接書き込む**（`obsidian append` は inbox 末尾にしか入らないため使わない）
+  - 会議で発生したタスクは meeting note 側に残す（`tasks.md` へ転記しない）
+  - **project note（`projects/`）にはチェックボックスを置かない**。project note の `## Task Dashboard`（Tasks プラグイン）がタグで自動集約するため、追記は不要
 
 追加後、「他に追加したいタスクはありますか？」と自由入力を促す。
 ユーザーが「なし」または終了を示したら次フェーズへ。
@@ -210,7 +213,7 @@ goals.mdの内容を簡潔に提示した上で問いかけること（ユーザ
 **手順：**
 1. フェーズ1で確認した「研究コアブロック」登録済み日を表示
 2. 未登録の日がある場合、以下の優先順位で候補日・時間帯を提案する：
-   - **最優先：8:00〜10:30**（CLAUDE.mdの「午前 8:30-12:00 は重い作業ブロック」方針に沿う）
+   - **最優先：8:00〜10:30**（週1〜2回・月曜午前が基本。毎日設定しない）
    - 授業・会議・実習と重複しない日の午前を優先
    - 勤務日（月〜金）のみ対象
 3. 「以下の日程で研究コアブロックを登録しますか？」と確認し、承認後に Google Calendar MCP（`create_event`）で登録する
