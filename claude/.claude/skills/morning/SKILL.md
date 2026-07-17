@@ -42,6 +42,22 @@ model: sonnet
    - fetch失敗（⚠）が出たら `/sync-repos` で別途対処する旨を添える
    - dirty / diverged は `/sync-repos` で別途対処する旨を1行で添える
 
+-0.5. **プロジェクト現在地の転記**（上のpull直後に実行。順序が重要）：
+
+   各リポジトリの `CLAUDE.md` の `## 現在地` を Obsidian の frontmatter へ転記する。
+   pull した後に走らせることで、別端末（自宅PC・Linux機）で書かれた現在地が反映される。
+
+   ```bash
+   python3 ~/work/projects/admin/scripts/project_mirror.py
+   python3 ~/work/projects/admin/scripts/project_radar.py
+   ```
+
+   - 通常の出力（`{project}: phase=...`）は表示しない
+   - **`[WARN]` が出たプロジェクトだけを報告する**。警告は2種類:
+     - 「現在地が古い可能性がある」＝ コミットは進んでいるのに現在地の `**更新**:` が置き去り。
+       そのプロジェクトに触れる予定があるなら、現在地を書き直すよう促す
+     - 「`## 現在地` に ... が無い」＝ ラベル揺れ。リポジトリの CLAUDE.md を直す必要がある
+
 0. **長期目標・方針の表示**：
    - Obsidian vault の `notes/goals.md` を読み込み、内容をそのまま表示する
    - ファイルがない場合はこのステップをスキップ

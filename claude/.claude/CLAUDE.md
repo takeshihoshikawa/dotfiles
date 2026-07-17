@@ -23,8 +23,23 @@ Folder structure:
 | ツール | 役割 |
 |--------|------|
 | **Obsidian Tasks** | 実行管理（期日・チェック）。各ノートに `- [ ]` チェックボックスとして配置 |
-| **Project note** (`projects/`) | 全体把握。どこまでやったかの確認 |
+| **Project note** (`projects/`) | **管理**レイヤ。プロジェクト間の見通し（状態・優先順位・リンク・意思決定の記録） |
+| **リポジトリの `CLAUDE.md`「## 現在地」** | **実行**レイヤ。gitプロジェクトの現在地の**正本**（現フェーズ・次の一手・懸念） |
 | **Meeting note** (`meetings/`) | 会議の文脈・決定事項の記録 |
+
+### プロジェクトの「現在地」はリポジトリが正本（gitプロジェクトのみ）
+
+作業する場所に記録が残るようにするための分担。vault は Ubuntu 機から参照できないため、
+現在地を vault だけに置くと Linux で作業中に読み書きできない。
+
+- **人が書くのはリポジトリの `CLAUDE.md`「## 現在地」ただ1箇所**（`**現フェーズ**:` `**次の一手**:` `**懸念**:` `**更新**:`）
+- vault の frontmatter（`current_phase` / `next_action` / `concern` / `last_touched`）は
+  `~/work/projects/admin/scripts/project_mirror.py` が転記する**生成物**。手で書かない
+- 対象の判別は frontmatter の `local_path` の有無。**`local_path` が無いプロジェクト**（会議駆動・未クローン）は
+  従来通り人が vault に直接書き、スクリプトは触らない
+- README にフェーズ欄を置かない（更新頻度が違い、必ず腐って誤情報になる）
+- 現在地を更新したら `chore: 現在地更新` として**単独でコミットし、離席時に push** する
+- 一覧は `_bases/active-projects.base`（Obsidian Bases）。`/morning` が pull 直後に転記を実行する
 
 タスク管理は2系統：
 
@@ -33,7 +48,10 @@ Folder structure:
 | **プロジェクトtask** | `tasks.md`（計画起点）または `meetings/`（会議起点）。転記しない | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]` |
 | **非プロジェクトtask** | `tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD] [priority:: medium]` |
 
-**プロジェクトノート（`projects/`）にはチェックボックスを置かない。** 概要・進捗・文脈の記述のみ。次のステップを書く場合は箇条書き（チェックなし）で記載し、実行管理は `tasks.md` に任せる。
+**プロジェクトノート（`projects/`）にはチェックボックスを置かない。** 実行管理は `tasks.md` に任せる。
+gitプロジェクトでは**現在地（現フェーズ・次の一手・懸念）も本文に書かない**（上記の通りリポジトリが正本）。
+プロジェクトノートに残すのは、概要・仮説・関係者・意思決定の記録・ログ・meeting note へのリンクなど、
+プロジェクト間で効く文脈に限る。
 
 `#project/{kebab-case}` のプロジェクト名は `projects/{kebab-case}.md` のファイル名と一致させる。  
 Claude Code は `rg "#project/X" tasks.md meetings` で横断検索（plugin非依存）。  
