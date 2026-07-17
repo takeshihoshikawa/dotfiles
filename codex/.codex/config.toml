@@ -48,12 +48,15 @@ trust_level = "trusted"
 [projects."/Users/takeshi/Documents/Codex/2026-07-15/forest-ecology-and-management"]
 trust_level = "trusted"
 
+[projects."/Users/takeshi/Documents/Codex/2026-07-17/create-a"]
+trust_level = "trusted"
+
 [tui.model_availability_nux]
 "gpt-5.5" = 2
 "gpt-5.6-sol" = 1
 
 [marketplaces.openai-bundled]
-last_updated = "2026-07-16T10:58:50Z"
+last_updated = "2026-07-16T21:25:40Z"
 source_type = "local"
 source = "/Users/takeshi/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
