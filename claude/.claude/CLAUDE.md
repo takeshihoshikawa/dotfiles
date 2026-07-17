@@ -12,7 +12,7 @@ Folder structure:
 - `courses/{course_id}/qa/` — 授業Q&A（1問1ファイル）
 - `courses/{course_id}/_meta.md` — 科目定義（topics と lecture_folder のマッピング）
 - `meetings/` — meeting notes (`YYYY-MM-DD_タイトル.md`)
-- `projects/` — project notes（ファイル名は **kebab-case 英語**、例 `spread1000-application.md`。研究プロジェクトの場合は `projects/{プロジェクト名}/` サブディレクトリを作成し、解析レポート等を格納）
+- `projects/` — project notes（ファイル名は **kebab-case 英語**、例 `spread1000-application.md`）。**`.md` をフラットに置き、サブディレクトリを作らない**（`archive/` を除く）。解析レポート・文献レビュー・照会文書等はリポジトリ側（`docs/`・`outputs/reports/`）に置く
 - `notes/` — misc notes, workflow docs, ideas
 - `notes/goals.md` — 長期目標・方針（/morningで毎朝表示）
 - `tasks.md` — タスク一元管理（vaultルート直下）
