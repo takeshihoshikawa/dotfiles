@@ -52,6 +52,7 @@ args:
 - Google Calendar MCPで来週・再来週（2週間分）の予定を取得
 - 日付・時刻・タイトル・場所を収集
 - 来週のうち「研究コアブロック」タイトルのイベントが登録されている日を内部でメモしておく（フェーズ3で使用）
+- **`list_calendars`で「日本の祝日」カレンダー（`ja.japanese#holiday@group.v.calendar.google.com`）が登録されているか確認し、同じ期間で`list_events`（`calendarId`にこのIDを指定）を実行して祝日を取得する。** 祝日はデフォルトの主カレンダーには出ない別購読カレンダーのため、指定しないと存在自体に気づけない（2026-07-18の週次レビューで海の日を見落とした事例あり）。祝日がある日は計画フェーズで作業日から外す
 
 ### 5. 今後2週間の担当授業の確認
 - セッションノートは `courses/{course_id}/sessions/YYYY-MM-DD_科目名.md`（年度ディレクトリは存在しない。年度はファイル名の日付で表す）。科目一覧・course_id の入口は `courses/registry.md`
@@ -93,11 +94,57 @@ args:
   ```
 - 取得できない場合はスキップ（エラーで止まらない）
 
+### 9. プロジェクト状態のスクリーニング（active/waiting）
+`projects/*.md` の `current_phase`/`next_action`/`concern`（＝各リポの `CLAUDE.md`「## 現在地」の転記）は、
+実態と乖離しても`project_mirror.py`の陳腐化ガードが必ずしも検知しない（2026-07-18の棚卸しで、
+解決済みブロッカーが3週間放置表示・完了済みタスクが次の一手のまま等が複数件発覚。詳細は
+adminリポの[[project-mirror-staleness-guard-gap]]）。**全件を毎回深掘りはしない**（時間がかかりすぎる。
+[[feedback-project-audit-efficiency]]）。機械的なスクリーニングで候補を絞ってから、ユーザーが選んだ分だけ深掘りする：
+
+```bash
+VAULT="$HOME/vault"
+for f in "$VAULT"/projects/*.md; do
+  [ -f "$f" ] || continue
+  status=$(grep -m1 '^status:' "$f" | sed 's/^status: *//')
+  [[ "$status" == "active" || "$status" == "waiting" ]] || continue
+  name=$(basename "$f" .md)
+  local_path=$(grep -m1 '^local_path:' "$f" | sed "s/^local_path: *//; s|~|$HOME|")
+  if [ -n "$local_path" ] && [ -d "$local_path" ]; then
+    last_real=$(git -C "$local_path" log --format="%ad|%s" --date=short 2>/dev/null \
+      | grep -v '|chore: 現在地更新' | head -1)
+    echo "$name [$status]: ${last_real:-コミット無し}"
+  else
+    echo "$name [$status]: 未clone・vault直書き管理"
+  fi
+done
+```
+
+- 「非choreコミット」の日付と今日の日付の差が大きい（目安10日以上）プロジェクトを「要確認候補」として一覧の先頭に出す。ただし日数ギャップは万能ではない（2026-07-18のnfi-understory-disturbanceはコミット当日でも内容が古かった）ので、ギャップが小さくても本人が気になるプロジェクトがあれば追加で見てよい
+- フェーズ2の表示時に「🔍 プロジェクト状態チェック」として要確認候補を提示し、**深掘りするプロジェクトをユーザーに選んでもらう**（0件でもよい）。選ばれた分だけ、そのリポのCLAUDE.md「現在地」・関連タスクの状態を読み、実態とズレていれば current_phase/next_action/concern を修正し（`chore: 現在地更新`でコミット）、`project_mirror.py --project {id}`・`project_radar.py --project {id}` で反映する
+- 「次の一手が無く外部通知/共著者待ち」で当面動かす予定がないプロジェクトは`status: waiting`への切替を提案してよい（`_bases/active-projects.base`のWaitingビューに入り、Active Projectsの一覧から外れる。集計自体は継続される）
+
 ---
 
 ## 【フェーズ2】振り返り（対話）
 
 情報収集後、以下の分析を行い表示する。
+
+### プロジェクト状態チェックの表示
+
+振り返り本文より先に、フェーズ1-9のスクリーニング結果を表示する：
+
+```markdown
+## 🔍 プロジェクト状態チェック（active/waiting）
+
+| プロジェクト | status | 最終実質更新（非chore） | 経過日数 |
+|---|---|---|---|
+| {name} | {active/waiting} | {date or 未clone} | {N日}{⚠️ 10日以上なら付ける} |
+```
+
+⚠️が付いたプロジェクトを提示し、「深掘りして現在地を確認しますか？（複数可・0件でも可）」と問いかける。
+選ばれたプロジェクトだけ、そのリポのCLAUDE.md「現在地」と関連タスクを読んで実態と照合し、
+ズレがあれば current_phase/next_action/concern を修正する（詳細な手順はフェーズ1の9参照）。
+この結果（見つかった乖離・修正内容）は下の「研究」振り返りの材料としても使う。
 
 ### 振り返りフォーマット
 
