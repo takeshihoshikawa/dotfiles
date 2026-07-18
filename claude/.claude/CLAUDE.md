@@ -1,5 +1,10 @@
 # Global Claude Code Settings
 
+## 出力スタイル
+
+- 囲み数字・丸付き文字（①②③、❶❷❸ など）を使わない。Macのターミナルで表示が崩れて読みにくい。番号は `1.` `2.` `3.` の半角数字で書く
+- 同様に ㈱・㊤ などの囲み文字・機種依存文字も避ける
+
 ## Obsidian Vault
 
 Vault path: `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/main`（`~/vault` シンボリックリンクからもアクセス可。未作成なら `ln -sfn "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main" "$HOME/vault"`）
