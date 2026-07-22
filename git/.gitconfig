@@ -10,8 +10,6 @@
 	lol = log --graph --decorate --pretty=oneline --all --abbrev-commit
 [push]
 	default = simple
-[credential "https://dev.azure.com"]
-	useHttpPath = true
 [credential "https://github.com"]
 	helper =
 	helper = !gh auth git-credential
