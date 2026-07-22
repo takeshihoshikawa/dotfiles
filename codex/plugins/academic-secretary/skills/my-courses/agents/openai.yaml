@@ -1,0 +1,4 @@
+interface:
+  display_name: "My Courses"
+  short_description: "Show upcoming assigned course sessions"
+  default_prompt: "Use $my-courses to show my next five assigned course sessions."

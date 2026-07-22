@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sync Repositories"
+  short_description: "Inspect and safely synchronize repositories"
+  default_prompt: "Use $sync-repos to inspect and safely synchronize my project repositories."

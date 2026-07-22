@@ -1,0 +1,4 @@
+interface:
+  display_name: "Course Q&A"
+  short_description: "Draft and publish concise student course Q&A"
+  default_prompt: "Use $course-qa to answer recent course questions and prepare the approved outputs."

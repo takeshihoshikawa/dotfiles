@@ -1,0 +1,4 @@
+interface:
+  display_name: "Capture Task"
+  short_description: "Capture one actionable task in Obsidian"
+  default_prompt: "Use $capture-task to turn this thought into one actionable Obsidian inbox task."

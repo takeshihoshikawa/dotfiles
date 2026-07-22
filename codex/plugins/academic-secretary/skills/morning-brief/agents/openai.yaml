@@ -1,0 +1,4 @@
+interface:
+  display_name: "Morning Brief"
+  short_description: "Prepare a concise academic morning brief"
+  default_prompt: "Use $morning-brief to review my schedule and tasks and help plan today."

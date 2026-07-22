@@ -1,0 +1,4 @@
+interface:
+  display_name: "Weekly Review"
+  short_description: "Review the week and plan actionable next steps"
+  default_prompt: "Use $weekly-review to review last week and build an actionable plan for next week."

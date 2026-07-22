@@ -1,8 +1,11 @@
 ---
 name: daily-report
-description: チャット履歴からObsidianの日報を作成。引数なし=append（デフォルト）、recap=1日まとめ
+description: 既存の日報とチャット履歴を正本としてObsidianの日報を作成。引数なし=append（デフォルト）、recap=1日まとめ
 model: sonnet
 args:
+  mode:
+    description: append（デフォルト）または recap
+    required: false
   date:
     description: 日報の日付（YYYY-MM-DD形式、省略時は今日）
     required: false
@@ -24,13 +27,15 @@ args:
 
 cron `33 16 * * 1-5` は `recap` 引数付きで発火する。
 
+日付引数があれば `TARGET_DATE=YYYY-MM-DD`、無ければ今日とする。以降の日報・Calendar・GitHub Issues・gitログ・保存先はすべて `TARGET_DATE` を使い、過去日指定を今日の日付へ置き換えない。
+
 ---
 
 ## append モード
 
 ### やること
 
-1. `obsidian daily:read` で今日の日報を確認し、骨格（フロントマター＋`## やったこと`）が無ければ先に Edit で作る（「日報フォーマット」参照。`## 気づき` は recap が作るので append では作らない。既存の裸の追記があれば `## やったこと` の下へ入れる）
+1. 今日なら `obsidian daily:read`、過去日なら `~/vault/daily/{TARGET_DATE}.md` をReadして対象日の日報を確認し、骨格（フロントマター＋`## やったこと`）が無ければ先に Edit で作る（「日報フォーマット」参照。`## 気づき` は recap が作るので append では作らない。既存の裸の追記があれば `## やったこと` の下へ入れる）
 2. 会話履歴から作業を抽出し、即座に保存して終了（確認なし）
 
 ### エントリフォーマット
@@ -52,7 +57,7 @@ cron `33 16 * * 1-5` は `recap` 引数付きで発火する。
 obsidian daily:append content="- HH:MM–HH:MM **内容**\n    - 詳細"
 ```
 
-`daily:append` はファイル末尾に追記する。既に `## 気づき` 節がある日報では append を使わず、Edit で `## やったこと` 節の末尾に挿入する（気づき節への混入防止）。
+`daily:append` は今日のファイル末尾にだけ追記する。過去日指定、または既に `## 気づき` 節がある日報では使わず、Edit で `~/vault/daily/{TARGET_DATE}.md` の `## やったこと` 節末尾に挿入する（別日・気づき節への混入防止）。
 
 ---
 
@@ -74,18 +79,21 @@ obsidian daily:append content="- HH:MM–HH:MM **内容**\n    - 詳細"
 
 **a. 日報全文**
 ```bash
-obsidian daily:read
+TARGET_DATE={日付引数、無ければ date +%F}
+FILE="$HOME/vault/daily/$TARGET_DATE.md"
+[ -f "$FILE" ] && printf '%s\n' "$FILE"
 ```
+表示されたファイルをReadツールで読む。既存日報を、その日の記録内容に関する第一の正本として扱う。
 
 **b. Google Calendar**
-その日の予定を取得（`list_events` ツール、終日イベントは除外）
+`TARGET_DATE` の予定を取得（`list_events` ツール、終日イベントは除外）
 
 **c. GitHub Issues（当日close）**
 ```bash
-TODAY=$(date +%F)
+TARGET_DATE={日付引数、無ければ date +%F}
 gh search issues --author @me --state closed --json repository,number,title,closedAt --limit 50 2>/dev/null \
-  | jq -r --arg today "$TODAY" '
-      .[] | select(.closedAt | startswith($today)) |
+  | TZ=Asia/Tokyo jq -r --arg target "$TARGET_DATE" '
+      .[] | select((.closedAt | fromdateiso8601 | strflocaltime("%Y-%m-%d")) == $target) |
       "[\(.repository.nameWithOwner | split("/")[1])] #\(.number): \(.title)"' \
   || true
 ```
@@ -95,7 +103,7 @@ gh search issues --author @me --state closed --json repository,number,title,clos
 `~/work/projects/` 直下の全リポジトリ + `~/dotfiles` の当日コミットを収集する。
 別マシンのコミットを拾うため、**fetch → clean なら pull → log** の順で実行する：
 ```bash
-TODAY=$(date +%F)
+TARGET_DATE={日付引数、無ければ date +%F}
 while IFS= read -r repo; do
   git -C "$repo" fetch origin 2>/dev/null || echo "⚠ fetch失敗: $(basename "$repo")"
   BRANCH=$(git -C "$repo" branch --show-current 2>/dev/null)
@@ -104,7 +112,7 @@ while IFS= read -r repo; do
   if [ -z "$STATUS" ] && [ "${BEHIND:-0}" -gt 0 ]; then
     git -C "$repo" pull --rebase --quiet 2>/dev/null && echo "pulled: $(basename "$repo") (+$BEHIND)"
   fi
-  git -C "$repo" log --since="$TODAY 00:00" --until="$TODAY 23:59" \
+  git -C "$repo" log --since="$TARGET_DATE 00:00" --until="$TARGET_DATE 23:59:59" \
     --format="%ai %s" 2>/dev/null | while IFS= read -r line; do
     echo "[$(basename "$repo")] $line"
   done
@@ -117,21 +125,21 @@ done < <(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed
 
 ### ② 再構成 → ユーザー確認
 
-4つのソース（日報・カレンダー・GitHub closedイシュー・gitログ）と会話履歴を統合して1日分を組み立てる。
+4つのソース（日報・カレンダー・GitHub closedイシュー・gitログ）と会話履歴を統合して1日分を組み立てる。**既存日報とユーザーの明示発言を正本**とし、カレンダー・Issue・gitは欠落補完と時刻照合の補助証拠として扱う。
 
 **やったこと**
 - 全エントリを**時刻順**に並べ直す
 - 複数セッション・複数マシンの並行追記で同じ作業が重複していたら、事実を落とさず1エントリに統合する
 - 表記規約（後述）へ正規化する
-- 終了時刻が抜けているエントリを補完
+- 終了時刻が抜けているエントリは、次の明示記録・カレンダー等で裏付けられる場合だけ補完する。根拠が無ければ開始時刻のみのまま残す
 - カレンダー予定はギャップを埋める参照として使う（記載なければ追加、あれば時刻補正）
-- gitコミット：会話履歴にないものはエントリとして追加。コミット時刻を時刻推定に使う。英語・短縮形は日本語に変換
+- gitコミット：会話履歴にないものはエントリとして追加してよいが、コミットから確実に分かるのはリポジトリ・時刻・メッセージまで。作業時間帯や詳細を推測で膨らませず、英語・短縮形も意味を変えない範囲で日本語にする
 - GitHub closed Issues：会話履歴にないサーバー作業の完了証跡として追加。closeした時刻を時刻推定に使う
 - チェック範囲：勤務開始〜 min(最後のエントリ終了時刻, 現在時刻)
 - 30分以上の空白があれば確認（カレンダーに予定があればそれを提示）
 
 **気づき**
-- 全エントリから学び・気づき・教訓を読み取り、2–3文にまとめる
+- 既存日報または会話でユーザーが明示した学び・気づき・教訓を2–3文にまとめる。作業事実だけから新しい教訓を創作しない
 - 主体は**ユーザー本人の気づき・所感**（気分・懸案の進展・今後の意向など本人の発言を優先）。ユーザーとAgentが同時に気づいた作業上の発見も残してよい
 - Agentだけの教訓・memoryへの記録報告は日報に載せない（memory保存のみで完結）
 
@@ -141,10 +149,7 @@ done < <(find ~/work/projects -maxdepth 2 -name ".git" -type d 2>/dev/null | sed
 
 ### ③ 保存
 
-```bash
-DAILY_PATH=$(obsidian daily:path 2>/dev/null | grep -v "^[0-9]" | grep -v "^Your Obsidian")
-```
-Editツールで `~/vault/$DAILY_PATH` を全文更新。
+Editツールで `~/vault/daily/{TARGET_DATE}.md` を全文更新する。今日以外を指定した場合も同じ対象日へ保存し、今日の日報は変更しない。
 
 ---
 

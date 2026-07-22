@@ -1,0 +1,4 @@
+interface:
+  display_name: "Order Request"
+  short_description: "Create budget records and purchase requests"
+  default_prompt: "Use $order-request to process a quotation into the budget database and purchase request documents."

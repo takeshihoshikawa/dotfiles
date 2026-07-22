@@ -1,0 +1,4 @@
+interface:
+  display_name: "Daily Check-in"
+  short_description: "Check current work against the daily plan"
+  default_prompt: "Use $daily-check-in to assess whether my current work is still on track."

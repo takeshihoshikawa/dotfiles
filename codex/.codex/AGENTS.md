@@ -7,39 +7,44 @@ Vault path: `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/main` (`~/v
 Folder structure:
 - `daily/` - daily notes (`YYYY-MM-DD.md`)
 - `weekly/` - weekly notes (`weekly-YYYY-MM-DD.md`)
-- `courses/{年度}/` - course notes (`YYYY-MM-DD_科目名.md`; academic year starts in April)
+- `courses/registry.md` - course registry and `course_id` entry point
+- `courses/{course_id}/_meta.md` - course definition, topics, and lecture-folder mappings
+- `courses/{course_id}/sessions/` - session notes (`YYYY-MM-DD_科目名.md`)
+- `courses/{course_id}/qa/` - accumulated course Q&A files
 - `meetings/` - meeting notes (`YYYY-MM-DD_タイトル.md`)
-- `projects/` - project notes. Filenames are kebab-case English, for example `spread1000-application.md`. Research projects may use `projects/{project-name}/` subdirectories for reports and analysis notes.
+- `projects/` - project notes. Keep kebab-case `.md` files flat; use only `projects/archive/` as a subdirectory. Put reports and analyses in the corresponding git repository.
 - `notes/` - misc notes, workflow docs, ideas
-- `references/literature/` - literature notes named by citekey
+- `sources/` - imported or external source material; literature PDFs and metadata are managed with papis
 - `notes/goals.md` - long-term goals and direction
+- `tasks.md` - centralized task list at the vault root
 
 ## Notes And Tasks
 
-Use Obsidian Tasks for execution management. Put tasks where they arise instead of copying them into a separate task system.
+Use Obsidian Tasks for execution management. Project notes are a management layer and must not contain task checkboxes.
 
 | Type | Location | Format |
 |------|----------|--------|
-| Project task | Meeting or project note where the task arose | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]` |
-| Non-project task | `notes/tasks.md` | `- [ ] 内容 [due:: YYYY-MM-DD] [priority:: medium]` |
+| Project task | `tasks.md` when planning-originated; meeting note when meeting-originated | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]` |
+| Non-project task | `tasks.md` | `- [ ] 内容 [due:: YYYY-MM-DD] [priority:: medium]` |
 
 `#project/{kebab-case}` must match the corresponding `projects/{kebab-case}.md` filename.
 
-For project task search, use `rg "#project/X" projects meetings` from the vault root. For task extraction, prefer `obsidian tasks todo format=json` over ad hoc parsing when the CLI is available; use `rg` only as a fallback.
+For project task search, use `rg "#project/X" tasks.md meetings` from the vault root. For task extraction, prefer `obsidian tasks todo format=json` over ad hoc parsing when the CLI is available; use `rg` only as a fallback.
 
-Append non-project tasks to `notes/tasks.md`.
+Append uncategorized tasks to vault-root `tasks.md`; `## inbox` must remain the final section so appends land there. Insert classified tasks directly into the appropriate section.
 
 | Section | Use |
 |---------|-----|
+| `## projects` | Planning-originated project tasks with a matching `#project/{kebab-case}` tag. |
 | `## inbox` | Default. Use this when classification is unclear. |
 | `## admin` | University administration, institutional procedures, mandatory training, make-up class procedures. |
 | `## teaching` | Classes, student support, grading, teaching preparation, student projects. |
 
 Classification rule: institution or office driven -> `admin`; class or student driven -> `teaching`; unclear -> `inbox`.
 
-Keep `## inbox` as the final section in `notes/tasks.md` so appended tasks naturally land in inbox.
+Keep `## inbox` as the final section in `tasks.md` so appended tasks naturally land in inbox.
 
-Meeting note action items are records of decisions, owners, actions, and deadlines. They are not a separate status-management system.
+Meeting-originated tasks remain in the meeting note and are not copied to `tasks.md`. Project notes aggregate tasks through their dashboard and must not receive duplicate checkboxes.
 
 Templates:
 - `templates/meeting-agenda-template.md`

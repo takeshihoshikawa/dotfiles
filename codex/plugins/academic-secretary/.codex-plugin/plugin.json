@@ -1,0 +1,26 @@
+{
+  "name": "academic-secretary",
+  "version": "0.1.0+codex.20260722124948",
+  "description": "Personal academic secretary workflows for planning, reporting, teaching, repositories, and purchase requests.",
+  "author": {
+    "name": "Takeshi Hoshikawa"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Academic Secretary",
+    "shortDescription": "Academic planning and reporting workflows.",
+    "longDescription": "Runs personal academic-secretary workflows across Obsidian, Google Calendar, GitHub, local repositories, course Q&A, and university purchase requests.",
+    "developerName": "Takeshi Hoshikawa",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Run my morning brief and help me choose today's tasks.",
+      "Prepare today's evidence-based daily report.",
+      "Review last week and build next week's plan."
+    ]
+  }
+}

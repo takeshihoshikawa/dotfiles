@@ -1,0 +1,4 @@
+interface:
+  display_name: "Daily Report"
+  short_description: "Build evidence-based Obsidian daily reports"
+  default_prompt: "Use $daily-report to compile the workday into a concise evidence-based report."
