@@ -33,26 +33,8 @@
       }
     ]
   },
-  "enabledPlugins": {
-    "obsidian@obsidian-skills": true,
-    "microsoft-docs@claude-plugins-official": false,
-    "document-skills@anthropic-agent-skills": true,
-    "clangd-lsp@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "obsidian-skills": {
-      "source": {
-        "source": "github",
-        "repo": "kepano/obsidian-skills"
-      }
-    },
-    "anthropic-agent-skills": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/skills"
-      }
-    }
-  },
+  "enabledPlugins": {},
+  "extraKnownMarketplaces": {},
   "language": "Japanese",
   "advisorModel": "opus",
   "tui": "fullscreen",
