@@ -7,7 +7,13 @@ import unittest
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).parents[1] / "scripts" / "repo_snapshot.py"
+SCRIPT = (
+    Path(__file__).parents[2]
+    / "plugins"
+    / "academic-secretary"
+    / "scripts"
+    / "repo_snapshot.py"
+)
 SPEC = importlib.util.spec_from_file_location("repo_snapshot", SCRIPT)
 assert SPEC and SPEC.loader
 repo_snapshot = importlib.util.module_from_spec(SPEC)
