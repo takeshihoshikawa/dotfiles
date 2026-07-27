@@ -11,6 +11,8 @@ Use `gpt-5.6-terra` with `medium` reasoning effort. When subagent execution is a
 
 If already running as that profile or subagent execution is unavailable, execute locally. Do not recursively delegate or launch a nested CLI process solely to switch models. The parent must not repeat completed child work.
 
+Keep the delegated child available across planning phases. When it asks the user to prioritize tasks or approve exact changes, the parent must relay that prompt. After the user answers, continue the same child with `followup_task`; do not spawn a replacement child. The initial delegation counts as the one routing action, while follow-ups resume the same workflow state.
+
 ---
 
 Read [the shared contract](../../references/secretary-contract.md). Interpret “tomorrow” explicitly; otherwise target today.
@@ -47,3 +49,12 @@ Show, in order:
 6. Important repository warnings.
 
 Then ask which tasks to prioritize. Do not change task dates, completion, priority, or calendar events until the user approves the exact changes. Batch approved changes and report them briefly.
+
+After the user confirms priorities, end with a compact `Confirmed plan` containing:
+
+- One sentence for the day's theme.
+- Only the outcomes the user intends to pursue, each with a completion condition.
+- A complete planned-effort allocation for research, administration, and teaching that sums to the target day's available working time. Derive a reasonable allocation from the chosen priorities and calendar; present it as part of the confirmed plan so the user can correct it.
+- Relevant constraints such as working hours, lunch, calendar commitments, or health stop conditions.
+
+Do not write this plan into the daily note. Keep it in the session so a later daily-report recap can compare it with execution. Omit inactive and waiting projects unless they materially constrain the day.
