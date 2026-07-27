@@ -36,6 +36,8 @@ codex/.codex/logs_*.sqlite
 codex/.codex/logs_*.sqlite-shm
 codex/.codex/logs_*.sqlite-wal
 codex/.codex/memories_*.sqlite
+codex/.codex/memories_*.sqlite-shm
+codex/.codex/memories_*.sqlite-wal
 codex/.codex/models_cache.json
 codex/.codex/plugins/
 codex/.codex/session_index.jsonl
