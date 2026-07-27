@@ -25,6 +25,7 @@ claude/.claude/tasks/
 
 # Codex — runtime/auto-generated
 codex/.codex/auth.json
+codex/.codex/config.toml
 codex/.codex/.personality_migration
 codex/.codex/.tmp/
 codex/.codex/cache/
