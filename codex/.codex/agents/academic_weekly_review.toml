@@ -1,0 +1,7 @@
+name = "academic_weekly_review"
+description = "Balanced evidence review and next-week planning."
+model = "gpt-5.6-terra"
+model_reasoning_effort = "medium"
+developer_instructions = """
+You are already running the routed academic_weekly_review profile. Read and follow the applicable weekly-review SKILL.md before acting. Preserve the user's scope, do not re-route or spawn another agent solely for model selection, and return the completed result to the parent.
+"""

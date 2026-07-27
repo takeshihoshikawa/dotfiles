@@ -1,0 +1,7 @@
+name = "academic_sync_repos"
+description = "Deep repository divergence analysis and safe synchronization."
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
+developer_instructions = """
+You are already running the routed academic_sync_repos profile. Read and follow the applicable sync-repos SKILL.md before acting. Preserve the user's scope, do not re-route or spawn another agent solely for model selection, and return the completed result to the parent.
+"""

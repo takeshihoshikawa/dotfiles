@@ -5,6 +5,14 @@ description: Draft concise answers to student course questions, restore question
 
 # Course Q&A
 
+## Codex execution profile
+
+Use `gpt-5.6-terra` with `medium` reasoning effort. When subagent execution is available and this request has not already been routed, delegate the complete workflow exactly once with `fork_turns="none"`, that model and effort, and instructions to read this `SKILL.md` before acting. The child must identify itself as the `academic_course_qa` profile.
+
+If already running as that profile or subagent execution is unavailable, execute locally. Do not recursively delegate or launch a nested CLI process solely to switch models. The parent must not repeat completed child work.
+
+---
+
 Read [the shared contract](../../references/secretary-contract.md) and, when writing outputs, [the output format](references/output-format.md).
 
 ## Establish scope

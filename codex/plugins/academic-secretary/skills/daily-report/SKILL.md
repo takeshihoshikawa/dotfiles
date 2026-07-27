@@ -5,6 +5,19 @@ description: Append work to an Obsidian daily note or produce an evidence-based 
 
 # Daily report
 
+## Codex execution profiles
+
+Select the profile from the requested mode:
+
+- Append mode: `academic_daily_append`, `gpt-5.6-terra`, `low`
+- Recap mode: `academic_daily_recap`, `gpt-5.6-sol`, `medium`
+
+When subagent execution is available and this request has not already been routed, delegate the complete workflow exactly once with `fork_turns="none"`, the selected model and effort, and instructions to read this `SKILL.md` before acting. The child must identify itself as the selected profile.
+
+If already running as the selected profile or subagent execution is unavailable, execute locally. Do not recursively delegate or launch a nested CLI process solely to switch models. The parent must not repeat completed child work.
+
+---
+
 Read [the shared contract](../../references/secretary-contract.md). Default to append mode and today. Honor an explicit mode, date, preview-only request, or no-save request.
 
 ## Evidence order

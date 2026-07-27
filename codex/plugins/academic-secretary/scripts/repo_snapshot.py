@@ -50,13 +50,22 @@ def ahead_behind(repo: Path) -> tuple[str | None, int, int]:
     return upstream, int(ahead_text), int(behind_text)
 
 
-def classify(dirty: bool, upstream: str | None, ahead: int, behind: int) -> str:
-    if ahead and behind:
-        return "diverged"
+def classify(
+    dirty: bool,
+    upstream: str | None,
+    ahead: int,
+    behind: int,
+    *,
+    fetch_failed: bool = False,
+) -> str:
     if dirty:
         return "dirty"
+    if fetch_failed:
+        return "fetch-failed"
     if upstream is None:
         return "no-upstream"
+    if ahead and behind:
+        return "diverged"
     if behind:
         return "pullable"
     if ahead:
@@ -109,7 +118,13 @@ def snapshot_repo(
         else:
             fetch_error = result.stderr.strip() or "git pull --rebase failed"
 
-    state = classify(bool(dirty_lines), upstream, ahead, behind)
+    state = classify(
+        bool(dirty_lines),
+        upstream,
+        ahead,
+        behind,
+        fetch_failed=fetch_error is not None,
+    )
     item: dict[str, Any] = {
         "name": repo.name,
         "path": str(repo),
@@ -132,15 +147,15 @@ def render_summary(items: list[dict[str, Any]]) -> str:
     lines: list[str] = []
     synced = sum(1 for item in items if item["state"] == "synced" and not item["pulled"])
     if synced:
-        lines.append(f"✅ {synced}件 synced")
+        lines.append(f"synced: {synced}件")
     for item in items:
         if item["pulled"]:
-            lines.append(f"⬇️ pulled: {item['name']}")
-        elif item["fetch_error"]:
-            lines.append(f"⚠️ fetch失敗: {item['name']} — {item['fetch_error']}")
+            lines.append(f"pulled: {item['name']}")
+        elif item["state"] == "fetch-failed":
+            lines.append(f"fetch-failed: {item['name']} — {item['fetch_error']}")
         elif item["state"] != "synced":
             lines.append(
-                f"⚠️ {item['state']}: {item['name']} "
+                f"{item['state']}: {item['name']} "
                 f"(ahead {item['ahead']}, behind {item['behind']})"
             )
     return "\n".join(lines)

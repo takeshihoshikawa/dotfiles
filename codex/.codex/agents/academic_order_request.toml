@@ -1,0 +1,7 @@
+name = "academic_order_request"
+description = "Careful purchase-request extraction, validation, and rendering."
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
+developer_instructions = """
+You are already running the routed academic_order_request profile. Read and follow the academic-secretary:order-request SKILL.md before acting. Preserve the user's scope, do not re-route or spawn another agent solely for model selection, and return the completed result to the parent.
+"""

@@ -80,6 +80,31 @@ class RepoSnapshotTest(unittest.TestCase):
         self.assertEqual((item["ahead"], item["behind"]), (1, 1))
         self.assertFalse(item["pulled"])
 
+    def test_dirty_takes_precedence_over_diverged(self) -> None:
+        (self.writer / "remote.txt").write_text("remote\n")
+        git(self.writer, "add", "remote.txt")
+        git(self.writer, "commit", "-m", "remote update")
+        git(self.writer, "push")
+        (self.reader / "local.txt").write_text("local\n")
+        git(self.reader, "add", "local.txt")
+        git(self.reader, "commit", "-m", "local update")
+        (self.reader / "wip.txt").write_text("dirty\n")
+
+        item = repo_snapshot.snapshot_repo(self.reader, fetch=True, pull_safe=True, target_date=None)
+
+        self.assertEqual(item["state"], "dirty")
+        self.assertEqual((item["ahead"], item["behind"]), (1, 1))
+        self.assertFalse(item["pulled"])
+
+    def test_fetch_failure_is_reported_as_its_own_state(self) -> None:
+        git(self.reader, "remote", "set-url", "origin", str(self.remote.parent / "missing.git"))
+
+        item = repo_snapshot.snapshot_repo(self.reader, fetch=True, pull_safe=True, target_date=None)
+
+        self.assertEqual(item["state"], "fetch-failed")
+        self.assertIsNotNone(item["fetch_error"])
+        self.assertFalse(item["pulled"])
+
 
 if __name__ == "__main__":
     unittest.main()
