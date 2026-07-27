@@ -1,0 +1,4 @@
+interface:
+  display_name: "Morning"
+  short_description: "Confirm a compact plan for the workday"
+  default_prompt: "Use $morning to review my schedule and priorities and confirm today's plan."

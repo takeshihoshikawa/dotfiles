@@ -1,6 +1,6 @@
 {
   "name": "academic-secretary",
-  "version": "0.1.0+codex.20260727134049",
+  "version": "0.1.0+codex.20260728083833",
   "description": "Personal academic secretary workflows for planning, reporting, teaching, repositories, and purchase requests.",
   "author": {
     "name": "Takeshi Hoshikawa"
@@ -18,7 +18,7 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Run my morning brief and help me choose today's tasks.",
+      "Run my morning planning and help me confirm today's priorities.",
       "Prepare today's evidence-based daily report.",
       "Review last week and build next week's plan."
     ]
