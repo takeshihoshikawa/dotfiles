@@ -107,7 +107,7 @@ cmd_adopt() {
     PROJECT_NAME "$name" \
     FULL_PROJECT_NAME "${proj_full:-}"
 
-  # 空ディレクトリを .gitkeep 付きで作成（構造の正本: vault notes/research-project-setup.md）
+  # 空ディレクトリを .gitkeep 付きで作成（構造の正本: ~/dotfiles/claude/.claude/research-project-conventions.md）
   local d
   for d in data/raw data/interim data/processed data/outputs \
            src notebooks \

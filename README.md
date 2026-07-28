@@ -117,4 +117,5 @@ gh repo create --private research-project-template --source=. --remote=origin --
 ## 関連
 
 - グローバル `~/.claude/CLAUDE.md`「研究プロジェクト規約」
-- Vault `notes/research-project-setup.md` — 同規約の解説版
+- `~/dotfiles/claude/.claude/research-project-conventions.md` — 構造の正本
+- `~/dotfiles/claude/.claude/research/phase-setup.md` — 立ち上げフェーズの手順（init.sh の使い方はこちら）

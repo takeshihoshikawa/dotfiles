@@ -64,7 +64,7 @@ outputs/{papers,presentations,reports}/  # 公開・提出する最終成果物
 docs/              # 設計メモ・データ入出力仕様
 ```
 
-構造の正本は Vault `notes/research-project-setup.md`。データ保存・NAS/S3 同期は Vault `notes/data-management-policy.md` と `scripts/utilities/sync_with_{nas,s3}.sh`（要: sync_raw() のデータセット定義）に従う。
+構造の正本は `~/dotfiles/claude/.claude/research-project-conventions.md`。データ保存・NAS/S3 同期は `~/dotfiles/claude/.claude/data-management-policy.md` と `scripts/utilities/sync_with_{nas,s3}.sh`（要: sync_raw() のデータセット定義）に従う。
 
 ## ワークフロー
 
@@ -135,7 +135,7 @@ Claude Code が自律的に commit/push を行う運用。ベストプラクテ�
 
 - **Obsidian プロジェクトノート**: `projects/{{PROJECT_NAME}}.md`（Vault）
 - **提出物アーカイブ**: `~/Documents/grant/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}/`（iCloud）
-- **規約**: グローバル `~/.claude/CLAUDE.md`「研究プロジェクト規約」 / Vault `notes/research-project-setup.md`
+- **規約**: グローバル `~/.claude/CLAUDE.md`「研究プロジェクト規約」 / `~/dotfiles/claude/.claude/research-project-conventions.md`
 
 ## 注意
 

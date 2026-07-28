@@ -3,7 +3,7 @@
 #   bash scripts/utilities/sync_with_nas.sh [check|push|pull] [raw|processed|results|outputs|all] [--dryrun] [--delete] [--no-las]
 #
 # NAS (mounted at /Volumes/Public) is the persistent Single Source of Truth
-# for this project's data (see ~/vault/notes/data-management-policy.md).
+# for this project's data (see ~/dotfiles/claude/.claude/data-management-policy.md).
 # S3 (sync_with_s3.sh) is used only as a transit store when running on EC2,
 # which has no direct NAS access -- do not treat S3 as authoritative.
 #

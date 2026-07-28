@@ -24,4 +24,4 @@
 
 - Obsidian プロジェクトノート: `projects/{{PROJECT_NAME}}.md`
 - 提出版アーカイブ: `~/Documents/grant/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}/`
-- 規約: `~/.claude/CLAUDE.md`「研究プロジェクト規約」、Vault `notes/research-project-setup.md`
+- 規約: `~/.claude/CLAUDE.md`「研究プロジェクト規約」、`~/dotfiles/claude/.claude/research-project-conventions.md`
