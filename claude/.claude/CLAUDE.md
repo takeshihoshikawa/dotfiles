@@ -156,7 +156,8 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 
 1. **申請書執筆**: `proposals/{YYYY}-{種別}/drafts/*.md` を真のソースとし、pandoc で .docx 生成 → 提出版を `~/Documents/grant/...` にコピー
 2. **採択後**: `data/`・`src/`・`notebooks/`・`scripts/` で本研究、`results/` → `scripts/publication/` → `outputs/` で成果物
-3. **GitHub remote**: 長期/多端末/将来の共有が見込まれるプロジェクトは private repo を推奨
+3. **投稿前**: 最終チェックの観点は `~/dotfiles/claude/.claude/manuscript-submission-check.md`（8項目・依頼前チェック・出力形式）。**投稿前チェックを頼まれたら必ず読む。** 特に引用は書誌の形式チェックだけで終わらせず、題名→要旨→本文PDF の3段階で主張との対応を照合する（項目7）
+4. **GitHub remote**: 長期/多端末/将来の共有が見込まれるプロジェクトは private repo を推奨
 
 ### .gitignore 雛形
 
