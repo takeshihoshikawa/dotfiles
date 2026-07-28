@@ -34,17 +34,16 @@ Folder structure:
 
 ### プロジェクトの「現在地」はリポジトリが正本（gitプロジェクトのみ）
 
-作業する場所に記録が残るようにするための分担。vault は Ubuntu 機から参照できないため、
-現在地を vault だけに置くと Linux で作業中に読み書きできない。
+作業する場所に記録が残るようにするための分担（vault は Ubuntu 機から参照できない）。
 
 - **人が書くのはリポジトリの `CLAUDE.md`「## 現在地」ただ1箇所**（`**現フェーズ**:` `**次の一手**:` `**懸念**:` `**更新**:`）
 - vault の frontmatter（`current_phase` / `next_action` / `concern` / `last_touched`）は
   `~/work/projects/admin/scripts/project_mirror.py` が転記する**生成物**。手で書かない
-- 対象の判別は frontmatter の `local_path` の有無。**`local_path` が無いプロジェクト**（会議駆動・未クローン）は
-  従来通り人が vault に直接書き、スクリプトは触らない
 - README にフェーズ欄を置かない（更新頻度が違い、必ず腐って誤情報になる）
 - 現在地を更新したら `chore: 現在地更新` として**単独でコミットし、離席時に push** する
-- 一覧は `_bases/active-projects.base`（Obsidian Bases）。`/morning` が pull 直後に転記を実行する
+
+転記の対象判別（`local_path` の有無）・陳腐化ガード等の仕様は `~/work/projects/admin/CLAUDE.md`
+「## プロジェクト状態の集約」が正本。**`project_mirror.py` / `project_radar.py` を変更する前に必ず読む。**
 
 タスク管理は2系統：
 
@@ -80,7 +79,8 @@ Claude Code は `rg "#project/X" tasks.md meetings` で横断検索（plugin非�
 - Meeting noteのアクションアイテムは「決定した事実」の記録（担当者・アクション・期限）。ステータス管理はしない
 - Project noteはチェックボックス禁止。タスク重複の温床になるため
 - テンプレート: `templates/meeting-agenda-template.md`、`templates/project-note-template.md`
-- 詳細: `notes/meeting-project-workflow.md`
+- 打ち合わせ後の手順（meeting note → project note → リポジトリの「## 現在地」）は
+  `~/dotfiles/claude/.claude/obsidian-workflow.md`「打ち合わせ → プロジェクト → タスク」を参照
 
 ## User
 
@@ -106,7 +106,26 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 
 ## データ管理ポリシー
 
-@data-management-policy.md
+研究データの置き場所は 4 層で判断する。
+
+| 層 | 定義 | 永続保存 |
+|----|------|----------|
+| `raw` | 計測・取得した一次データ。**変更禁止（immutable）** | ○ |
+| `interim` | 一時作業領域。**消失しても問題ないものだけ**置く | × |
+| `processed` | 再利用する安定データ。再生成に時間・計算資源・人手がかかるものは品質確認前でも置く | ○ |
+| `outputs` | 外部共有・GIS配布用の最終データ成果物 | ○ |
+
+- **迷ったら `processed` に保存する。** 手修正・アノテーション途中データを `interim` に置かない
+- 間引き・正規化等の処理を経たデータは raw ではない（`processed` に属する）
+- **正本（Single Source of Truth）は常に1か所**。ローカル作業領域はキャッシュであり永続保管場所ではない
+- 永続ストレージは QNAP NAS。**S3 は EC2 利用時の受け渡し専用で、正本として扱わない**
+  （例外: 公開用バケット `takeshi-research-public` は S3 が正本）
+- 削除は非破壊が原則。**ストレージを消す前に、参照している側のコードを grep する**
+
+上記以外（NAS のディレクトリ構成、raw の README 必須項目、CIFS/rsync の落とし穴、
+sync スクリプトの標準パターン、削除・保持ルールの詳細、S3 の運用と課金、移行の経緯）は
+`~/dotfiles/claude/.claude/data-management-policy.md` が正本。
+**NAS/S3 の同期・掃除・raw の受け入れをする前に必ず読む。**
 
 ## 文献管理
 
@@ -115,76 +134,44 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 
 ## 研究プロジェクト規約
 
-新規研究プロジェクトは以下 4 点を組み合わせて構成する。詳細・判断基準は Obsidian Vault の `notes/research-project-setup.md` を参照。
+作業領域（ソース・git）は `~/work/projects/{kebab-case名}/`（**非 iCloud**。iCloud と git/.claude/ は
+相性が悪い）。提出物（.docx, .pdf）のみ iCloud `~/Documents/grant/` にコピーしてアーカイブする。
 
-### 場所の使い分け
+場所の使い分け・標準ディレクトリ構造・命名規約・EC2 の使い方・.gitignore 雛形・完了時の扱いは
+`~/dotfiles/claude/.claude/research-project-conventions.md` が正本。
+**新規研究プロジェクトを作る・既存の構造を変えるときは必ず読む。**
 
-| 性質 | 場所 |
-|------|------|
-| 作業領域（ソース、git） | `~/work/projects/{kebab-case名}/`（**非 iCloud**） |
-| 提出物アーカイブ | `~/Documents/grant/{YYYYMMDD}_{種別}_{略称}/`（iCloud） |
-| Obsidian プロジェクトノート | Vault の `projects/{kebab-case名}.md` |
-| データ実体（巨大） | git 管理外（外部 HDD・S3 等） |
+フェーズ固有の規約は `~/dotfiles/claude/.claude/research/` にある。**これから行う作業に該当する
+ものを必ず読む**（複数フェーズが並行することもある）:
 
-**iCloud と git/.claude/ は相性が悪い**ため、ソースは必ず `~/work/projects/` に置く。提出物（.docx, .pdf）のみ iCloud `Documents/grant/` にコピーしてアーカイブする。
-
-### 計算リソース（EC2）
-
-- 重い処理は EC2 を一時起動 → 結果を S3 に sync → **terminate**（永続させない／ホームは破棄前提）
-- 接続は Tailscale 経由・ユーザー `ubuntu`（パブリックIPは不可）、GitHub push は `ssh -A`
-
-### 標準ディレクトリ構造（要約）
-
-**正本は Vault の `notes/research-project-setup.md`**（フルツリー・責務の詳細はそちら）。骨格：
-
-```
-~/work/projects/{name}/
-├── CLAUDE.md / README.md / .gitignore
-├── proposals/{YYYY}-{種別}/    # 申請書フェーズ（drafts/*.md, 様式/, figures/, refs/, budget/, output/）
-├── data/{raw,interim,processed,outputs}/   # gitignore（実体は NAS、data-management-policy 参照）
-├── src/                        # 再利用可能な関数（テスト対象）
-├── notebooks/                  # 探索的実験
-├── scripts/{pipeline,experiments,publication,utilities}/
-├── config/{datasets,models,paths}/
-├── results/                    # 解析成果（metrics・models・figures）
-└── outputs/{papers,presentations,reports}/  # 公開・提出する最終成果物
-```
-
-旧構成のルート直下 `reports/`・`papers/`、`scripts/{explore,paper}` は 2026-07-07 に上記へ統一（既存プロジェクトは遡及リネームしない）。
-
-### ワークフロー
-
-1. **申請書執筆**: `proposals/{YYYY}-{種別}/drafts/*.md` を真のソースとし、pandoc で .docx 生成 → 提出版を `~/Documents/grant/...` にコピー
-2. **採択後**: `data/`・`src/`・`notebooks/`・`scripts/` で本研究、`results/` → `scripts/publication/` → `outputs/` で成果物
-3. **投稿前**: 最終チェックの観点は `~/dotfiles/claude/.claude/manuscript-submission-check.md`（8項目・依頼前チェック・出力形式）。**投稿前チェックを頼まれたら必ず読む。** 特に引用は書誌の形式チェックだけで終わらせず、題名→要旨→本文PDF の3段階で主張との対応を照合する（項目7）
-4. **GitHub remote**: 長期/多端末/将来の共有が見込まれるプロジェクトは private repo を推奨
-
-### .gitignore 雛形
-
-
-```
-.DS_Store
-data/raw/
-data/processed/
-*.las
-*.laz
-*.ply
-*.pcd
-proposals/**/output/
-~$*
-.venv/
-__pycache__/
-.Rhistory
-.RData
-.Rproj.user/
-renv/library/
-.claude/local/
-```
+| ファイル | 読むとき |
+|---|---|
+| `research/phase-setup.md` | プロジェクトを立ち上げる・`init.sh` を使う |
+| `research/phase-proposal.md` | 申請書を書く・提出物を作る |
+| `research/phase-analysis.md` | 解析スクリプトを書く・`scripts/` `config/` `results/` を触る |
+| `research/phase-publication.md` | 論文原稿・投稿用図表を作る |
 
 ## Obsidian vault の取り扱い
 
-@obsidian-workflow.md
+Vault: `~/vault`（実体は iCloud 上の vault へのシンボリックリンク）。CWD は常にホーム。
+
+| 操作 | 担当 |
+|------|------|
+| 本文を読む・要約・下書き・本文を編集 | 通常のファイルアクセス（Read / Edit / Grep / Glob）でよい |
+| 移動・リネーム・削除・テンプレ作成・daily・properties・tag 操作 | **必ず `obsidian` CLI 経由**（wikilink 保護） |
+
+**vault 内で `mv` / `rm` / `rmdir` を直接使わない**（PreToolUse hook でブロックされる）。
+`obsidian` は起動中の Obsidian アプリのリモコン。未起動時のみ起動する
+（`pgrep -x Obsidian >/dev/null || { open -a Obsidian; sleep 2; }`）。
+
+コマンドリファレンス（`obsidian` CLI の各コマンド、タスクの追加・一覧・完了、`rg` フォールバック、
+更新順ノート一覧）と、打ち合わせ後の記録手順は
+`~/dotfiles/claude/.claude/obsidian-workflow.md` が正本。
+**vault を操作する・会議録やプロジェクトノートを書くときは必ず読む。** 学習カットオフ以降に
+コマンドが増えている可能性があるため `obsidian help` でも確認する。
 
 ## Quarto 原稿レンダリングパターン
 
-@quarto-manuscript-rendering-patterns.md
+PDF と DOCX の両方を出す Quarto 原稿プロジェクトの構成・テーブルレンダリング（gt/LaTeX を単一定義とし
+DOCX には PNG を埋め込む）・検証手順は `~/dotfiles/claude/.claude/quarto-manuscript-rendering-patterns.md`
+が正本。**Quarto 原稿のレンダリング構成を作る・変えるときは必ず読む。**
