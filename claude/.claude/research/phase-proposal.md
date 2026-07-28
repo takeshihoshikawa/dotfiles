@@ -1,7 +1,7 @@
 # フェーズ: 申請書
 
 公募研究計画書（科研費・学術変革・受託等）を書き、提出物を作るときの手順。
-`proposals/` の位置づけとディレクトリ構造は `../research-project-conventions.md` が正本。
+`proposals/` の位置づけとディレクトリ構造は `~/dotfiles/claude/.claude/research-project-conventions.md` が正本。
 
 ## 提出物のワークフロー
 

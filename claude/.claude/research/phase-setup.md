@@ -1,7 +1,7 @@
 # フェーズ: 立ち上げ
 
 プロジェクトを新規に作る・既存ディレクトリを標準構成へ引き上げるときの手順。
-ディレクトリ構造そのものは `../research-project-conventions.md` が正本。
+ディレクトリ構造そのものは `~/dotfiles/claude/.claude/research-project-conventions.md` が正本。
 
 ## 自動立ち上げ（init.sh）
 
@@ -100,4 +100,4 @@
   **そのプロジェクト自身の実際の監査結果**を書く。他プロジェクトの監査結果を転用しない
   （事実が食い違う可能性がある）
 
-同期の運用ルール本体は `../data-management-policy.md` が正本。
+同期の運用ルール本体は `~/dotfiles/claude/.claude/data-management-policy.md` が正本。

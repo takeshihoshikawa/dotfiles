@@ -22,12 +22,12 @@
 - 再解析時の不整合
 
 を防げる。PDF と DOCX の両方を出す構成（原稿は prose 中心、テーブルは gt/LaTeX を単一定義とし
-DOCX には PNG を埋め込む）の作り方・検証手順は `../quarto-manuscript-rendering-patterns.md` が正本。
+DOCX には PNG を埋め込む）の作り方・検証手順は `~/dotfiles/claude/.claude/quarto-manuscript-rendering-patterns.md` が正本。
 **Quarto 原稿のレンダリング構成を作る・変えるときはそちらを読む。**
 
 ## 投稿前チェック
 
-最終品質確認の観点表は `../manuscript-submission-check.md`（8項目・依頼前チェック・出力形式）。
+最終品質確認の観点表は `~/dotfiles/claude/.claude/manuscript-submission-check.md`（8項目・依頼前チェック・出力形式）。
 **投稿前チェックをするときは必ず読む。**
 
 特に注意する点:
@@ -42,7 +42,7 @@ DOCX には PNG を埋め込む）の作り方・検証手順は `../quarto-manu
 ## 共著者とのやりとり
 
 共著者コメント待ちで並行作業も無い状態になったら、vault のプロジェクトノートの `status` を
-`waiting` にする（`../research-project-conventions.md`「完了プロジェクトの扱い」参照）。
+`waiting` にする（`~/dotfiles/claude/.claude/research-project-conventions.md`「完了プロジェクトの扱い」参照）。
 
 ## 投稿後・受理後
 

@@ -145,10 +145,10 @@ renv/library/
 
 | 状態 | 対応 |
 |------|------|
-| **条件付き完了**（再開の可能性あり） | vault の `projects/` に置いたまま。frontmatter の `status` を `waiting` にする |
+| **条件付き完了**（再開の可能性あり） | vault の `projects/` に置いたまま。frontmatter の `status` を更新する |
 | **完全完了**（申請書提出・論文投稿済み等で再開予定なし） | `obsidian move` で `projects/archive/` に移動（wikilink 自動修正）。NAS 側も `archive/` へ非破壊 `mv` し、移動先をプロジェクトノートに記録する |
 
 例: `obsidian move file="paper-writing-efficiency" to="projects/archive/"`
 
-`waiting` と `done` の違いは「戻ってくる予定があるか」。詳細は
-`~/work/projects/admin/CLAUDE.md`「## プロジェクト状態の集約」。
+`status` の使い分け（`active` / `waiting` / `done`）と `_bases/active-projects.base` の
+ビュー定義は `~/work/projects/admin/CLAUDE.md`「## プロジェクト状態の集約」が正本。

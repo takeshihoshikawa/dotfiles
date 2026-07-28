@@ -1,8 +1,8 @@
 # フェーズ: 解析
 
 解析スクリプトを書く・`scripts/` `config/` `results/` を触るときの責務定義。
-ディレクトリ構造そのものは `../research-project-conventions.md`、データの保存・同期は
-`../data-management-policy.md`、コードの書き方は `../data-analysis-coding-conventions.md` が正本。
+ディレクトリ構造そのものは `~/dotfiles/claude/.claude/research-project-conventions.md`、データの保存・同期は
+`~/dotfiles/claude/.claude/data-management-policy.md`、コードの書き方は `~/dotfiles/claude/.claude/data-analysis-coding-conventions.md` が正本。
 
 本ファイルが定義するのは**「何をどこに置き、どう成果物へつなぐか」**。
 
@@ -74,7 +74,7 @@ GUI による手作業を最小化し、再生成可能な状態を維持する�
 | **outputs/** | 公開・提出・共有する最終成果物。投稿論文・発表資料・報告書・配布図面 |
 
 `data/outputs/` はデータとしての成果物（配布 CSV・GeoTIFF 等）で、これとは別物
-（`../data-management-policy.md` 参照）。
+（`~/dotfiles/claude/.claude/data-management-policy.md` 参照）。
 
 ## 環境管理
 
@@ -97,4 +97,4 @@ GUI による手作業を最小化し、再生成可能な状態を維持する�
 同じロジックを 2 つ目・3 つ目のプロジェクトで独立に書きそうになったら、技術層
 （センサー・ツール固有で目的非依存な部分）だけを共有リポジトリへ抽出することを検討する。
 1 プロジェクトでしか使っていないコードを、将来使うかもしれないからと先回りして共有化しない。
-判断基準・実装の型は `../cross-project-technology-layer.md`。
+判断基準・実装の型は `~/dotfiles/claude/.claude/cross-project-technology-layer.md`。
