@@ -1,0 +1,143 @@
+# {{PROJECT_NAME}} — プロジェクト指示
+
+<!--
+このファイルは ~/work/templates/research-project/ から生成された雛形です。
+立ち上げ時に ChatGPT・Obsidian・既存メモから内容を引き継いで埋めてください。
+未確定の項目は {{...}} プレースホルダのまま残して構いません。後で init.sh add-proposal 等で埋まります。
+-->
+
+## 概要
+
+<!-- TODO: プロジェクトの目的・対象・背景を 1〜2 段落で。ChatGPT/Obsidian で書いた構想を貼ると良い -->
+
+**領域名/プロジェクト正式名**: {{FULL_PROJECT_NAME}}
+
+## 体制
+
+<!-- TODO: 共同研究者・班構成・役割分担。決まっている範囲で記入 -->
+
+| 班/役割 | 担当 | 氏名 |
+|---|---|---|
+
+## 現在のフェーズ
+
+<!-- TODO: 立ち上げ直後はここを最優先で埋める -->
+
+**フェーズ**: {{PHASE}}（例: 申請書執筆 / 解析中 / 報告書執筆）
+
+| マイルストーン | 日付 |
+|---|---|
+| {{MILESTONE_1}} | {{DATE_1}} |
+| {{MILESTONE_2}} | {{DATE_2}} |
+
+## 役割と作成書類
+
+<!-- TODO: 自分が作成する書類を整理（科研費の場合は様式番号付きで） -->
+
+**本人の役割**: {{ROLE}}（例: 領域代表者 / 計画研究代表者 / 研究分担者）
+
+| 書類 | 形式 | 概要 |
+|---|---|---|
+
+## 研究構想の現状
+
+<!-- TODO: ChatGPT・Obsidian で固めた構想をここに移植。
+中心問い・仮説・案 A/B 比較・象徴種候補などが該当する -->
+
+## ディレクトリ構成
+
+```
+proposals/{{YEAR}}-{{GRANT_TYPE}}/
+  ├── drafts/      # 申請書節別 markdown（真のソース）
+  ├── 様式/        # JSPS/JST 等の配布様式（参照のみ）
+  ├── figures/     # 概念図・予備データ図
+  ├── refs/        # BibTeX, 引用メモ, papis-lib/
+  ├── budget/      # budget.R, budget.xlsx
+  └── output/      # pandoc 生成物（gitignore）
+data/{raw,interim,processed,outputs}/  # 巨大データ（gitignore、実体は NAS）
+src/               # 再利用可能な関数（テスト対象）
+notebooks/         # 探索的実験
+scripts/{pipeline,experiments,publication,utilities}/
+config/{datasets,models,paths}/
+results/           # 解析成果（gitignore）
+outputs/{papers,presentations,reports}/  # 公開・提出する最終成果物
+docs/              # 設計メモ・データ入出力仕様
+```
+
+構造の正本は `~/dotfiles/claude/.claude/research-project-conventions.md`。データ保存・NAS/S3 同期は `~/dotfiles/claude/.claude/data-management-policy.md` と `scripts/utilities/sync_with_{nas,s3}.sh`（要: sync_raw() のデータセット定義）に従う。
+
+## ワークフロー
+
+### 文献管理 (Papis)
+
+文献は Papis ライブラリ `{{PAPIS_LIB_NAME}}` で管理（実体は `proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/papis-lib/`）。`info.yaml`/`notes.md` は git 管理、PDF/HTML は gitignore。
+
+```sh
+# DOI から追加
+papis -l {{PAPIS_LIB_NAME}} add --from doi 10.1126/science.aau0137 --batch
+
+# 一覧・検索
+papis -l {{PAPIS_LIB_NAME}} list
+papis -l {{PAPIS_LIB_NAME}} list 'author:Name'
+
+# BibTeX エクスポート（申請書ビルド前に再生成）
+papis -l {{PAPIS_LIB_NAME}} export --all --format bibtex \
+  > proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/references.bib
+```
+
+Citation key の形式は `{Family}{Year}` (例: `Canuto2018`)。
+
+### 申請書執筆
+
+```sh
+# drafts/ で節ごとに md を編集（引用は [@CiteKey] 形式）
+# BibTeX を最新化
+papis -l {{PAPIS_LIB_NAME}} export --all --format bibtex \
+  > proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/references.bib
+
+# 出力（節目・最終）
+pandoc proposals/{{YEAR}}-{{GRANT_TYPE}}/drafts/{{MAIN_DRAFT}}.md \
+  --citeproc \
+  --bibliography=proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/references.bib \
+  --reference-doc=proposals/{{YEAR}}-{{GRANT_TYPE}}/様式/{{TEMPLATE_DOCX}} \
+  -o proposals/{{YEAR}}-{{GRANT_TYPE}}/output/{{OUTPUT_DOCX}}
+
+# 提出版アーカイブ
+cp proposals/{{YEAR}}-{{GRANT_TYPE}}/output/{{OUTPUT_DOCX}} \
+   ~/Documents/grant/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}/
+```
+
+### Git 運用
+
+Claude Code が自律的に commit/push を行う運用。ベストプラクティスとプロジェクトフェーズに応じて以下のルールに従う。
+
+**コミット方針**:
+- 論理単位ごとに 1 コミット
+- メッセージは「why」中心で 1〜2 文 + 必要に応じて bullet で詳細補足
+- Co-Authored-By 行を末尾に付与（HEREDOC で改行を保持）
+- WIP 状態でセッションを終わらせない
+- 機密ファイル・大容量バイナリはステージしない
+
+**ブランチ運用**:
+- **個人作業期**: `main` 直接コミット可。大きな構想転換は `proposal/<topic>` ブランチで隔離してから main へマージ
+- **共同研究期**: `main` を共有資産として扱い、`feature/<topic>` から PR でマージ。force push 禁止
+
+**Push 方針**:
+- commit 直後に push（fast-forward 限定）
+- main への force push 禁止
+
+**タグ運用**（annotated tag、申請書プロジェクトの節目で打つ）:
+- `v0.1-{reviewer}-review` — レビュー直前
+- `v0.5-internal-deadline` — 学内提出版
+- `v1.0-{funder}-submission` — 公募提出版
+
+## 関連リソース
+
+- **Obsidian プロジェクトノート**: `projects/{{PROJECT_NAME}}.md`（Vault）
+- **提出物アーカイブ**: `~/Documents/grant/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}/`（iCloud）
+- **規約**: グローバル `~/.claude/CLAUDE.md`「研究プロジェクト規約」 / `~/dotfiles/claude/.claude/research-project-conventions.md`
+
+## 注意
+
+- データ実体は git 管理外。`.gitignore` で除外済み
+- 共同研究者との授受は学内締切後。それまでは個人作業

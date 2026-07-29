@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+# Run from project root:
+#   bash scripts/utilities/sync_with_s3.sh [check|push|pull] [raw|processed|results|outputs|all] [--dryrun] [--delete] [--no-las]
+#
+# S3 is a transit store for EC2 runs only -- NAS (see sync_with_nas.sh) is the
+# persistent Single Source of Truth. Typical EC2 flow: NAS -> S3 (push from
+# Mac before the job) -> EC2 (pull) -> S3 (push results) -> NAS (pull on Mac,
+# then sync_with_nas.sh push to persist). Do not treat data left in S3 as
+# authoritative long-term.
+#
+# `pull` restores from S3, which can be stale or incomplete relative to the
+# NAS without looking like it.
+# TODO: after your first NAS<->S3 audit, record THIS project's findings here
+# (what was missing/stale in S3 and when you checked). Do not copy another
+# project's audit results -- the facts may differ.
+# Unlike `push raw` (blocked by default via {{ENV_PREFIX}}_ALLOW_RAW_PUSH),
+# `pull raw` has no such guard.
+#
+# Modes:
+#   check        Show local -> S3 differences only (default; dry-run)
+#   push         Sync local -> S3
+#   pull         Sync S3 -> local
+#
+# Targets:
+#   raw          data/raw/       (edit sync_raw below per dataset)
+#   processed    data/processed/
+#   results      results/
+#   outputs      data/outputs/
+#   all          all targets (default)
+#
+# Environment overrides:
+#   {{ENV_PREFIX}}_S3_BUCKET       default: takeshi-research-data
+#   {{ENV_PREFIX}}_ALLOW_RAW_PUSH  default: false
+#
+# Options:
+#   --dryrun     Preview without copying. Useful with push/pull.
+#   --delete     Delete destination files absent from source.
+#   --no-las     Exclude .las / .laz / .lax files.
+set -euo pipefail
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$PROJECT_ROOT"
+
+BUCKET="${{{ENV_PREFIX}}_S3_BUCKET:-takeshi-research-data}"
+S3_RAW="s3://${BUCKET}/data/raw"
+S3_PROJECT="s3://${BUCKET}/data/projects/{{PROJECT_NAME}}"
+ALLOW_RAW_PUSH="${{{ENV_PREFIX}}_ALLOW_RAW_PUSH:-false}"
+
+MODE="check"
+TARGET="all"
+DRYRUN=""
+DELETE=()
+SYNC_OPTIONS=(
+  --size-only
+  --exclude ".DS_Store"
+  --exclude "*/.DS_Store"
+  --exclude ".gitkeep"
+  --exclude "*/.gitkeep"
+)
+NO_LAS=()
+
+usage() {
+  sed -n '2,38p' "$0" >&2
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    check|push|pull) MODE="$arg" ;;
+    raw|processed|results|outputs|all) TARGET="$arg" ;;
+    --dryrun) DRYRUN="--dryrun" ;;
+    --delete) DELETE=(--delete) ;;
+    --no-las) NO_LAS=(--exclude "*.las" --exclude "*.laz" --exclude "*.lax") ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage; exit 1 ;;
+  esac
+done
+
+if [[ "$MODE" == "check" ]]; then
+  DRYRUN="--dryrun"
+fi
+
+require_cmd() {
+  command -v "$1" >/dev/null 2>&1 || {
+    echo "Missing command: $1" >&2
+    exit 1
+  }
+}
+
+run_sync() {
+  local label="$1"
+  local source="$2"
+  local destination="$3"
+  shift 3
+
+  echo "=== ${MODE}: ${label} ==="
+  if [[ "$source" != s3://* && ! -e "$source" ]]; then
+    echo "skip: missing local source: $source"
+    return
+  fi
+  aws s3 sync "$source" "$destination" \
+    "${SYNC_OPTIONS[@]}" \
+    ${DELETE[@]+"${DELETE[@]}"} \
+    "$@" \
+    ${DRYRUN:+"$DRYRUN"}
+}
+
+sync_pair() {
+  local label="$1"
+  local local_path="$2"
+  local s3_path="$3"
+  shift 3
+
+  if [[ "$MODE" == "pull" ]]; then
+    run_sync "$label" "$s3_path" "$local_path" "$@"
+  else
+    run_sync "$label" "$local_path" "$s3_path" "$@"
+  fi
+}
+
+sync_raw() {
+  if [[ "$MODE" == "push" && "$ALLOW_RAW_PUSH" != "true" ]]; then
+    echo "Refusing to push raw data to shared ${S3_RAW}/." >&2
+    echo "Set {{ENV_PREFIX}}_ALLOW_RAW_PUSH=true only for intentional raw-data registration." >&2
+    exit 1
+  fi
+  # TODO: map local data/raw/ subdirs to shared S3 raw datasets, one line each:
+  #   sync_pair "raw: koboriya" "data/raw/koboriya/" "${S3_RAW}/20260526_koboriya/" ${NO_LAS[@]+"${NO_LAS[@]}"}
+  echo "sync_raw: no datasets configured yet -- edit sync_raw() in $0" >&2
+}
+
+sync_processed() {
+  sync_pair "processed" "data/processed/" "${S3_PROJECT}/processed/" ${NO_LAS[@]+"${NO_LAS[@]}"}
+}
+
+sync_results() {
+  sync_pair "results" "results/" "${S3_PROJECT}/results/"
+}
+
+sync_outputs() {
+  sync_pair "outputs" "data/outputs/" "${S3_PROJECT}/outputs/"
+}
+
+require_cmd aws
+
+case "$TARGET" in
+  raw)       sync_raw ;;
+  processed) sync_processed ;;
+  results)   sync_results ;;
+  outputs)   sync_outputs ;;
+  all)       sync_raw; sync_processed; sync_results; sync_outputs ;;
+esac
+
+echo "Done."

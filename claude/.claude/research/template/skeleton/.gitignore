@@ -1,0 +1,38 @@
+# OS
+.DS_Store
+
+# 大型データ（実体は NAS、data-management-policy 参照）
+data/raw/
+data/interim/
+data/processed/
+data/outputs/
+results/
+*.las
+*.laz
+*.ply
+*.pcd
+
+# 生成物
+proposals/**/output/
+
+# Papis: バイナリ/取得物は除外、info.yaml/notes.md は git 管理
+proposals/**/refs/papis-lib/**/*.pdf
+proposals/**/refs/papis-lib/**/*.html
+proposals/**/refs/papis-lib/**/*.epub
+
+# Word 一時ファイル
+~$*
+
+# Python / venv
+.venv/
+__pycache__/
+*.egg-info/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+renv/library/
+
+# Claude Code
+.claude/
