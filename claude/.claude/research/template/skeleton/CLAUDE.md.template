@@ -108,7 +108,7 @@ pandoc proposals/{{YEAR}}-{{GRANT_TYPE}}/drafts/{{MAIN_DRAFT}}.md \
 
 # 提出したら submitted/ へコピーしてコミットし、push する（提出版の正本はこのリポジトリだけ）
 cp proposals/{{YEAR}}-{{GRANT_TYPE}}/output/{{OUTPUT_DOCX}} \
-   proposals/{{YEAR}}-{{GRANT_TYPE}}/submitted/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}.docx
+   proposals/{{YEAR}}-{{GRANT_TYPE}}/submitted/YYYYMMDD_{{GRANT_TYPE}}_略称.docx
 ```
 
 ### Git 運用

@@ -241,12 +241,14 @@ cmd_add_papis_lib() {
     log "papis: registered library [$lib] -> $lib_dir"
   fi
 
-  # CLAUDE.md の {{PAPIS_LIB_NAME}} を置換
-  local f="$target/CLAUDE.md"
-  if [[ -f $f ]] && grep -q '{{PAPIS_LIB_NAME}}' "$f"; then
-    substitute_in_file "$f" PAPIS_LIB_NAME "$lib"
-    log "substituted PAPIS_LIB_NAME in: $f"
-  fi
+  # CLAUDE.md・README.md の {{PAPIS_LIB_NAME}} を置換
+  local f
+  for f in "$target/CLAUDE.md" "$target/README.md"; do
+    if [[ -f $f ]] && grep -q '{{PAPIS_LIB_NAME}}' "$f"; then
+      substitute_in_file "$f" PAPIS_LIB_NAME "$lib"
+      log "substituted PAPIS_LIB_NAME in: $f"
+    fi
+  done
 }
 
 # ---------- add-obsidian-note ----------

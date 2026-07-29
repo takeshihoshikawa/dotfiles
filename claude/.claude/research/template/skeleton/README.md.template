@@ -2,27 +2,23 @@
 
 <!-- TODO: プロジェクトの 1 行概要を書く -->
 
-## 現フェーズ
-
-{{PHASE}}（例: 学術変革領域研究B 申請書執筆）
-
-| マイルストーン | 日付 |
-|---|---|
-| {{MILESTONE_1}} | {{DATE_1}} |
-| {{MILESTONE_2}} | {{DATE_2}} |
+<!-- 現フェーズ・次の一手は CLAUDE.md「## 現在地」が正本。README に書かない
+     （更新頻度が違い、必ず腐って誤情報になる） -->
 
 ## ディレクトリ
 
 - `proposals/{{YEAR}}-{{GRANT_TYPE}}/drafts/`: 研究計画調書 markdown 原稿（真のソース）
 - `proposals/{{YEAR}}-{{GRANT_TYPE}}/output/`: pandoc で生成した .docx（gitignore）
-- `data/`: 解析データ（gitignore、実体は外部）
-- `src/`: 解析コード
+- `proposals/{{YEAR}}-{{GRANT_TYPE}}/submitted/`: 提出した版（git 追跡・以後変更しない）
+- `data/`: 解析データ（gitignore、実体は NAS）
+- `src/`: 再利用可能な関数
 - `notebooks/`: 探索的実験
-- `reports/`, `papers/`: 採択後
+- `scripts/`: `pipeline/`（安定版）・`experiments/`（試行錯誤）・`publication/`（投稿用図表）・`utilities/`
+- `results/`: 解析から生成される成果（gitignore 中心）
+- `outputs/`: 公開・提出する最終成果物（`papers/`・`presentations/`・`reports/`）
 
 ## 関連
 
 - Obsidian プロジェクトノート: `projects/{{PROJECT_NAME}}.md`
-- 提出版: `proposals/{{YEAR}}-{{GRANT_TYPE}}/submitted/`（リポジトリ内・git 追跡）
 - 文献ライブラリ: papis `{{PAPIS_LIB_NAME}}`（`~/Documents/papis/{{PAPIS_LIB_NAME}}/`、リポジトリ外）
 - 規約: `~/.claude/CLAUDE.md`「研究プロジェクト規約」、`~/dotfiles/claude/.claude/research-project-conventions.md`

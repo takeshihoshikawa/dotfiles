@@ -5,6 +5,7 @@
 
 基準実装は `~/work/projects/nfi-understory-disturbance`（2026-07-28 に移設・`src/nfi/refs.py`・
 `scripts/utilities/export_refs_from_papis.py`）。新規プロジェクトはこれを踏襲する。
+**参照実装であって依存先ではない**（このリポジトリが無くても本規約は成立する。実装を写すときの見本）。
 
 ## 1. ライブラリはすべて iCloud に置く
 
@@ -44,6 +45,10 @@
 proposals/{YYYY}-{種別}/refs/refs.bib     # 申請書
 outputs/papers/{原稿名}/refs.bib          # 論文
 ```
+
+ファイル名は `refs.bib` に統一する。**既存プロジェクトは遡及リネームしない**
+（`forest-instance-annotation` は `references.bib`）。pandoc/Quarto の参照先を書き換える必要があり、
+名前を揃える利益より原稿を壊す危険のほうが大きい。
 
 ## 3. `refs.bib` を直接編集しない
 
