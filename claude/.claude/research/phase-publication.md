@@ -13,6 +13,13 @@
 
 原稿は git 管理する。図表は `scripts/publication/` から生成し、**手で置かない**。
 
+## 文献
+
+papis ライブラリは**リポジトリの外**（iCloud `~/Documents/papis/{project}/`）。リポジトリに入るのは
+生成した `outputs/papers/{原稿名}/refs.bib` だけで、直接編集しない。申請書フェーズと扱いは同じで、
+出力先だけが違う。引用点検スクリプト（`citation_claim_audit.py` 等）の型も含め
+`~/dotfiles/claude/.claude/papis-conventions.md` が正本。**投稿前チェックの前に読む。**
+
 ## Quarto を使う
 
 論文執筆は Quarto を推奨する。解析結果を直接参照することで、

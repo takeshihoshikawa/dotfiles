@@ -130,7 +130,14 @@ sync スクリプトの標準パターン、削除・保持ルールの詳細、
 ## 文献管理
 
 文献（論文PDF・書誌情報）は papis で管理する。設定: `~/Library/Application Support/papis/config`。
-ライブラリ: `kb`（汎用、`~/Documents/papis/kb`）と、研究プロジェクトごとの `{project}/proposals/{年度-種別}/refs/papis-lib`。
+
+**papis ライブラリはリポジトリの外**（iCloud `~/Documents/papis/{kb|project}/`）。出版社版 PDF を
+含むため、リポジトリに入れるとコード公開時に著作物の再配布になる。リポジトリに入るのは papis から
+生成した `refs.bib` だけで、**直接編集しない**。
+
+ライブラリの置き方・`refs.bib` の生成と追跡・場所の解決（`src/{pkg}/refs.py`）・引用点検スクリプトの型は
+`~/dotfiles/claude/.claude/papis-conventions.md` が正本。
+**文献ライブラリを作る・`refs.bib` を触る・引用点検をするときは必ず読む。**
 
 ## 研究プロジェクト規約
 

@@ -50,7 +50,7 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避し�
 │       ├── drafts/      # *.md（真のソース）
 │       ├── 様式/        # 配布様式（参照のみ）
 │       ├── figures/     # 概念図・予備データ図
-│       ├── refs/        # BibTeX, 引用メモ, papis-lib
+│       ├── refs/        # refs.bib（papis から生成）・引用メモ。papis 実体はリポジトリ外
 │       ├── budget/      # budget.R, budget.xlsx
 │       └── output/      # pandoc 生成物（gitignore）
 │

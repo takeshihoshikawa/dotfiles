@@ -73,9 +73,11 @@ proposals/{YYYY}-{種別}/output/研究計画調書.docx
 
 ## 文献
 
-引用文献はプロジェクト別の papis ライブラリ
-（`proposals/{YYYY}-{種別}/refs/papis-lib`）で管理する。知識ベース `kb` から必要なものをコピーして
-使う一方向フロー。運用は vault の `notes/papis.md`。
+引用文献はプロジェクト別の papis ライブラリで管理する。**ライブラリはリポジトリの外**
+（iCloud `~/Documents/papis/{project}/`）。知識ベース `kb` から必要なものをコピーして使う一方向フロー。
+
+リポジトリに入るのは生成した `proposals/{YYYY}-{種別}/refs/refs.bib` だけで、直接編集しない。
+規約は `~/dotfiles/claude/.claude/papis-conventions.md` が正本。**文献を触るときは読む。**
 
 ## 提出後
 
