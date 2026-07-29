@@ -5,8 +5,12 @@
 
 ## 自動立ち上げ（init.sh）
 
-`~/work/templates/research-project/init.sh` で標準構成を scaffold する。テンプレ自体も git 管理
-されており、改善は同レポで commit していく。詳細は `~/work/templates/research-project/README.md`。
+`~/dotfiles/claude/.claude/research/template/init.sh` で標準構成を scaffold する。詳細は同ディレクトリの
+`README.md`。
+
+**テンプレは本規約と同じ dotfiles にある**（2026-07-29 に `~/work/templates/research-project` から
+subtree で移設）。規約を変えたらテンプレも同じコミットで直す。別リポだった頃は追随に別コミットが
+必要で、片方だけ更新されて腐る事故が起きていた。
 
 | サブコマンド | 役割 |
 |---|---|
@@ -29,14 +33,14 @@
 
 ```sh
 # 空状態からのフル scaffold
-~/work/templates/research-project/init.sh adopt --name forest-thermal-normalization --representative "星川 健史"
-~/work/templates/research-project/init.sh add-proposal --name forest-thermal-normalization --year 2027 --grant-type 学術変革B
-~/work/templates/research-project/init.sh add-papis-lib --name forest-thermal-normalization
-~/work/templates/research-project/init.sh add-obsidian-note --name forest-thermal-normalization --phase "申請書執筆"
-~/work/templates/research-project/init.sh add-archive --name forest-thermal-normalization --archive-date 20270601 --short 森林熱画像 --grant-type 学術変革B
+~/dotfiles/claude/.claude/research/template/init.sh adopt --name forest-thermal-normalization --representative "星川 健史"
+~/dotfiles/claude/.claude/research/template/init.sh add-proposal --name forest-thermal-normalization --year 2027 --grant-type 学術変革B
+~/dotfiles/claude/.claude/research/template/init.sh add-papis-lib --name forest-thermal-normalization
+~/dotfiles/claude/.claude/research/template/init.sh add-obsidian-note --name forest-thermal-normalization --phase "申請書執筆"
+~/dotfiles/claude/.claude/research/template/init.sh add-archive --name forest-thermal-normalization --archive-date 20270601 --short 森林熱画像 --grant-type 学術変革B
 
 # 構想メモを持つ既存ディレクトリへの補完（既存 CLAUDE.md・00-構想.md 等は保護される）
-~/work/templates/research-project/init.sh adopt --name my-existing-project
+~/dotfiles/claude/.claude/research/template/init.sh adopt --name my-existing-project
 ```
 
 > [!note] `add-papis-lib` の取り消しは手作業
@@ -77,7 +81,7 @@
 
 コード・原稿より大きい生データ・中間生成物・結果は git 管理外とし、`scripts/utilities/` に
 2 本のスクリプトを揃える。`init.sh adopt` が雛形
-（`~/work/templates/research-project/skeleton/scripts/utilities/*.template`）をプロジェクト名・
+（`~/dotfiles/claude/.claude/research/template/skeleton/scripts/utilities/*.template`）をプロジェクト名・
 環境変数プレフィックス置換済みで自動配置する。配置後、`sync_raw()` 内のデータセット対応行を
 各プロジェクトで記述する。
 

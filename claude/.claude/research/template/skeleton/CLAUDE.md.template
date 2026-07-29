@@ -1,7 +1,7 @@
 # {{PROJECT_NAME}} — プロジェクト指示
 
 <!--
-このファイルは ~/work/templates/research-project/ から生成された雛形です。
+このファイルは ~/dotfiles/claude/.claude/research/template/ から生成された雛形です。
 立ち上げ時に ChatGPT・Obsidian・既存メモから内容を引き継いで埋めてください。
 未確定の項目は {{...}} プレースホルダのまま残して構いません。後で init.sh add-proposal 等で埋まります。
 -->

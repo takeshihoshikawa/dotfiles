@@ -15,30 +15,30 @@
 
 ```sh
 # 1. プロジェクトディレクトリと基本骨格を作成
-~/work/templates/research-project/init.sh adopt \
+~/dotfiles/claude/.claude/research/template/init.sh adopt \
   --name forest-thermal-normalization \
   --representative "星川 健史" \
   --project-name "亜熱帯林の熱画像正規化に関する研究"
 
 # 2. 申請書サブツリーを追加
-~/work/templates/research-project/init.sh add-proposal \
+~/dotfiles/claude/.claude/research/template/init.sh add-proposal \
   --name forest-thermal-normalization \
   --year 2027 \
   --grant-type 学術変革B
 
 # 3. Papis 文献ライブラリを登録
-~/work/templates/research-project/init.sh add-papis-lib \
+~/dotfiles/claude/.claude/research/template/init.sh add-papis-lib \
   --name forest-thermal-normalization
 
 # 4. Obsidian プロジェクトノートを生成
-~/work/templates/research-project/init.sh add-obsidian-note \
+~/dotfiles/claude/.claude/research/template/init.sh add-obsidian-note \
   --name forest-thermal-normalization \
   --representative "星川 健史" \
   --affiliation "静岡県立農林環境専門職大学短期大学部" \
   --phase "申請書執筆"
 
 # 5. 提出物アーカイブディレクトリを作成
-~/work/templates/research-project/init.sh add-archive \
+~/dotfiles/claude/.claude/research/template/init.sh add-archive \
   --name forest-thermal-normalization \
   --archive-date 20270601 \
   --short 森林熱画像 \
@@ -49,7 +49,7 @@
 
 ```sh
 # 構想メモ・自作 CLAUDE.md を既に置いたディレクトリで実行しても、既存ファイルは保護される
-~/work/templates/research-project/init.sh adopt --name my-existing-project
+~/dotfiles/claude/.claude/research/template/init.sh adopt --name my-existing-project
 # → 不足していた .gitignore, README.md, data/, src/ などのみ追加
 # → 自作 CLAUDE.md は上書きされない
 ```
@@ -71,7 +71,7 @@
 このディレクトリ自体が git repo。テンプレを改善したら commit する:
 
 ```sh
-cd ~/work/templates/research-project
+cd ~/dotfiles/claude/.claude/research/template
 git add .
 git commit -m "skeleton: CLAUDE.md に X セクション追加"
 ```
@@ -79,7 +79,7 @@ git commit -m "skeleton: CLAUDE.md に X セクション追加"
 多端末同期や長期保管が必要になったら GitHub private repo に push:
 
 ```sh
-cd ~/work/templates/research-project
+cd ~/dotfiles/claude/.claude/research/template
 gh repo create --private research-project-template --source=. --remote=origin --push
 ```
 
@@ -97,7 +97,7 @@ gh repo create --private research-project-template --source=. --remote=origin --
 ## ディレクトリ構成
 
 ```
-~/work/templates/research-project/
+~/dotfiles/claude/.claude/research/template/
 ├── README.md                    # このファイル
 ├── init.sh                      # 立ち上げスクリプト本体
 ├── skeleton/                    # adopt が使うトップレベル雛形
