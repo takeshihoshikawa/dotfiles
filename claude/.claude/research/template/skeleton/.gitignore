@@ -15,10 +15,9 @@ results/
 # 生成物
 proposals/**/output/
 
-# Papis: バイナリ/取得物は除外、info.yaml/notes.md は git 管理
-proposals/**/refs/papis-lib/**/*.pdf
-proposals/**/refs/papis-lib/**/*.html
-proposals/**/refs/papis-lib/**/*.epub
+# Papis: ライブラリ実体はリポジトリ外（papis-conventions.md）。
+# 追跡するのは生成された refs.bib のみで、export の中間生成物は除外する
+*.papis-raw.bib
 
 # Word 一時ファイル
 ~$*

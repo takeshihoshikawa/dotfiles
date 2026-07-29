@@ -100,38 +100,11 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避し�
 
 ## .gitignore 雛形
 
-```gitignore
-# OS
-.DS_Store
+**正本は `research/template/skeleton/.gitignore`**（`init.sh adopt` が配置するもの）。
+ここに写しを置かない。規約とテンプレに同じ内容を 2 か所持つと必ず片方が腐る
+（実際、papis 規則・`data/interim/`・`results/` が規約側にだけ無い状態が発生していた）。
 
-# 大型データ
-data/raw/
-data/processed/
-*.las
-*.laz
-*.ply
-*.pcd
-
-# 生成物
-proposals/**/output/
-
-# Word 一時ファイル
-~$*
-
-# Python / venv
-.venv/
-__pycache__/
-*.egg-info/
-
-# R
-.Rhistory
-.RData
-.Rproj.user/
-renv/library/
-
-# Claude Code
-.claude/local/
-```
+既存プロジェクトを標準構成へ引き上げるときも、skeleton の内容を正として差分を当てる。
 
 ## いつ分割するか（monorepo → 別 repo）
 
