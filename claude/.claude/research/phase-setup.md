@@ -15,10 +15,9 @@ subtree で移設）。規約を変えたらテンプレも同じコミットで
 | サブコマンド | 役割 |
 |---|---|
 | `adopt` | プロジェクトディレクトリ作成 or 既存補完。CLAUDE.md・README.md・.gitignore・空ディレクトリ・git 初期化 |
-| `add-proposal` | `proposals/{YEAR}-{GRANT_TYPE}/{drafts,様式,figures,refs,budget,output}/` を追加 |
-| `add-papis-lib` | papis ライブラリディレクトリ作成 + `~/Library/Application Support/papis/config` に登録 |
+| `add-proposal` | `proposals/{YEAR}-{GRANT_TYPE}/{drafts,様式,figures,refs,budget,output,submitted}/` を追加 |
+| `add-papis-lib` | papis ライブラリを **`~/Documents/papis/{name}/` に**作成 + `~/Library/Application Support/papis/config` に登録（`papis-conventions.md`） |
 | `add-obsidian-note` | Vault `projects/{name}.md` を生成 |
-| `add-archive` | `~/Documents/grant/{YYYYMMDD}_{種別}_{略称}/` を作成 |
 
 ### 設計方針（変更するときはここを壊さないこと）
 
@@ -37,7 +36,6 @@ subtree で移設）。規約を変えたらテンプレも同じコミットで
 ~/dotfiles/claude/.claude/research/template/init.sh add-proposal --name forest-thermal-normalization --year 2027 --grant-type 学術変革B
 ~/dotfiles/claude/.claude/research/template/init.sh add-papis-lib --name forest-thermal-normalization
 ~/dotfiles/claude/.claude/research/template/init.sh add-obsidian-note --name forest-thermal-normalization --phase "申請書執筆"
-~/dotfiles/claude/.claude/research/template/init.sh add-archive --name forest-thermal-normalization --archive-date 20270601 --short 森林熱画像 --grant-type 学術変革B
 
 # 構想メモを持つ既存ディレクトリへの補完（既存 CLAUDE.md・00-構想.md 等は保護される）
 ~/dotfiles/claude/.claude/research/template/init.sh adopt --name my-existing-project
@@ -51,11 +49,15 @@ subtree で移設）。規約を変えたらテンプレも同じコミットで
 
 | 状況 | 推奨 |
 |------|------|
+| **申請書・論文を含む**（提出物がリポジトリに入る） | GitHub private repo（**必須**） |
 | 長期プロジェクト・複数端末・複数人 | GitHub private repo（個人アカウント） |
 | 単発・短期・ローカル完結 | ローカル git のみ |
 
 ローカルの `~/work/projects/` は作業領域＝キャッシュであり、**repo の正本は GitHub 側**。
 「ローカル git で十分」と判断するのは単発・短期に限る。
+
+提出物を repo で完結させる方針にした結果、**提出版の唯一の正本がリポジトリ**になった。
+申請書を含むプロジェクトでローカル git のみにすると、提出物のバックアップが 1 台にしか無くなる。
 
 ## プロジェクト CLAUDE.md の最低構成
 
@@ -64,7 +66,7 @@ subtree で移設）。規約を変えたらテンプレも同じコミットで
   — gitプロジェクトの現在地の正本。vault の frontmatter へは `project_mirror.py` が転記する
 - ディレクトリ構成（実体に合わせて記述。標準から外れた部分だけ書けばよい）
 - 実行方法（コードがある場合）
-- Obsidian プロジェクトノートと提出アーカイブへのリンク
+- Obsidian プロジェクトノートへのリンク、papis ライブラリ名（使う場合）
 - コーディング規約への参照（標準と違うことをする場合）
 
 **README にフェーズ欄を置かない**（更新頻度が違い、必ず腐って誤情報になる）。
@@ -72,8 +74,8 @@ subtree で移設）。規約を変えたらテンプレも同じコミットで
 ## Obsidian プロジェクトノート
 
 `projects/{kebab-case名}.md` を `templates/project-note-template.md` から作成する
-（`init.sh add-obsidian-note` が生成）。「関連リソース」に作業ディレクトリと提出アーカイブの
-パスを記載し、Obsidian と Claude Code の両側から相互参照可能にする。
+（`init.sh add-obsidian-note` が生成）。「関連リソース」に作業ディレクトリ・GitHub repo・
+papis ライブラリのパスを記載し、Obsidian と Claude Code の両側から相互参照可能にする。
 
 **frontmatter の `local_path` を必ず入れる**。`project_mirror.py` はこれの有無で転記対象を判別する。
 

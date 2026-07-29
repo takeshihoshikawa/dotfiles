@@ -51,9 +51,10 @@ proposals/{{YEAR}}-{{GRANT_TYPE}}/
   ├── drafts/      # 申請書節別 markdown（真のソース）
   ├── 様式/        # JSPS/JST 等の配布様式（参照のみ）
   ├── figures/     # 概念図・予備データ図
-  ├── refs/        # BibTeX, 引用メモ, papis-lib/
+  ├── refs/        # refs.bib（papis から生成）・引用メモ
   ├── budget/      # budget.R, budget.xlsx
-  └── output/      # pandoc 生成物（gitignore）
+  ├── output/      # pandoc 生成物（gitignore）
+  └── submitted/   # 提出した版（git 追跡・以後変更しない）
 data/{raw,interim,processed,outputs}/  # 巨大データ（gitignore、実体は NAS）
 src/               # 再利用可能な関数（テスト対象）
 notebooks/         # 探索的実験
@@ -70,7 +71,10 @@ docs/              # 設計メモ・データ入出力仕様
 
 ### 文献管理 (Papis)
 
-文献は Papis ライブラリ `{{PAPIS_LIB_NAME}}` で管理（実体は `proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/papis-lib/`）。`info.yaml`/`notes.md` は git 管理、PDF/HTML は gitignore。
+文献は Papis ライブラリ `{{PAPIS_LIB_NAME}}` で管理する。**ライブラリ実体はリポジトリの外**
+（`~/Documents/papis/{{PAPIS_LIB_NAME}}/`）。出版社版 PDF を含むため、リポジトリに入れると
+コード公開時に著作物の再配布になる。リポジトリに入るのは生成した `refs.bib` だけで、**直接編集しない**。
+規約は `~/dotfiles/claude/.claude/papis-conventions.md`。
 
 ```sh
 # DOI から追加
@@ -82,7 +86,7 @@ papis -l {{PAPIS_LIB_NAME}} list 'author:Name'
 
 # BibTeX エクスポート（申請書ビルド前に再生成）
 papis -l {{PAPIS_LIB_NAME}} export --all --format bibtex \
-  > proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/references.bib
+  > proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/refs.bib
 ```
 
 Citation key の形式は `{Family}{Year}` (例: `Canuto2018`)。
@@ -93,18 +97,18 @@ Citation key の形式は `{Family}{Year}` (例: `Canuto2018`)。
 # drafts/ で節ごとに md を編集（引用は [@CiteKey] 形式）
 # BibTeX を最新化
 papis -l {{PAPIS_LIB_NAME}} export --all --format bibtex \
-  > proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/references.bib
+  > proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/refs.bib
 
 # 出力（節目・最終）
 pandoc proposals/{{YEAR}}-{{GRANT_TYPE}}/drafts/{{MAIN_DRAFT}}.md \
   --citeproc \
-  --bibliography=proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/references.bib \
+  --bibliography=proposals/{{YEAR}}-{{GRANT_TYPE}}/refs/refs.bib \
   --reference-doc=proposals/{{YEAR}}-{{GRANT_TYPE}}/様式/{{TEMPLATE_DOCX}} \
   -o proposals/{{YEAR}}-{{GRANT_TYPE}}/output/{{OUTPUT_DOCX}}
 
-# 提出版アーカイブ
+# 提出したら submitted/ へコピーしてコミットし、push する（提出版の正本はこのリポジトリだけ）
 cp proposals/{{YEAR}}-{{GRANT_TYPE}}/output/{{OUTPUT_DOCX}} \
-   ~/Documents/grant/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}/
+   proposals/{{YEAR}}-{{GRANT_TYPE}}/submitted/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}.docx
 ```
 
 ### Git 運用
@@ -134,7 +138,7 @@ Claude Code が自律的に commit/push を行う運用。ベストプラクテ�
 ## 関連リソース
 
 - **Obsidian プロジェクトノート**: `projects/{{PROJECT_NAME}}.md`（Vault）
-- **提出物アーカイブ**: `~/Documents/grant/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}/`（iCloud）
+- **文献ライブラリ**: papis `{{PAPIS_LIB_NAME}}`（`~/Documents/papis/{{PAPIS_LIB_NAME}}/`、リポジトリ外）
 - **規約**: グローバル `~/.claude/CLAUDE.md`「研究プロジェクト規約」 / `~/dotfiles/claude/.claude/research-project-conventions.md`
 
 ## 注意

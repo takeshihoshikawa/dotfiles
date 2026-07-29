@@ -53,6 +53,6 @@ updated: {{TODAY}}
 
 ## 関連リソース
 
-- 作業ディレクトリ: `~/work/projects/{{PROJECT_NAME}}/`
-- 提出物アーカイブ: `~/Documents/grant/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}/`
+- 作業ディレクトリ: `~/work/projects/{{PROJECT_NAME}}/`（提出物も repo 内 `proposals/*/submitted/`）
+- 文献ライブラリ: papis `{{PROJECT_NAME}}`（`~/Documents/papis/{{PROJECT_NAME}}/`）
 - データ: <!-- TODO: 外部 HDD / S3 等のパス -->

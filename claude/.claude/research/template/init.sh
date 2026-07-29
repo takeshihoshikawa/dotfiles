@@ -4,9 +4,8 @@
 # サブコマンド:
 #   adopt              プロジェクトディレクトリを作成または既存ディレクトリを補完
 #   add-proposal       proposals/{YEAR}-{GRANT_TYPE}/ サブツリーを追加
-#   add-papis-lib      Papis ライブラリを登録
+#   add-papis-lib      Papis ライブラリを作成・登録（実体は iCloud、リポジトリ外）
 #   add-obsidian-note  Obsidian プロジェクトノートを生成
-#   add-archive        iCloud 提出物アーカイブディレクトリを作成
 #
 # 設計方針:
 #   - 既存ファイルは絶対に上書きしない（cp -n、mkdir -p のみ使用）
@@ -19,7 +18,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECTS_ROOT="${PROJECTS_ROOT:-$HOME/work/projects}"
 VAULT_ROOT="${VAULT_ROOT:-$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/main}"
-ARCHIVE_ROOT="${ARCHIVE_ROOT:-$HOME/Documents/grant}"
+PAPIS_ROOT="${PAPIS_ROOT:-$HOME/Documents/papis}"
 PAPIS_CONFIG="${PAPIS_CONFIG:-$HOME/Library/Application Support/papis/config}"
 
 # ---------- 共通ヘルパー ----------
@@ -56,15 +55,6 @@ copy_template_file() {
   cp "$src" "$dst"
   substitute_in_file "$dst" "$@"
   log "added: $dst"
-}
-
-# detect_proposal DIR  — proposals/ 配下の最新の {YEAR}-{TYPE} を出力
-detect_proposal() {
-  local proj=$1
-  if [[ ! -d "$proj/proposals" ]]; then
-    return 1
-  fi
-  ls -1 "$proj/proposals" 2>/dev/null | grep -E '^[0-9]{4}-' | sort -r | head -n1
 }
 
 # ---------- adopt ----------
@@ -159,9 +149,7 @@ cmd_adopt() {
        $0 add-papis-lib --name $name
   4. Obsidian プロジェクトノートを作る場合:
        $0 add-obsidian-note --name $name
-  5. 提出物アーカイブディレクトリを作る場合:
-       $0 add-archive --name $name --archive-date YYYYMMDD --short 略称 --grant-type 種別
-  6. GitHub private repo に push する場合（任意）:
+  5. GitHub private repo に push する（申請書を含むなら必須。提出版の正本がここだけになる）:
        cd $target && gh repo create --private $name --source=. --remote=origin --push
 
 EOF
@@ -218,25 +206,24 @@ cmd_add_proposal() {
 
 # ---------- add-papis-lib ----------
 
+# ライブラリ実体はリポジトリの外に置く。出版社版 PDF を含むため、ワークツリー内にあると
+# コード公開時に著作物の再配布になる（papis-conventions.md）。
 cmd_add_papis_lib() {
-  local name= proposal=
+  local name= lib=
   while [[ $# -gt 0 ]]; do
     case $1 in
-      --name)     name=$2; shift 2 ;;
-      --proposal) proposal=$2; shift 2 ;;  # YYYY-種別 形式
+      --name)    name=$2; shift 2 ;;
+      --library) lib=$2; shift 2 ;;  # 既定はプロジェクト名
       *) err "add-papis-lib: unknown option $1" ;;
     esac
   done
   [[ -z $name ]] && err "add-papis-lib: --name required"
+  [[ -z $lib ]] && lib=$name
 
   local target="$PROJECTS_ROOT/$name"
   [[ ! -d $target ]] && err "add-papis-lib: $target does not exist (run adopt first)"
 
-  if [[ -z $proposal ]]; then
-    proposal=$(detect_proposal "$target") || err "add-papis-lib: no proposals/{YEAR}-{TYPE}/ found; specify --proposal"
-  fi
-
-  local lib_dir="$target/proposals/$proposal/refs/papis-lib"
+  local lib_dir="$PAPIS_ROOT/$lib"
   if [[ ! -d $lib_dir ]]; then
     mkdir -p "$lib_dir"
     log "added: $lib_dir/"
@@ -247,17 +234,17 @@ cmd_add_papis_lib() {
   # papis config に section を追記（既にあればスキップ）
   mkdir -p "$(dirname "$PAPIS_CONFIG")"
   touch "$PAPIS_CONFIG"
-  if grep -q "^\[$name\]" "$PAPIS_CONFIG" 2>/dev/null; then
-    log "skip (exists in papis config): [$name]"
+  if grep -q "^\[$lib\]" "$PAPIS_CONFIG" 2>/dev/null; then
+    log "skip (exists in papis config): [$lib]"
   else
-    printf '\n[%s]\ndir = %s\n' "$name" "$lib_dir" >> "$PAPIS_CONFIG"
-    log "papis: registered library [$name] -> $lib_dir"
+    printf '\n[%s]\ndir = %s\n' "$lib" "$lib_dir" >> "$PAPIS_CONFIG"
+    log "papis: registered library [$lib] -> $lib_dir"
   fi
 
   # CLAUDE.md の {{PAPIS_LIB_NAME}} を置換
   local f="$target/CLAUDE.md"
   if [[ -f $f ]] && grep -q '{{PAPIS_LIB_NAME}}' "$f"; then
-    substitute_in_file "$f" PAPIS_LIB_NAME "$name"
+    substitute_in_file "$f" PAPIS_LIB_NAME "$lib"
     log "substituted PAPIS_LIB_NAME in: $f"
   fi
 }
@@ -302,44 +289,6 @@ cmd_add_obsidian_note() {
   log "added: $note"
 }
 
-# ---------- add-archive ----------
-
-cmd_add_archive() {
-  local name= adate= short= gtype=
-  while [[ $# -gt 0 ]]; do
-    case $1 in
-      --name)         name=$2; shift 2 ;;
-      --archive-date) adate=$2; shift 2 ;;
-      --short)        short=$2; shift 2 ;;
-      --grant-type)   gtype=$2; shift 2 ;;
-      *) err "add-archive: unknown option $1" ;;
-    esac
-  done
-  [[ -z $adate ]] && err "add-archive: --archive-date required (YYYYMMDD)"
-  [[ -z $short ]] && err "add-archive: --short required"
-  [[ -z $gtype ]] && err "add-archive: --grant-type required"
-
-  local archive="$ARCHIVE_ROOT/${adate}_${gtype}_${short}"
-  if [[ ! -d $archive ]]; then
-    mkdir -p "$archive"
-    log "added: $archive/"
-  else
-    log "skip (exists): $archive/"
-  fi
-
-  # CLAUDE.md と README.md のプレースホルダを置換
-  if [[ -n $name ]]; then
-    local target="$PROJECTS_ROOT/$name"
-    local f
-    for f in "$target/CLAUDE.md" "$target/README.md"; do
-      if [[ -f $f ]] && grep -q '{{ARCHIVE_DATE}}\|{{SHORT}}' "$f"; then
-        substitute_in_file "$f" ARCHIVE_DATE "$adate" SHORT "$short" GRANT_TYPE "$gtype"
-        log "substituted ARCHIVE_DATE/SHORT/GRANT_TYPE in: $f"
-      fi
-    done
-  fi
-}
-
 # ---------- usage / dispatch ----------
 
 usage() {
@@ -349,14 +298,13 @@ Usage: $0 <subcommand> [options]
 Subcommands:
   adopt              --name NAME [--representative "氏名"] [--project-name "正式名"]
   add-proposal       --name NAME --year YYYY --grant-type 種別
-  add-papis-lib      --name NAME [--proposal YYYY-種別]
+  add-papis-lib      --name NAME [--library ライブラリ名]
   add-obsidian-note  --name NAME [--representative "氏名"] [--affiliation "所属"] [--phase 現フェーズ]
-  add-archive        [--name NAME] --archive-date YYYYMMDD --short 略称 --grant-type 種別
 
 Environment:
   PROJECTS_ROOT  default: ~/work/projects
   VAULT_ROOT     default: Obsidian iCloud Vault
-  ARCHIVE_ROOT   default: ~/Documents/grant
+  PAPIS_ROOT     default: ~/Documents/papis
   PAPIS_CONFIG   default: ~/Library/Application Support/papis/config
 
 EOF
@@ -370,7 +318,6 @@ main() {
     add-proposal)      cmd_add_proposal "$@" ;;
     add-papis-lib)     cmd_add_papis_lib "$@" ;;
     add-obsidian-note) cmd_add_obsidian_note "$@" ;;
-    add-archive)       cmd_add_archive "$@" ;;
     -h|--help|help)    usage ;;
     *) err "unknown subcommand: $sub" ;;
   esac

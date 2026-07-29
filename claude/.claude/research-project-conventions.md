@@ -1,8 +1,7 @@
 # 研究プロジェクト規約
 
 新規研究プロジェクト（科研費・受託研究・自主研究などのコード/原稿作業を伴うもの）の標準構成。
-Claude Code 最適化を前提とし、iCloud と git の不整合を回避しつつ、Word 中心の既存資産
-（`~/Documents/grant/`）と整合させる。
+Claude Code 最適化を前提とし、iCloud と git の不整合を回避する。
 
 本ファイルは**フェーズ非依存の構造の正本**。フェーズ固有の手順は `research/` 配下を参照:
 
@@ -20,17 +19,32 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避し�
 
 | # | 性質 | 場所 | 同期 |
 |---|------|------|------|
-| 1 | 作業領域（ソース、git） | `~/work/projects/{kebab-case名}/` | git（必要なら GitHub private repo） |
-| 2 | 提出物アーカイブ | `~/Documents/grant/{YYYYMMDD}_{種別}_{略称}/` | iCloud |
-| 3 | プロジェクトノート（全体把握） | Obsidian Vault `projects/{kebab-case名}.md` | iCloud（Vault そのもの） |
-| 4 | データ実体（巨大ファイル） | NAS・外部 HDD・S3 等 | `data-management-policy.md` に従う |
+| 1 | 作業領域（ソース、原稿、**提出物**） | `~/work/projects/{kebab-case名}/` | git（GitHub private repo） |
+| 2 | プロジェクトノート（全体把握） | Obsidian Vault `projects/{kebab-case名}.md` | iCloud（Vault そのもの） |
+| 3 | データ実体（巨大ファイル） | NAS・外部 HDD・S3 等 | `data-management-policy.md` に従う |
+| 4 | 文献ライブラリ（papis） | `~/Documents/papis/{kb\|project}/` | iCloud（`papis-conventions.md`） |
 
-**なぜ作業領域が非 iCloud か**（提出物だけ iCloud に置く理由）:
+**提出物もリポジトリで完結させる**（2026-07-29 変更。以前は `~/Documents/grant/` へ iCloud
+アーカイブしていた）。提出版は `proposals/{YYYY}-{種別}/submitted/` に置いて git 追跡する:
+
+| | 内容 | git |
+|---|---|---|
+| `output/` | pandoc のビルド成果。毎回上書きされる | ignore |
+| `submitted/` | **提出したもの**そのもの。以後変更しない | 追跡 |
+
+作業領域が非 iCloud である理由:
 
 - iCloud は `.git/` の部分同期で破損する（`index.lock` の半同期、`(Conflicted Copy)` ファイル）
 - `.claude/`・`.venv/`・`node_modules/` 等の隠しディレクトリも同期で詰まる
 - Word 一時ファイル `~$*.docx` が git に紛れる
 - 多端末同期は **GitHub remote** 経由のほうが信頼性が高い
+
+> [!important] 提出版の正本が 1 台にしか無い状態を作らない
+> repo 完結にした結果、提出物のバックアップは git remote に依存する。**申請書を含む
+> プロジェクトは GitHub private repo を必須とする**（`phase-setup.md` の「単発・短期なら
+> ローカル git のみ」は申請書のあるプロジェクトには適用しない）。
+>
+> 既存の `~/Documents/grant/` はそのまま残す。過去の提出物を移す必要はない。
 
 ## 計算リソース（EC2）
 
@@ -52,7 +66,8 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避し�
 │       ├── figures/     # 概念図・予備データ図
 │       ├── refs/        # refs.bib（papis から生成）・引用メモ。papis 実体はリポジトリ外
 │       ├── budget/      # budget.R, budget.xlsx
-│       └── output/      # pandoc 生成物（gitignore）
+│       ├── output/      # pandoc 生成物（gitignore）
+│       └── submitted/   # 提出した版（git 追跡・以後変更しない）
 │
 ├── data/                # gitignore（実体は NAS。data-management-policy.md 参照）
 │   ├── raw/             # 読み取り専用・変更禁止
@@ -93,8 +108,8 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避し�
 
 - 作業ディレクトリ・GitHub repo 名: **kebab-case**（例: `cultural-heritage-digital-twin`）。
   repo 名はディレクトリ名と一致させる
-- 提出アーカイブ: `{YYYYMMDD}_{種別}_{略称}`（例: `20260601_学術変革B_文化財DT`）。
-  日付は応募/締切日。略称は和文短縮（4〜6 文字目安）
+- 提出版ファイル: `submitted/{YYYYMMDD}_{種別}_{略称}.docx`
+  （例: `20260601_学術変革B_文化財DT.docx`）。日付は応募/締切日。略称は和文短縮（4〜6 文字目安）
 - 申請書サブディレクトリ: `proposals/{YYYY}-{種別}/`（例: `proposals/2026-学術変革B/`）
 - 変数名・ファイル名: snake_case（`data-analysis-coding-conventions.md`）
 

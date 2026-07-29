@@ -142,7 +142,8 @@ sync スクリプトの標準パターン、削除・保持ルールの詳細、
 ## 研究プロジェクト規約
 
 作業領域（ソース・git）は `~/work/projects/{kebab-case名}/`（**非 iCloud**。iCloud と git/.claude/ は
-相性が悪い）。提出物（.docx, .pdf）のみ iCloud `~/Documents/grant/` にコピーしてアーカイブする。
+相性が悪い）。**提出物もリポジトリで完結させる**（`proposals/{YYYY}-{種別}/submitted/` に git 追跡。
+2026-07-29 変更。以前の `~/Documents/grant/` は残すが、新規の提出物はそちらへ置かない）。
 
 場所の使い分け・標準ディレクトリ構造・命名規約・EC2 の使い方・.gitignore 雛形・完了時の扱いは
 `~/dotfiles/claude/.claude/research-project-conventions.md` が正本。

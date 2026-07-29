@@ -8,15 +8,17 @@
 ```
 proposals/{YYYY}-{種別}/drafts/*.md
         ↓ pandoc --reference-doc=様式/template.docx
-proposals/{YYYY}-{種別}/output/研究計画調書.docx
-        ↓ コピー（節目・最終）
-~/Documents/grant/{YYYYMMDD}_{種別}_{略称}/研究計画調書.docx
+proposals/{YYYY}-{種別}/output/研究計画調書.docx     ← 毎回上書き（gitignore）
+        ↓ コピー（提出したときだけ）
+proposals/{YYYY}-{種別}/submitted/{YYYYMMDD}_{種別}_{略称}.docx   ← git 追跡・以後変更しない
 ```
 
 **markdown が真のソース。** Word は最終出力としてのみ生成する。共同研究者と Word で授受する
 場合も、md → docx 変換を都度回す（Word 側で直接編集した内容を md へ戻す運用にしない）。
 
-`output/` は gitignore 対象。git に残るのは `drafts/` の md と `figures/`・`refs/`・`budget/`。
+**提出物もリポジトリで完結させる**（2026-07-29 変更。以前は `~/Documents/grant/` へ iCloud
+アーカイブしていた）。`output/` はビルドのたびに変わるので、提出した事実を残すには別ディレクトリが要る。
+git に残るのは `drafts/` の md、`figures/`・`refs/`・`budget/`、そして `submitted/`。
 
 ## AI の使い分け（Claude / ChatGPT）
 
@@ -81,7 +83,7 @@ proposals/{YYYY}-{種別}/output/研究計画調書.docx
 
 ## 提出後
 
-提出版を `~/Documents/grant/{YYYYMMDD}_{種別}_{略称}/` にコピーしてアーカイブする
-（`init.sh add-archive` がディレクトリを作る）。
+提出版を `proposals/{YYYY}-{種別}/submitted/{YYYYMMDD}_{種別}_{略称}.docx` にコピーしてコミットし、
+**push する**。提出版の正本はこのリポジトリだけなので、push しないとバックアップが存在しない。
 
 採択結果を待つあいだ並行作業が無いなら、vault のプロジェクトノートの `status` を `waiting` にする。

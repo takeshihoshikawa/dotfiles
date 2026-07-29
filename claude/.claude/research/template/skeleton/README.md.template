@@ -23,5 +23,6 @@
 ## 関連
 
 - Obsidian プロジェクトノート: `projects/{{PROJECT_NAME}}.md`
-- 提出版アーカイブ: `~/Documents/grant/{{ARCHIVE_DATE}}_{{GRANT_TYPE}}_{{SHORT}}/`
+- 提出版: `proposals/{{YEAR}}-{{GRANT_TYPE}}/submitted/`（リポジトリ内・git 追跡）
+- 文献ライブラリ: papis `{{PAPIS_LIB_NAME}}`（`~/Documents/papis/{{PAPIS_LIB_NAME}}/`、リポジトリ外）
 - 規約: `~/.claude/CLAUDE.md`「研究プロジェクト規約」、`~/dotfiles/claude/.claude/research-project-conventions.md`

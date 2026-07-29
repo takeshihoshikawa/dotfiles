@@ -37,12 +37,9 @@
   --affiliation "静岡県立農林環境専門職大学短期大学部" \
   --phase "申請書執筆"
 
-# 5. 提出物アーカイブディレクトリを作成
-~/dotfiles/claude/.claude/research/template/init.sh add-archive \
-  --name forest-thermal-normalization \
-  --archive-date 20270601 \
-  --short 森林熱画像 \
-  --grant-type 学術変革B
+# 5. GitHub private repo に push（申請書を含むなら必須。提出版の正本がここだけになる）
+cd ~/work/projects/forest-thermal-normalization
+gh repo create --private forest-thermal-normalization --source=. --remote=origin --push
 ```
 
 ### 典型例: ChatGPT/Obsidian で先行構築した構想を引き継ぐ
@@ -59,29 +56,19 @@
 | サブコマンド | 役割 |
 |---|---|
 | `adopt` | プロジェクトディレクトリ作成 or 既存補完。CLAUDE.md・README.md・.gitignore・空ディレクトリ・git 初期化 |
-| `add-proposal` | `proposals/{YEAR}-{GRANT_TYPE}/{drafts,様式,figures,refs,budget,output}/` を追加 |
-| `add-papis-lib` | Papis ライブラリディレクトリ作成 + `~/Library/Application Support/papis/config` に登録 |
+| `add-proposal` | `proposals/{YEAR}-{GRANT_TYPE}/{drafts,様式,figures,refs,budget,output,submitted}/` を追加 |
+| `add-papis-lib` | Papis ライブラリを `~/Documents/papis/{name}/`（**リポジトリ外**）に作成 + `~/Library/Application Support/papis/config` に登録 |
 | `add-obsidian-note` | Vault `projects/{name}.md` を生成 |
-| `add-archive` | `~/Documents/grant/{YYYYMMDD}_{種別}_{略称}/` を作成 |
 
 `init.sh --help` で詳細オプション確認。
 
 ## テンプレート自身の育て方
 
-このディレクトリ自体が git repo。テンプレを改善したら commit する:
+このディレクトリは **dotfiles リポジトリの一部**（2026-07-29 に subtree で取り込み。以前は
+`~/work/templates/research-project` の独立 repo だった）。
 
-```sh
-cd ~/dotfiles/claude/.claude/research/template
-git add .
-git commit -m "skeleton: CLAUDE.md に X セクション追加"
-```
-
-多端末同期や長期保管が必要になったら GitHub private repo に push:
-
-```sh
-cd ~/dotfiles/claude/.claude/research/template
-gh repo create --private research-project-template --source=. --remote=origin --push
-```
+**規約を変えたらテンプレも同じコミットで直す。** 別リポだった頃は追随に別コミットが必要で、
+片方だけ更新されて腐る事故が起きていた。
 
 ### 新しい雛形ファイルを追加するとき
 
@@ -110,7 +97,7 @@ gh repo create --private research-project-template --source=. --remote=origin --
 │       config/{datasets,models,paths}/、results/、
 │       outputs/{papers,presentations,reports}/、docs/（.gitkeep 付き）
 ├── proposal-skeleton/           # add-proposal が使う雛形
-│   └── proposals/{{YEAR}}-{{GRANT_TYPE}}/{drafts,様式,figures,refs,budget,output}/
+│   └── proposals/{{YEAR}}-{{GRANT_TYPE}}/{drafts,様式,figures,refs,budget,output,submitted}/
 └── obsidian-project-note.md.template   # add-obsidian-note が使う
 ```
 
