@@ -15,7 +15,7 @@ If already running as that profile or subagent execution is unavailable, execute
 
 Read [the shared contract](../../references/secretary-contract.md).
 
-Resolve `../../scripts/repo_snapshot.py` relative to this `SKILL.md` and invoke it with `--fetch --pull-safe --format json`.
+Resolve `../../scripts/repo_snapshot.py` relative to this `SKILL.md` and normally invoke it with `--fetch --pull-safe --format json`. If the user explicitly requests a preview or prohibits updates, invoke it with `--format json` instead and report that remote state was not refreshed.
 
 The script may fetch and pull only clean, behind-only repositories. It never commits, pushes, resets, or resolves divergence.
 
@@ -43,7 +43,7 @@ diverged:  harvest-accessibility (ahead 13, behind 13) — 内容確認してか
 
 ## Stale repository review
 
-After synchronization, review only synced repositories under `~/work/projects`; exclude `~/dotfiles`, dirty, diverged, no-upstream, and fetch-failed repositories.
+After synchronization, review every discovered repository under `~/work/projects`; exclude only `~/dotfiles`. Include dirty, diverged, no-upstream, and fetch-failed repositories in the inactivity review, but do not synchronize, evacuate, or delete them automatically.
 
 Treat a repository as used within the last seven days when either source shows a recent session:
 
@@ -52,23 +52,50 @@ Treat a repository as used within the last seven days when either source shows a
 
 Do not use git log or reflog as activity evidence because this workflow's own pull changes them. If neither session source has a matching directory or record, label the result `セッションログ無し`. This intentionally does not detect direct edits made outside Claude Code and Codex.
 
-Separate stale repositories by whether a `data/` directory exists:
+Treat every repository without a matching session in the last seven days as a deletion candidate, regardless of git state or whether `data/` exists. The seven-day inactivity rule alone determines candidacy. Git state determines whether deletion is currently safe, and local-only data determines what must be evacuated before deletion.
 
-- Without `data/`: before proposing deletion, confirm every local branch is fully pushed, the stash is empty, and ignored files contain nothing valuable such as `.env`, local-only scripts, or personal notes. Regenerable environments and dependencies do not block archival.
-- With `data/`: report only. Do not run synchronization scripts or delete anything; project-specific knowledge is required to verify NAS or other authoritative storage.
+For every deletion candidate:
+
+1. Record the snapshot classification. A dirty, diverged, no-upstream, or fetch-failed repository remains a deletion candidate but is not `削除可`.
+2. Confirm every local branch is fully pushed and the stash is empty.
+3. Inspect untracked and ignored files, including `data/`, for local-only data, `.env`, scripts, notes, credentials, or other valuable content. Regenerable environments, dependencies, and caches do not require evacuation.
+4. If git safety checks pass and valuable local-only content does not exist, classify the repository as `削除可`.
+5. If valuable local-only content exists, classify the repository as `退避待ち` and determine its authoritative storage from the repository's `CLAUDE.md`, `AGENTS.md`, README, path configuration, or the global data-management policy. Never assume S3 is authoritative when the project designates NAS, an external HDD, or another location.
+6. If the authoritative destination or project-specific synchronization procedure is unclear, keep the repository as a deletion candidate but mark it `退避先要確認`. Ask the user rather than inventing a destination or deleting the repository.
+7. If git safety checks fail, keep the repository as a deletion candidate but mark it `git確認待ち` and report the exact blocker. Resolve it only through the normal safe synchronization workflow; never discard or overwrite work to make a repository deletable.
+
+After the user selects a candidate with local-only content, evacuate it before deleting the repository:
+
+1. Recheck that the repository and destination state have not changed.
+2. Use the documented project-specific synchronization procedure when one exists. Otherwise propose the exact source, destination, and copy method and obtain confirmation before writing to external storage.
+3. Verify the evacuation using file counts and total bytes plus a content check such as checksums, a manifest comparison, or an equivalent tool-specific verification. A successful copy command alone is insufficient.
+4. Preserve the verified destination and evidence in the final report. Delete only after evacuation and verification succeed.
 
 Report the result at the end:
 
 ```text
-退避候補（7日以上未使用・data/なし・チェック通過。このセッションで削除可）:
+削除候補（7日以上未使用）:
   - some-old-repo（セッションログ無し）
+    状態: 削除可（ローカル専用データなし）
 
-プロジェクト側で対応が必要（7日以上未使用・data/あり）:
   - tree-species-classification
-    → そのプロジェクトのセッションで NAS 同期を確認のうえ削除を検討してください
+    状態: 退避待ち
+    退避元: data/
+    正本: /Volumes/research/tree-species-classification
+    → 退避と検証後に削除可
 
-要確認（7日以上未使用だがgit側の担保が未達）:
-  - third-repo（feature/x が未push 3コミット）
+  - another-project
+    状態: 退避先要確認
+    退避元: data/raw/（24 GB）
+    → 正本の保存先を確認してください
+
+候補外（7日以内に使用）:
+  - active-project（最終セッション 2026-07-30）
+
+git側の担保が未達:
+  - third-repo
+    状態: git確認待ち
+    → feature/x が未push 3コミット
 ```
 
 Ask the user to select any repository to remove. After selection, rerun all pre-deletion checks and verify that the state has not changed. Delete only the exact selected path, then explain that repositories without local-only data can be restored by cloning.
