@@ -8,31 +8,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "sonnet",
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f \"$HOME/.claude/hooks/guard-obsidian.py\" ]; then python3 \"$HOME/.claude/hooks/guard-obsidian.py\"; else exit 0; fi"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
-          }
-        ]
-      }
-    ]
-  },
+  "model": "opus",
   "enabledPlugins": {},
   "extraKnownMarketplaces": {},
   "language": "Japanese",

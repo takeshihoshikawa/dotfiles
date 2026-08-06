@@ -168,7 +168,8 @@ Vault: `~/vault`（実体は iCloud 上の vault へのシンボリックリン�
 | 本文を読む・要約・下書き・本文を編集 | 通常のファイルアクセス（Read / Edit / Grep / Glob）でよい |
 | 移動・リネーム・削除・テンプレ作成・daily・properties・tag 操作 | **必ず `obsidian` CLI 経由**（wikilink 保護） |
 
-**vault 内で `mv` / `rm` / `rmdir` を直接使わない**（PreToolUse hook でブロックされる）。
+**vault 内で `mv` / `rm` / `rmdir` を直接使わない**（wikilink が壊れる）。
+以前は PreToolUse hook がブロックしていたが 2026-08-06 に廃止したため、**自動では止まらない**。
 `obsidian` は起動中の Obsidian アプリのリモコン。未起動時のみ起動する
 （`pgrep -x Obsidian >/dev/null || { open -a Obsidian; sleep 2; }`）。
 
