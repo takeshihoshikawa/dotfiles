@@ -17,18 +17,35 @@ model キーが無いときは**ファイルを書き換えない**。書き換�
 揺れて、結局リポジトリが汚れるため。
 """
 
+import datetime
 import json
 import pathlib
 import sys
 
 path = pathlib.Path.home() / ".claude" / "settings.json"
+log = pathlib.Path.home() / ".cache" / "claude-reset-model.log"
+
+
+def record(message: str) -> None:
+    """フックが発火したこと自体を残す。無音だと動作確認ができないため。"""
+    try:
+        log.parent.mkdir(parents=True, exist_ok=True)
+        stamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        with log.open("a") as f:
+            f.write(f"{stamp} {message}\n")
+    except OSError:
+        pass
 
 try:
     settings = json.loads(path.read_text())
 except (OSError, json.JSONDecodeError):
+    record("skip: settings.json を読めない")
     sys.exit(0)  # フックで設定を壊さない。読めなければ何もしない
 
-if settings.pop("model", None) is None:
+removed = settings.pop("model", None)
+if removed is None:
+    record("noop: model キーなし")
     sys.exit(0)
 
 path.write_text(json.dumps(settings, indent=2, ensure_ascii=False) + "\n")
+record(f"removed: model={removed}")
