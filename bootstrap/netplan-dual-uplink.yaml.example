@@ -1,0 +1,43 @@
+# 有線を通常経路、無線をバックアップにする netplan の例。
+# /etc/netplan/01-network.yaml として設置する。
+#
+# 【重要】このファイルはテンプレート。SSID・パスワードを実値に書き換えたものは
+# 資格情報を含むため git に入れないこと（.gitignore で netplan-*.yaml を除外済み）。
+#
+#   sudo cp netplan-dual-uplink.yaml.example /etc/netplan/01-network.yaml
+#   sudoedit /etc/netplan/01-network.yaml     # SSID とパスワードを記入
+#   sudo chmod 600 /etc/netplan/01-network.yaml
+#   sudo netplan try                          # 120秒以内にEnterしないと自動で元に戻る
+#
+# メトリック差で「平常時は有線」になるが、上流の転送遮断（リンクは生きたまま
+# その先だけ死ぬ型）ではメトリックによる自動フェイルオーバは働かない。
+# 副回線へ逃がすのは uplink_recover.sh が主回線を明示的に落とすことで行う。
+
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    CHANGE_ME_WIRED_IFACE:        # 例: enp5s0（`ip -br link` で確認）
+      dhcp4: true
+      dhcp4-overrides:
+        route-metric: 100
+  wifis:
+    CHANGE_ME_WIFI_IFACE:         # 例: wlp12s0
+      dhcp4: true
+      dhcp4-overrides:
+        route-metric: 600
+        # 無線側の DNS も受け取る。退避中は有線が down するため、
+        # ここを false にすると名前解決ごと死んでしまう
+      access-points:
+        "CHANGE_ME_SSID":
+          password: "CHANGE_ME_PASSWORD"
+
+# --- WPA2-Enterprise（eduroam 等）の場合の access-points の書き方 ---
+#      access-points:
+#        "eduroam":
+#          auth:
+#            key-management: eap
+#            method: peap
+#            identity: "CHANGE_ME_ID"
+#            password: "CHANGE_ME_PASSWORD"
+#            ca-certificate: /etc/ssl/certs/ca-certificates.crt

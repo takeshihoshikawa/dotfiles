@@ -4,6 +4,11 @@ __pycache__/
 *.key
 *.pem
 
+# ネットワーク設定の実値（WiFi の PSK・EAP 資格情報を含むため）
+# テンプレートは netplan-*.yaml.example として置く
+netplan-*.yaml
+uplink-failover.conf
+
 aws/.aws/credentials
 aws/.aws/login/
 

@@ -61,6 +61,27 @@ bash ~/dotfiles/bootstrap/setup_nas_mount.sh
 > ```
 > NAS ホスト・共有名・マウント先・SMB ユーザー等はスクリプト冒頭の変数（`TSC_NAS_HOST` 等の env でも上書き可）で調整する。`TSC_NAS_ROOT=/mnt/public` は `~/.bashrc` に追記され、各プロジェクトの `sync_with_nas.sh`（既定は Mac の `/Volumes/Public`）がマウント先を吸収する。
 
+### Uplink failover (`setup_uplink_failover.sh`)
+
+「リンクは生きているのに上流が転送してくれない」型の障害からの自動復旧と、障害時の層別の証拠ロガーを systemd サービスとして設置する。
+
+対象とする障害の署名は、キャリア UP・IP・デフォルト経路すべて正常でゲートウェイまで ping も通るのに、その先だけが全滅し、L2/DHCP を再アタッチする（ケーブル抜き差し等）まで戻らないというもの。ネットワーク管理デーモンは異常と認識しないためログを出さず、**経路メトリックによる自動フェイルオーバも働かない**（リンクが生きて見えるため）。副回線へ逃がすには主回線を明示的に落とす必要があり、それをやるのがこのサービス。
+
+```bash
+bash ~/dotfiles/bootstrap/setup_uplink_failover.sh
+```
+
+動作は二段構え。遮断を既定3分検知したら、段1で主回線のリンクを down/up（＝抜き差し相当）を最大2回、それでも直らなければ段2で**主回線を down のまま保持して副回線へ退避**し、30分ごとに主回線の回復を確認する。
+
+```bash
+sudo tail -f /var/log/uplink-recover.log   # 復旧動作
+sudo tail -f /var/log/uplink-watch.log     # 障害時にどの層が落ちているか
+```
+
+インタフェースとゲートウェイはデフォルト経路から自動判定される。閾値等を変えたい場合のみ `/etc/uplink-failover.conf`（コメントアウト済みのテンプレートが生成される）を編集する。
+
+> **注**: 段2を使うには副回線が要る。有線＋無線の2本立てにする netplan の例が `netplan-dual-uplink.yaml.example`。**実値（SSID・パスワード）を書いたものは資格情報を含むため git に入れないこと**（`.gitignore` で `netplan-*.yaml` を除外済み）。副回線にデフォルト経路が無いうちは段2に移らず、段1だけを試す。段2の退避中は主回線が down するため、同一セグメントの NAS 等には届かなくなる。
+
 ---
 
 ## Setup (macOS)
