@@ -6,5 +6,6 @@
     "files.autoSave": "onFocusChange",
     "files.hotExit": "off",
     "chat.viewSessions.orientation": "stacked",
-    "git.autofetch": true
+    "git.autofetch": true,
+    "chat.remoteAgentHosts": []
 }
