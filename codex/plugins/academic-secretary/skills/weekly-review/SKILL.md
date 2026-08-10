@@ -42,7 +42,7 @@ Summarize achievements, misses, and reasons under education, research, and admin
 
 ## Phase 3: organize work
 
-Show the next two weeks of calendar and teaching commitments, current inbox tasks, `#waiting` items, and open GitHub issues. Propose only actionable tasks for next week.
+Run `academic_ops.py audit --format json`, then show the next two weeks of calendar and teaching commitments, current inbox tasks, `#waiting` items, and open GitHub issues. Explicitly screen stale open tasks, active projects without a valid next task, waiting projects pointing to non-waiting work, and done projects with open tasks. Propose only actionable tasks for next week; do not auto-fix semantic contradictions.
 
 Ask which proposed tasks to adopt. Apply approved tasks to the locations defined by global `AGENTS.md`; do not duplicate meeting-originated tasks or add checkboxes to project notes.
 

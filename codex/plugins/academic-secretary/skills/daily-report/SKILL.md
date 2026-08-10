@@ -101,7 +101,7 @@ Apply these rules:
 - Summarize only explicit user observations under `## 気づき`.
 - Put only unresolved work and concrete next actions under `## 次への引継ぎ`.
 
-Show the complete draft before replacing the file. Save only after approval. After saving, identify possible completed Obsidian tasks and ask before marking them done. Do not create new tasks.
+Show the complete draft before replacing the file. Save only after approval. After saving, identify possible completed Obsidian tasks by stable task ID. In the same approval unit, propose each completion, the replacement `next_task_id` for any project whose current next task is being completed, and the resulting project phase/status/concern. After approval, use `academic_ops.py task complete` for ordinary tasks or the `close-project-session` workflow for a current project next task. Do not create new tasks.
 
 Repository publication is outside this skill. If needed, offer `$sync-repos`; do not automatically commit or push every repository.
 

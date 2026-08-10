@@ -45,6 +45,8 @@ diverged:  harvest-accessibility (ahead 13, behind 13) — 内容確認してか
 
 After synchronization, review every discovered repository under `~/work/projects`; exclude only `~/dotfiles`. Include dirty, diverged, no-upstream, and fetch-failed repositories in the inactivity review, but do not synchronize, evacuate, or delete them automatically.
 
+Before proposing any repository for evacuation, archive, or deletion, run `academic_ops.py audit --project {repo-name} --format json` when a matching Obsidian project note exists. A project with `status: active` or `status: waiting`, an integrity violation, or any unfinished task is not an archive/delete candidate. Report the blocking state and task IDs instead.
+
 Treat a repository as used within the last seven days when either source shows a recent session:
 
 - Claude Code: a file under `~/.claude/projects/-Users-takeshi-work-projects-{name}/` has an mtime within seven days.
