@@ -102,7 +102,7 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 
 ## データ分析コーディング規約
 
-@data-analysis-coding-conventions.md
+データ分析プロジェクト（R/Python）のコーディング規約は `data-analysis-coding-conventions` スキルを参照（scripts/ や src/ を書くときに自動で読み込まれる）。
 
 ## データ管理ポリシー
 
