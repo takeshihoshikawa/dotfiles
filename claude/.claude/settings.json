@@ -23,6 +23,7 @@
   "enabledPlugins": {},
   "extraKnownMarketplaces": {},
   "language": "Japanese",
+  "effortLevel": "high",
   "advisorModel": "opus",
   "tui": "fullscreen",
   "voice": {
