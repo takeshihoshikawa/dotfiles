@@ -69,8 +69,10 @@ Rebuild the day chronologically, merge duplicates, normalize formatting, and pre
 ### Plan comparison
 
 - Treat the confirmed morning plan as the plan source. If none exists, omit the comparison rather than reconstructing an elaborate plan after the fact.
-- Pair each planned outcome directly with its execution result and status in one compact table.
-- Add material unplanned work only when it affected the day.
+- Pair each planned outcome directly with its project, morning role, execution result, outcome status, and allocation assessment in one compact table.
+- Use only `達成`, `一部達成`, `未着手`, `変更`, or `想定以上` as the outcome status. `外部待ち` is a reason or project state, not an outcome status; record it in the result/reason text.
+- Use `計画どおり`, `意図的変更`, or `意図しない流入` as the allocation assessment.
+- Add material unplanned work only when it affected the day. Use `計画外` as its morning role and state whether it was an intentional change or unintended inflow.
 - Do not repeat the same facts in separate project-allocation or narrative comparison sections.
 - Omit inactive and waiting project inventories.
 
@@ -118,9 +120,9 @@ tags:
 
 **主題**：朝に確定した主題
 
-| 計画 | 実行・成果 | 判定 |
-|---|---|---|
-| 完了条件を含む計画 | 実際の成果 | 完了・一部達成・未着手・外部待ち |
+| プロジェクト | 朝の役割 | 期待成果 | 実行・成果／理由 | 判定 | 配分評価 |
+|---|---|---|---|---|---|
+| project-id | 本人の主軸・期限対応・維持・待機・計画外 | 完了条件を含む計画 | 実際の成果または未達理由 | 達成・一部達成・未着手・変更・想定以上 | 計画どおり・意図的変更・意図しない流入 |
 
 ## やったこと
 
@@ -138,6 +140,8 @@ tags:
 | 研究 | 計画値または未設定 | 実績 | 差または— |
 | 事務 | 計画値または未設定 | 実績 | 差または— |
 | 教育 | 計画値または未設定 | 実績 | 差または— |
+
+- 予定と差は日次セルフチェック専用。週次レビューは実績だけを合計する。
 
 ## 気づき
 
