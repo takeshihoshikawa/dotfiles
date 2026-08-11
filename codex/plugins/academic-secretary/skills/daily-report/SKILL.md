@@ -62,7 +62,7 @@ Collect in parallel:
 - The session handoff supplied by the parent.
 - Google Calendar events for the target date in Asia/Tokyo, excluding all-day events unless they materially describe work.
 - Closed GitHub issues whose close time falls on the target date in Asia/Tokyo.
-- Repository state and commits using `../../scripts/repo_snapshot.py` resolved relative to this `SKILL.md`, with arguments `--fetch --pull-safe --date {YYYY-MM-DD} --format json`.
+- Repository state and commits using `~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --date {YYYY-MM-DD} --format json`.
 
 Rebuild the day chronologically, merge duplicates, normalize formatting, and preserve uncertainty.
 

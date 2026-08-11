@@ -88,7 +88,7 @@ description: 会話、Obsidian日報、朝の計画、Google Calendar、GitHub�
 - `~/work/projects/`直下の全gitリポジトリと`~/dotfiles`の対象日コミット。
 - 会話履歴にある本人の明示時刻、体調、判断、指示、成果。
 
-gitは各リポジトリでfetchし、cleanかつbehindのみならpull --rebaseしてからlogを読む。改行区切りは`while IFS= read -r repo`で処理する。取得失敗は報告して続行する。
+`~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --date {対象日} --format json`を実行する。cleanかつbehindのみのリポジトリは自動でpull --rebaseされ、対象日のコミットも同時に取得できる。取得失敗は報告して続行する。
 
 ### 2. 再構成
 
@@ -219,17 +219,10 @@ tags:
 
 ### 4. 完了タスク
 
-「実際の成果」から完了と判断できる未完タスクをvault全体で検索して候補を提示する。確認後に`obsidian task ref="path:line" done`を使う。新規タスクは追加しない。
+「実際の成果」から完了と判断できる未完タスクをvault全体でタスクIDベースで検索して候補を提示する。
+確認後、通常のタスクは`python3 ~/work/projects/admin/scripts/academic_ops.py task complete --id {tsk-id} --apply`を使う。
+完了させたいタスクが対象プロジェクトの`next_task_id`と一致する場合は、単独のtask completeではなく`close-project-session`を使う（フェーズ・次タスク・懸念を1トランザクションで更新するため）。新規タスクは追加しない。
 
-### 5. リポジトリの片づけ
+### 5. リポジトリの状態報告
 
-全対象リポジトリを確認する。
-
-| 状態 | 処理 |
-|---|---|
-| dirty | diffを確認し、一貫した安全な変更だけcommit+push。判断不能なら報告 |
-| ahead | push |
-| pullable | pull --rebase |
-| diverged | 触らず報告 |
-
-WIP、デバッグ痕跡、秘密情報、複数目的が混在する変更は自動コミットしない。結果はチャットへ報告し、日報本文には書かない。
+対象リポジトリのdirty・ahead・divergedを`repo_snapshot.py`の結果から報告する。commit・pushの判断はこのスキルの範囲外。dirtyなリポジトリがあれば`sync-repos`の実行を促す。結果はチャットへ報告し、日報本文には書かない。

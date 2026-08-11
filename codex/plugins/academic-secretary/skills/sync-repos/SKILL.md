@@ -15,7 +15,7 @@ If already running as that profile or subagent execution is unavailable, execute
 
 Read [the shared contract](../../references/secretary-contract.md).
 
-Resolve `../../scripts/repo_snapshot.py` relative to this `SKILL.md` and normally invoke it with `--fetch --pull-safe --format json`. If the user explicitly requests a preview or prohibits updates, invoke it with `--format json` instead and report that remote state was not refreshed.
+Normally invoke `~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --format json`. If the user explicitly requests a preview or prohibits updates, invoke it with `--format json` instead and report that remote state was not refreshed.
 
 The script may fetch and pull only clean, behind-only repositories. It never commits, pushes, resets, or resolves divergence.
 

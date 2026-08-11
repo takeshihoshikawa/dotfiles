@@ -41,12 +41,11 @@ description: 朝または前日に、当週の週次計画と全アクティブ�
 
 ### リポジトリ同期
 
-`~/work/projects/`直下の全gitリポジトリと`~/dotfiles`をfetchする。cleanかつbehindのみならpull --rebaseする。改行区切りは`while IFS= read -r repo`で処理する。
+`~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --format json`を実行する。
+cleanかつbehindのみのリポジトリだけが自動でpull --rebaseされる。
 
 - pullしたリポジトリだけ簡潔に報告する。
 - fetch失敗、dirty、divergedは`/sync-repos`で別途扱う。
-- これは`/sync-repos`の「pullable」の規則を無言で適用したもの（毎朝走るため速度優先で、対話も退避提案もしない）。
-  片方の判定条件を変えるならもう片方も合わせる。
 
 ### プロジェクトレーダー
 

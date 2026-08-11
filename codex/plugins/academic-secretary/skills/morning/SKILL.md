@@ -32,7 +32,7 @@ After confirming the plan, keep this task as the user's lightweight work log. Fo
 
 Run independent reads in parallel where possible.
 
-1. Resolve `../../scripts/repo_snapshot.py` relative to this skill and run it with `--fetch --pull-safe --format json`. Report only pulls, failures, dirty repositories, and divergence.
+1. Run `~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --format json`. Report only pulls, failures, dirty repositories, and divergence.
 2. After safe pulls finish, run `academic_ops.py audit --format json` before the compatibility `project_mirror.py` and `project_radar.py` commands from `~/work/projects/admin/scripts/`. Show warnings and integrity violations. Exclude projects with integrity violations from recommended next actions until repaired.
 3. Read `~/vault/notes/goals.md` and the newest daily note strictly before the target date.
 4. Find the Monday of the target week, subtract seven days, and read `~/vault/weekly/weekly-{previous Monday}.md`. Extract the target weekday from `## 来週の計画` and `## 来週の重点`. Weekly filenames represent the reviewed week.

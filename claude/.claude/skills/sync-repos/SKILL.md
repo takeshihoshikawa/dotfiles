@@ -17,33 +17,27 @@ model: sonnet
 
 ### 1. 状態収集（並列）
 
-全リポジトリに対して `git fetch` を実行し、以下の状態に分類する：
-
-```bash
-# fetch後にステータス確認
-git -C <repo> status -sb
-```
+`~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --format json` を実行する。
+cleanかつbehindのみのリポジトリはこの時点で自動的にpull --rebaseされ、結果の`state`は`synced`（`pulled: true`）になる。
 
 | 状態 | 判定条件 |
 |------|---------|
-| **synced** | ahead/behind なし、working tree clean |
-| **pullable** | behind のみ（ahead なし）、working tree clean |
+| **synced** | ahead/behind なし、working tree clean（pull-safe適用後を含む） |
 | **dirty** | uncommitted changes あり |
 | **ahead** | ローカルのみ ahead（behind なし） |
 | **diverged** | ahead かつ behind |
-| **no-upstream** | upstream 未設定（`status -sb` に `...origin/x` が出ない） |
+| **no-upstream** | upstream 未設定 |
 | **fetch-failed** | fetch がエラー（ネットワーク・認証・remote無し） |
 
 **判定順序**: working tree を先に見る。uncommitted changes があれば commit 位置によらず **dirty**。
-clean だった場合にのみ ahead/behind で分類する（dirty かつ behind のように2行に該当しうるため）。
+clean だった場合にのみ ahead/behind で分類する（dirty かつ behind のように2行に該当しうるため）。この順序判定は`repo_snapshot.py`側で行われる。
 
 no-upstream と fetch-failed は ahead/behind を判定できない。どちらも**自動対応せず報告のみ**とし、
 退避判定（ステップ4）の対象にもしない。
 
 ### 2. 自動対応
 
-#### pullable（behind のみ・clean）
-`git pull --rebase` を自動実行する。
+pullable（behind のみ・clean）はステップ1の`--pull-safe`実行時にすでにpull済み。
 
 #### dirty（未コミット変更あり）
 `git diff` で差分を確認し、**コミット可能かどうかを判断する**：
@@ -100,19 +94,26 @@ diverged:  harvest-accessibility (ahead 13, behind 13) — 内容確認してか
 
 #### 未使用の判定
 
-Claude Codeセッションログ（`~/.claude/projects/-Users-takeshi-work-projects-{name}/`）の
-mtimeを見る。7日以内に更新されたファイルが1つも無ければ「未使用」。
+次の2つのセッションログのいずれかが7日以内に更新されていれば「使用中」とする。ClaudeとCodexを併用しているため、片方だけでは判定しない。
+
+- Claude Code：`~/.claude/projects/-Users-takeshi-work-projects-{name}/` にmtimeが7日以内のファイルがある
+- Codex：`~/.codex/sessions/` 配下のJSONLファイルのmtimeが7日以内、かつそのファイルの`session_meta.payload.cwd`が対象リポジトリのパスと一致する
 
 ```bash
 find ~/.claude/projects/-Users-takeshi-work-projects-{name} -type f -mtime -7 2>/dev/null | head -1
 ```
 
-`git log`/`git reflog` は使わない。このスキル自身の自動pullでも更新されるため、
+両方に該当が無ければ「未使用」。`git log`/`git reflog` は使わない。このスキル自身の自動pullでも更新されるため、
 自動同期が「使っている」と自己申告する循環になる。セッションログはpullでは変化しない。
-（Claude Code外での直接編集を捕捉できないのは既知の限界。ディレクトリ自体が無い場合も
+（Claude Code・Codex CLI外での直接編集を捕捉できないのは既知の限界。両方のディレクトリ自体が無い場合も
 「未使用」に含め、出力に「セッションログ無し」と明記してユーザーが判断できるようにする）
 
 判定対象は**ステップ2適用後にsyncedになったリポジトリのみ**。dirty/divergedは先に手動対応が要る。
+
+#### 退避前の整合性チェック
+
+退避候補として提示する前に、Obsidianの対応するproject noteがあれば`python3 ~/work/projects/admin/scripts/academic_ops.py audit --project {repo名} --format json`を実行する。
+`status: active`／`status: waiting`、整合性違反、または未完了タスクがあれば、退避候補から外してその状態を報告する（例：「activeのため退避候補から除外」）。project noteが無い、またはprojectがacademic_opsの管理対象外の場合はこのチェックを省略する。
 
 #### `data/` の有無で扱いを分ける
 

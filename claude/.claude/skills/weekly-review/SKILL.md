@@ -89,7 +89,9 @@ description: 日次のmorningとdaily-report recapを週単位へ集約し、対
 
 `~/work/projects/admin/scripts/project_radar.py`を実行し、週次レビュー単独でも客観指標を最新化する。morning実行済みと仮定しない。
 
-リポジトリはfetchし、cleanかつbehindのみならpull --rebaseする。dirty、ahead、divergedは報告し、別目的の変更を自動コミットしない。
+`~/work/projects/admin/scripts/academic_ops.py audit --format json`を実行し、タスクID整合性違反や矛盾（次タスク未設定のactiveプロジェクト、waitingなのに実行可能タスクが無い等）を収集結果に含める。次週のタスク画面（Phase 4）で違反プロジェクトを優先候補にしない。
+
+`~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --format json`を実行する。dirty、ahead、divergedは報告し、別目的の変更を自動コミットしない。
 
 ## Phase 2: 週の振り返り
 
