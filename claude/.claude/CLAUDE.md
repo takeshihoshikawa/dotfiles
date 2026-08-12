@@ -29,21 +29,35 @@ Folder structure:
 |--------|------|
 | **Obsidian Tasks** | 実行管理（期日・チェック）。各ノートに `- [ ]` チェックボックスとして配置 |
 | **Project note** (`projects/`) | **管理**レイヤ。プロジェクト間の見通し（状態・優先順位・リンク・意思決定の記録） |
-| **リポジトリの `CLAUDE.md`「## 現在地」** | **実行**レイヤ。gitプロジェクトの現在地の**正本**（現フェーズ・次の一手・懸念） |
+| **リポジトリの `project-status.yaml`** | **実行**レイヤ。gitプロジェクトの状態の**正本**（status・phase・next_task_id・concern）。`CLAUDE.md` の生成ブロックはその表示 |
 | **Meeting note** (`meetings/`) | 会議の文脈・決定事項の記録 |
 
-### プロジェクトの「現在地」はリポジトリが正本（gitプロジェクトのみ）
+### プロジェクトの状態はリポジトリが正本（gitプロジェクトのみ）
 
 作業する場所に記録が残るようにするための分担（vault は Ubuntu 機から参照できない）。
 
-- **人が書くのはリポジトリの `CLAUDE.md`「## 現在地」ただ1箇所**（`**現フェーズ**:` `**次の一手**:` `**懸念**:` `**更新**:`）
-- vault の frontmatter（`current_phase` / `next_action` / `concern` / `last_touched`）は
-  `~/work/projects/admin/scripts/project_mirror.py` が転記する**生成物**。手で書かない
+- **正本はリポジトリ直下の `project-status.yaml`**（`schema_version` `project_id` `status` `phase`
+  `next_task_id` `concern` `updated` のみ）
+- `CLAUDE.md` の `<!-- BEGIN GENERATED PROJECT STATUS -->` 〜 `<!-- END GENERATED PROJECT STATUS -->` は
+  **生成ブロック**。見出しとラベルは英語（`## Current Status` / `**Phase**` / `**Next task**` /
+  `**Concern**` / `**Updated**`）で、値とタスク本文は日本語のままでよい。**手で編集しない**
+- vault の frontmatter（`current_phase` / `next_task_id` / `next_action` / `concern` / `last_touched`）も**生成物**。手で書かない
+- 書き込みは `~/work/projects/admin/scripts/academic_ops.py`（`project migrate` / `project render` /
+  `close-session`）か `close-project-session` スキル経由。ファイルを直接編集しない
 - README にフェーズ欄を置かない（更新頻度が違い、必ず腐って誤情報になる）
-- 現在地を更新したら `chore: 現在地更新` として**単独でコミットし、離席時に push** する
+- 状態だけの更新は `chore: 現在地更新` として**単独でコミットし、離席時に push** する
+- `local_path` を持たないプロジェクトノート（会議駆動・未クローン）は従来どおり frontmatter が状態の正本。
+  `next_task_id` を必ず持たせる
 
-転記の対象判別（`local_path` の有無）・陳腐化ガード等の仕様は `~/work/projects/admin/CLAUDE.md`
-「## プロジェクト状態の集約」が正本。**`project_mirror.py` / `project_radar.py` を変更する前に必ず読む。**
+**移行中**（2026-08-10〜）: `project-status.yaml` があるリポが新方式、無いリポは旧方式の手書き `## 現在地`
+（`**現フェーズ**:` `**次の一手**:` `**懸念**:` `**更新**:`）のまま。読み手は当面この日本語ラベルも受理する。
+旧方式のリポを移すのは `academic_ops.py project migrate --repo ... --phase ... --apply` を1回
+（現在地に状態4項目以外が書いてあると失敗するので、先に作業ログ等へ退避する）。未移行は
+`audit` では warning 止まりで、error にはならない。
+
+yaml のスキーマ・audit の整合規則・`project_mirror.py` / `project_radar.py`（互換CLI として存続）の仕様は
+`~/work/projects/admin/CLAUDE.md`「## プロジェクト状態の制御（academic_ops.py）」が正本。
+**プロジェクト状態まわりのスクリプトを変更する前に必ず読む。**
 
 タスク管理は2系統：
 
@@ -53,7 +67,7 @@ Folder structure:
 | **非プロジェクトtask** | `tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD] [priority:: medium]` |
 
 **プロジェクトノート（`projects/`）にはチェックボックスを置かない。** 実行管理は `tasks.md` に任せる。
-gitプロジェクトでは**現在地（現フェーズ・次の一手・懸念）も本文に書かない**（上記の通りリポジトリが正本）。
+gitプロジェクトでは**状態（フェーズ・次タスク・懸念）も本文に書かない**（上記の通りリポジトリが正本）。
 プロジェクトノートに残すのは、概要・仮説・関係者・意思決定の記録・ログ・meeting note へのリンクなど、
 プロジェクト間で効く文脈に限る。
 
@@ -79,7 +93,7 @@ Claude Code は `rg "#project/X" tasks.md meetings` で横断検索（plugin非�
 - Meeting noteのアクションアイテムは「決定した事実」の記録（担当者・アクション・期限）。ステータス管理はしない
 - Project noteはチェックボックス禁止。タスク重複の温床になるため
 - テンプレート: `templates/meeting-agenda-template.md`、`templates/project-note-template.md`
-- 打ち合わせ後の手順（meeting note → project note → リポジトリの「## 現在地」）は
+- 打ち合わせ後の手順（meeting note → project note → リポジトリの状態更新）は
   `~/dotfiles/claude/.claude/obsidian-workflow.md`「打ち合わせ → プロジェクト → タスク」を参照
 
 ## User

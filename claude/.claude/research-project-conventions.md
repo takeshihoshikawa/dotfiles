@@ -55,7 +55,8 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避す�
 
 ```
 ~/work/projects/{name}/
-├── CLAUDE.md            # プロジェクト概要・実行方法・規約・「## 現在地」
+├── CLAUDE.md            # プロジェクト概要・実行方法・規約・状態の生成ブロック
+├── project-status.yaml  # 状態の正本（academic_ops.py が読み書き。手で書かない）
 ├── README.md            # 人間向け説明
 ├── .gitignore
 │

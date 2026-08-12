@@ -36,6 +36,7 @@ subtree で移設）。規約を変えたらテンプレも同じコミットで
 ~/dotfiles/claude/.claude/research/template/init.sh add-proposal --name forest-thermal-normalization --year 2027 --grant-type 学術変革B
 ~/dotfiles/claude/.claude/research/template/init.sh add-papis-lib --name forest-thermal-normalization
 ~/dotfiles/claude/.claude/research/template/init.sh add-obsidian-note --name forest-thermal-normalization --phase "申請書執筆"
+# 最後に project migrate で project-status.yaml と CLAUDE.md の生成ブロックを作る（下記「プロジェクト CLAUDE.md の最低構成」）
 
 # 構想メモを持つ既存ディレクトリへの補完（既存 CLAUDE.md・00-構想.md 等は保護される）
 ~/dotfiles/claude/.claude/research/template/init.sh adopt --name my-existing-project
@@ -62,8 +63,9 @@ subtree で移設）。規約を変えたらテンプレも同じコミットで
 ## プロジェクト CLAUDE.md の最低構成
 
 - プロジェクト概要（1 段落）
-- **`## 現在地`**（`**現フェーズ**:` `**次の一手**:` `**懸念**:` `**更新**:`）
-  — gitプロジェクトの現在地の正本。vault の frontmatter へは `project_mirror.py` が転記する
+- **状態の生成ブロック**（`<!-- BEGIN GENERATED PROJECT STATUS -->` 〜 `<!-- END GENERATED PROJECT STATUS -->`、
+  中身は `## Current Status` / `**Phase**` / `**Next task**` / `**Concern**` / `**Updated**`）
+  — 正本はリポジトリ直下の `project-status.yaml` で、このブロックはその生成物。**手で書かない**
 - ディレクトリ構成（実体に合わせて記述。標準から外れた部分だけ書けばよい）
 - 実行方法（コードがある場合）
 - Obsidian プロジェクトノートへのリンク、papis ライブラリ名（使う場合）
@@ -71,13 +73,32 @@ subtree で移設）。規約を変えたらテンプレも同じコミットで
 
 **README にフェーズ欄を置かない**（更新頻度が違い、必ず腐って誤情報になる）。
 
+生成ブロックは `init.sh` では作られない。立ち上げ時に一度だけ次を実行して `project-status.yaml` と
+ブロックを作る（テンプレの空の `## 現在地` 見出しがブロックに置き換わる）。以後の更新は
+`close-project-session` スキル（`academic_ops.py close-session`）に任せる。
+
+```sh
+# 先に add-obsidian-note を済ませておく（vault の projects/{name}.md が無いと失敗する）
+python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \
+  --repo ~/work/projects/{name} --status waiting --phase "申請書執筆"          # preview
+python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \
+  --repo ~/work/projects/{name} --status waiting --phase "申請書執筆" --apply
+```
+
+`--status active` は**実在する未完了タスクの `--next-task-id` を要求する**。着手タスクを
+`tasks.md` に立てる前は `waiting` で作り、タスクができてから `close-session` で `active` へ移す。
+
+状態まわりの規約本体（英語ラベル・手書き禁止・移行中の旧 `## 現在地` の扱い）はグローバル
+`CLAUDE.md`「### プロジェクトの状態はリポジトリが正本」を参照。
+
 ## Obsidian プロジェクトノート
 
 `projects/{kebab-case名}.md` を `templates/project-note-template.md` から作成する
 （`init.sh add-obsidian-note` が生成）。「関連リソース」に作業ディレクトリ・GitHub repo・
 papis ライブラリのパスを記載し、Obsidian と Claude Code の両側から相互参照可能にする。
 
-**frontmatter の `local_path` を必ず入れる**。`project_mirror.py` はこれの有無で転記対象を判別する。
+**frontmatter の `local_path` を必ず入れる**。`academic_ops.py` はこれの有無で生成対象を判別する
+（無いノートは会議駆動として frontmatter 自体が状態の正本になり、機械は触らない）。
 
 ## データ同期スクリプトの配置
 

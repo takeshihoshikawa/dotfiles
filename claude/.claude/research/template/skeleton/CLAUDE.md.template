@@ -6,6 +6,17 @@
 未確定の項目は {{...}} プレースホルダのまま残して構いません。後で init.sh add-proposal 等で埋まります。
 -->
 
+<!-- 状態（フェーズ・次タスク・懸念）の正本はリポジトリ直下の project-status.yaml。
+     下の空見出しは、立ち上げ時に一度だけ次を実行すると英語ラベルの生成ブロックへ置き換わる:
+
+       python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \
+         --repo . --status active --phase "申請書執筆" --apply
+
+     以後は手で書かず close-project-session スキルで更新する。ここに状態以外を書かない
+     （書くと migrate が失敗する）。migrate 後はこのコメントを削除する。 -->
+
+## 現在地
+
 ## 概要
 
 <!-- TODO: プロジェクトの目的・対象・背景を 1〜2 段落で。ChatGPT/Obsidian で書いた構想を貼ると良い -->
@@ -18,17 +29,6 @@
 
 | 班/役割 | 担当 | 氏名 |
 |---|---|---|
-
-## 現在のフェーズ
-
-<!-- TODO: 立ち上げ直後はここを最優先で埋める -->
-
-**フェーズ**: {{PHASE}}（例: 申請書執筆 / 解析中 / 報告書執筆）
-
-| マイルストーン | 日付 |
-|---|---|
-| {{MILESTONE_1}} | {{DATE_1}} |
-| {{MILESTONE_2}} | {{DATE_2}} |
 
 ## 役割と作成書類
 

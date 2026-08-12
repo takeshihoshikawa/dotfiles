@@ -110,7 +110,7 @@ obsidian task ref="tasks.md:10" done           # ref形式（path:line）も可
 |--------|------|
 | **Meeting note** (`meetings/`) | 会議の文脈・決定事項の記録。**Action Items の source of truth** |
 | **Project note** (`projects/`) | 管理レイヤ。プロジェクト間の見通し（優先順位・リンク・意思決定の記録）。**現在地は書かない** |
-| **リポジトリの `CLAUDE.md`「## 現在地」** | 実行レイヤ。gitプロジェクトの現在地の正本 |
+| **リポジトリの `project-status.yaml`** | 実行レイヤ。gitプロジェクトの状態の正本（`CLAUDE.md` の生成ブロックはその表示） |
 | **`tasks.md`** | 全タスクの集約（プロジェクト/非プロジェクト両方） |
 | **`_bases/active-projects.base`** | プロジェクト横断の一覧（現フェーズ・次の一手・懸念・未更新日数） |
 
@@ -118,8 +118,9 @@ obsidian task ref="tasks.md:10" done           # ref形式（path:line）も可
 
 1. **Meeting note** を整理する（決定事項・Action Items）
 2. **Project note** に反映する（重要な決定は `## 意思決定の記録` に要約、経緯は `## ログ` に1行）
-3. 会議で状態が動いた gitプロジェクトは、**リポジトリの `CLAUDE.md`「## 現在地」を更新**する
-   （project note には書かない。`project_mirror.py` が vault の frontmatter へ転記する）
+3. 会議で状態が動いた gitプロジェクトは、**リポジトリの状態を更新**する（project note には書かない）。
+   更新は `close-project-session` スキル経由で、`project-status.yaml`・`CLAUDE.md` の生成ブロック・
+   vault の frontmatter が同時に書かれる。手書きしない
 4. **Action Items は meeting note に残したまま**にする（`tasks.md` へ転記しない）。
    `#project/X` タグで横断検索・集約する
 
