@@ -149,8 +149,8 @@ sync スクリプトの標準パターン、削除・保持ルールの詳細、
 `~/dotfiles/claude/.claude/research-project-conventions.md` が正本。
 **新規研究プロジェクトを作る・既存の構造を変えるときは必ず読む。**
 
-フェーズ固有の規約は `~/dotfiles/claude/.claude/research/` にある。**これから行う作業に該当する
-ものを必ず読む**（複数フェーズが並行することもある）:
+フェーズ固有の規約は `~/dotfiles/claude/.claude/` にある（下表のパスはここからの相対）。
+**これから行う作業に該当するものを必ず読む**（複数フェーズが並行することもある）:
 
 | ファイル | 読むとき |
 |---|---|
@@ -158,6 +158,7 @@ sync スクリプトの標準パターン、削除・保持ルールの詳細、
 | `research/phase-proposal.md` | 申請書を書く・提出物を作る |
 | `research/phase-analysis.md` | 解析スクリプトを書く・`scripts/` `config/` `results/` を触る |
 | `research/phase-publication.md` | 論文原稿・投稿用図表を作る |
+| `manuscript-submission-check.md` | **投稿前チェック・監査をする**（8項目の観点表。項目7・8は原稿の外＝文献の本文・解析スクリプトに当たらないと終わらない） |
 
 ## Obsidian vault の取り扱い
 
