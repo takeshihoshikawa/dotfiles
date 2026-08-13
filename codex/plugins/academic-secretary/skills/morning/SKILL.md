@@ -24,6 +24,8 @@ Create the day's plan in the current session. Do not write the morning plan into
 After confirming the plan, keep this task as the user's lightweight work log. For later free-form updates:
 
 - Preserve explicit work, times or durations, decisions, observations, status changes, and carryovers as recap evidence.
+- On every work update, check the current local system time and preserve it as the report-received timestamp so partial progress has a reliable latest-known time.
+- Keep reported event times distinct from the report-received timestamp. Check whether start, end, and transition times are complete; ask promptly when a missing time matters, and never infer one.
 - Reply with a short acknowledgment unless the user asks for analysis or an action.
 - Do not append to the daily note unless the user explicitly requests durable logging.
 - Do not ask the user to repeat facts available from git or GitHub.
