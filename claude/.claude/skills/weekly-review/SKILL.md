@@ -1,6 +1,6 @@
 ---
 name: weekly-review
-description: 日次のmorningとdaily-report recapを週単位へ集約し、対象週の計画に対する成果・プロジェクト配分・本人エフォート・委任成果を振り返り、次週のプロジェクト優先順位・期待成果・エフォート予算・曜日配置を作る。週次レビュー、先週の振り返り、プロジェクト棚卸し、次週計画、タスク整理に使う。
+description: 日次のmorningとdaily-reportを週単位へ集約し、対象週の計画に対する成果・プロジェクト配分・本人エフォート・委任成果を振り返り、次週のプロジェクト優先順位・期待成果・エフォート予算・曜日配置を作る。週次レビュー、先週の振り返り、プロジェクト棚卸し、次週計画、タスク整理に使う。
 ---
 
 # Weekly Review
@@ -8,7 +8,7 @@ description: 日次のmorningとdaily-report recapを週単位へ集約し、対
 週の`Introduction → Results / Discussion`を閉じ、次週のIntroductionを作る。
 
 ```text
-週の計画 → morning → daily-report recap → 週の振り返り → 次週の計画
+週の計画 → morning → daily-report → 週の振り返り → 次週の計画
 ```
 
 ## 対象週

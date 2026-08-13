@@ -1,6 +1,6 @@
 ---
 name: morning
-description: Build and confirm a compact morning plan from goals, the latest daily note, the prior weekly plan, Google Calendar, Obsidian tasks, GitHub issues, and repository state. Use for morning planning, today or tomorrow planning, or starting a day-long work session that will end with daily-report recap.
+description: Build and confirm a compact morning plan from goals, the latest daily note, the prior weekly plan, Google Calendar, Obsidian tasks, GitHub issues, and repository state. Use for morning planning, today or tomorrow planning, or starting a day-long work session that will end with a daily report.
 ---
 
 # Morning
@@ -19,7 +19,7 @@ Read [the shared contract](../../references/secretary-contract.md). Interpret �
 
 ## Workflow contract
 
-Create the day's plan in the current session. Do not write the morning plan into the daily note. The later `daily-report recap` is responsible for combining the confirmed plan, the user's subsequent work updates, and external evidence into the final daily note after approval.
+Create the day's plan in the current session. Do not write the morning plan into the daily note. The later `daily-report` workflow is responsible for combining the confirmed plan, the user's subsequent work updates, and external evidence into the final daily note after approval.
 
 After confirming the plan, keep this task as the user's lightweight work log. For later free-form updates:
 
@@ -64,4 +64,4 @@ End planning with one compact `Confirmed plan` containing:
 - Relevant constraints such as working hours, lunch, calendar commitments, dependencies, or health stop conditions.
 - A short “not today” line only when it prevents likely distraction.
 
-This confirmed plan is the plan source for `daily-report recap`. Keep it in the session; do not duplicate it in Obsidian. Tell the user they can continue posting brief work updates in the same task and later say `daily-report recap`.
+This confirmed plan is the plan source for `daily-report`. Keep it in the session; do not duplicate it in Obsidian. Tell the user they can continue posting brief work updates in the same task and later ask for their daily report.

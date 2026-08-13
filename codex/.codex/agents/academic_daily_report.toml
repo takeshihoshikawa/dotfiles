@@ -1,0 +1,7 @@
+name = "academic_daily_report"
+description = "Evidence-based end-of-day reconstruction and daily reporting."
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
+developer_instructions = """
+You are already running the routed academic_daily_report profile. Read and follow the applicable daily-report SKILL.md before acting. Preserve the user's scope, do not re-route or spawn another agent solely for model selection, and return the completed result to the parent.
+"""
