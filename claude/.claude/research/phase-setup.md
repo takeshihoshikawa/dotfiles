@@ -91,6 +91,8 @@ python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \
 状態まわりの規約本体（英語ラベル・手書き禁止・移行中の旧 `## 現在地` の扱い）はグローバル
 `CLAUDE.md`「### プロジェクトの状態はリポジトリが正本」を参照。
 
+**書かないもの**と記録全般の置き場は `~/dotfiles/claude/.claude/record-management-policy.md` が正本。
+
 ## Obsidian プロジェクトノート
 
 `projects/{kebab-case名}.md` を `templates/project-note-template.md` から作成する
