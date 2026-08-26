@@ -95,6 +95,73 @@ A shared helper such as `scripts/publication/manuscript_table_helpers.R` may pro
 - `tables/generated/*`: generated render artifacts; safe to overwrite.
 - `main.pdf` and `main.docx`: render outputs.
 
+## Japanese Fonts (XeLaTeX)
+
+Applies to any Quarto target that goes through XeLaTeX — manuscripts and beamer decks alike.
+Two traps compound, and both are silent: the document renders, it just renders wrong.
+
+**Trap 1 — a family name lets the engine pick the faces.** `mainfont: "Hiragino Sans"` names a
+family with ten weights (W0–W9). XeLaTeX picked **W0 (ExtraLight)** as Regular and **W5** as Bold,
+so body text was a hairline and "bold" was barely heavier. Name the faces explicitly.
+
+**Trap 2 — pandoc shrinks the CJK bold.** The template emits
+`\defaultfontfeatures{Scale=MatchLowercase}` followed by
+`\defaultfontfeatures[\rmfamily]{Scale=1}`. The second line exempts the Latin main font; the
+CJK font set by `\setCJKmainfont` is not `\rmfamily`, so it keeps `MatchLowercase` and the
+**bold face is scaled down ~3%** to match the regular face's x-height. Naming W3/W6 alone does not
+fix this — emphasised text still renders smaller than the body around it. `Scale=1` is required.
+
+```yaml
+format:
+  beamer:              # or pdf
+    pdf-engine: xelatex
+    mainfont: "Hiragino Sans W3"
+    mainfontoptions:
+      - BoldFont=Hiragino Sans W6
+    CJKmainfont: "Hiragino Sans W3"
+    CJKoptions:
+      - BoldFont=Hiragino Sans W6
+      - Scale=1        # without this the CJK bold is ~3% smaller than the body
+```
+
+Set `mainfont` too, not only `CJKmainfont` — digits and Latin runs inside Japanese prose come
+from the roman font, and a deck typically embeds only two or three faces in total.
+
+**Changing faces changes metrics.** Re-run the overflow check afterwards. Beamer discards
+content that overflows a frame **without an error**, so a slide that fit before can silently lose
+its last line.
+
+**Do not put a bare size command on its own line** under `markdown+hard_line_breaks`. A line
+holding only `\small` gets a `\\` appended and fails with `LaTeX Error: There's no line here to
+end.` Inline `\small ... \normalsize` compiles, but any source-to-PDF text comparison will report
+the line as missing, because the control sequences are in the source and not in the PDF.
+
+Verify mechanically rather than by eye — the difference is a few percent:
+
+```bash
+pdffonts out.pdf          # expect the named faces; the unintended weight must be gone
+```
+
+Regular and bold must then share the same `Tf` size. Pick a page with ordinary body prose —
+a title or section page carries only headings.
+
+```bash
+uv run --with pypdf python - <<'EOF'
+import collections, re, pypdf
+PAGE = 5                       # 0-based; choose a page with body text
+p = pypdf.PdfReader("out.pdf").pages[PAGE]
+faces = {k: str(v.get_object().get("/BaseFont")) for k, v in p["/Resources"]["/Font"].items()}
+stream = p.get_contents().get_data().decode("latin-1")
+print(collections.Counter(
+    (faces["/" + m[0]].split("+")[-1], m[1])
+    for m in re.findall(r"/(F\d+)\s+([\d.]+)\s+Tf", stream)))
+EOF
+```
+
+An italic fallback may remain: Japanese faces have no italic, so constructs that ask for one
+(beamer's `quotation`, for example) fall back to another weight. Harmless, but it explains a
+stray face in `pdffonts`.
+
 ## Verification
 
 After changing rendering structure, run both formats.
@@ -111,3 +178,4 @@ Then check:
 - `identify tables/generated/*.png` shows non-empty images with plausible dimensions.
 - Open or inspect generated PNGs when table titles, spanners, or multi-table layouts changed.
 - `git diff --stat` does not show unrelated churn.
+- For Japanese output, `pdffonts` shows the intended faces and regular/bold share a `Tf` size.

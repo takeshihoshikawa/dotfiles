@@ -197,8 +197,11 @@ Vault: `~/vault`（実体は iCloud 上の vault へのシンボリックリン�
 **vault を操作する・会議録やプロジェクトノートを書くときは必ず読む。** 学習カットオフ以降に
 コマンドが増えている可能性があるため `obsidian help` でも確認する。
 
-## Quarto 原稿レンダリングパターン
+## Quarto レンダリングパターン（原稿・スライド）
 
 PDF と DOCX の両方を出す Quarto 原稿プロジェクトの構成・テーブルレンダリング（gt/LaTeX を単一定義とし
-DOCX には PNG を埋め込む）・検証手順は `~/dotfiles/claude/.claude/quarto-manuscript-rendering-patterns.md`
-が正本。**Quarto 原稿のレンダリング構成を作る・変えるときは必ず読む。**
+DOCX には PNG を埋め込む）・**日本語フォント（XeLaTeX）**・検証手順は
+`~/dotfiles/claude/.claude/quarto-manuscript-rendering-patterns.md` が正本。
+**Quarto のレンダリング構成を作る・変えるときは必ず読む——原稿だけでなく beamer スライドも。**
+**日本語フォントの節は XeLaTeX を通る出力すべてに効く**（既定のままだと本文が極細 W0 で組まれ、
+太字が本文より小さくなる。目では気づけないので `pdffonts` と Tf サイズで機械検査する）。
