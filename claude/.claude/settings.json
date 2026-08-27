@@ -8,18 +8,6 @@
     ],
     "defaultMode": "auto"
   },
-  "hooks": {
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -f \"$HOME/.claude/hooks/reset-model.py\" ] && python3 \"$HOME/.claude/hooks/reset-model.py\" || true"
-          }
-        ]
-      }
-    ]
-  },
   "enabledPlugins": {},
   "extraKnownMarketplaces": {},
   "language": "Japanese",
