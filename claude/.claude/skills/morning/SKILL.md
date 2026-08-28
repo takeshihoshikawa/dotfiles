@@ -47,6 +47,18 @@ cleanかつbehindのみのリポジトリだけが自動でpull --rebaseされ�
 - pullしたリポジトリだけ簡潔に報告する。
 - fetch失敗、dirty、divergedは`/sync-repos`で別途扱う。
 
+### 文書参照の腐り
+
+`~/work/projects/admin/scripts/doc_refs.py --quiet`を実行する。失敗しても続行する。
+
+全リポジトリの`CLAUDE.md`と`docs/*.md`から、実在しないパス・シンボル・`§`番号・重複見出し・
+重複した状態マーカーを検出する。**指摘のあったリポジトリだけ、件数と代表1件を報告する**（全件は出さない）。
+
+- **その場で直さない。** 計画の材料として出すだけで、修正は当該リポのセッションで行う。
+- 検査するのは参照の実在まで。「主張の判定が古いか」は機械では見ない
+  （`~/dotfiles/claude/.claude/record-management-policy.md`「機械で見られる範囲／見られない範囲」）。
+- 実在しないのが正しい参照は、当該リポの`.claude/doc-refs.toml`に理由つきで宣言する。
+
 ### プロジェクトレーダー
 
 Obsidianを起動し、`~/work/projects/admin/scripts/project_radar.py`を実行する。失敗しても続行し、通常は出力しない。
