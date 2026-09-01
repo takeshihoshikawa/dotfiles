@@ -3,6 +3,10 @@
 公募研究計画書（科研費・学術変革・受託等）を書き、提出物を作るときの手順。
 `proposals/` の位置づけとディレクトリ構造は `~/dotfiles/claude/.claude/research-project-conventions.md` が正本。
 
+> **科研費を出すときは `research/kakenhi-erad-input.md` も読む。** e-Rad の Web入力項目
+> （経費明細の CSV 形式・必要性欄の上限・PDF 生成器が化ける文字・提出前 PDF の機械検証・
+> 執行段階の流用の自由度）は記入要領に書かれていない仕様が多く、**推測で作った形式は通らない**。
+
 ## 提出物のワークフロー
 
 ```
