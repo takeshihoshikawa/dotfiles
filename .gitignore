@@ -24,8 +24,10 @@ claude/.claude/ide/
 claude/.claude/plans/
 claude/.claude/plugins/
 claude/.claude/projects/
+claude/.claude/remote/
 claude/.claude/sessions/
 claude/.claude/shell-snapshots/
+claude/.claude/stats-cache.json
 claude/.claude/tasks/
 
 # Codex — runtime/auto-generated
@@ -46,6 +48,9 @@ codex/.codex/memories_*.sqlite-shm
 codex/.codex/memories_*.sqlite-wal
 codex/.codex/models_cache.json
 codex/.codex/plugins/
+codex/.codex/queue_*.sqlite
+codex/.codex/queue_*.sqlite-shm
+codex/.codex/queue_*.sqlite-wal
 codex/.codex/session_index.jsonl
 codex/.codex/sessions/
 codex/.codex/shell_snapshots/
