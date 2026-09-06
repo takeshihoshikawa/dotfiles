@@ -54,6 +54,32 @@ model: sonnet
 
 ## 3. 適用
 
+### 実行できる機体かを先に確かめる
+
+**`~/work/projects/admin` と `~/vault` の両方が要る。** どちらかが無ければ状態は書けない。
+
+```bash
+[ -d ~/work/projects/admin ] && [ -d ~/vault ] && echo "締められる" || echo "退避手順へ"
+```
+
+vault が無いと `project_changes()` が `vault/projects/{リポ名}.md` を存在検査なしで読むため
+例外で止まる（`academic_ops.py:133`）。`next_task_id` の解決と検査も vault のタスク一覧を要る。
+**admin を clone しても解決しない**——足りない半分は vault の方で、Ubuntu 機からは参照できない。
+
+### 退避手順（admin か vault が無い機体）
+
+gpu-remote など計算専用の機体はこちらを使う。**状態は書かず、成果だけ確定させる。**
+
+1. **`CLAUDE.md` の生成ブロックを手で編集しない。** 次に Mac 側で `project render` を通したとき、
+   手編集は黙って上書きされる。
+2. 変更を commit・push する。コミットメッセージに、次に締めるときへ渡す内容
+   （フェーズの進み・次の一手・懸念）を書いておく。**これが引き継ぎの器になる。**
+3. ユーザーへ「状態は未更新。Mac 側の次のセッションで締める」と明示して終える。
+   締め忘れは Mac の `/morning` が `status_stale` で拾う。
+4. 台帳の点検（ステップ0）は**この機体でもやる**。`docs/` の論点ファイル・`docs/lessons.md` は
+   リポ内にあり、admin も vault も要らない。結果が出た場に残すのが原則3の趣旨で、
+   状態が書けないことと台帳を放置してよいことは別。
+
 承認後、まずpreview実行してから`--apply`を付けて本実行する。
 
 ```bash

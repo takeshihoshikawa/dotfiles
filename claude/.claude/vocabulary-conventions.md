@@ -134,5 +134,5 @@ candidates モードで候補を出す → 本人が選ぶ → **上の表に1�
 
 ## 関連
 
-- `~/work/projects/admin/docs/vocabulary-migration.md` — pine-wilt / tea の既存文書を置換する手順
+- `vocabulary-migration.md`（同ディレクトリ） — pine-wilt / tea の既存文書を置換する手順
 - `record-management-policy.md` — 記録の置き場と失効の管理
