@@ -1,0 +1,163 @@
+# 技術語彙の表（正本・機械可読）
+#
+# 2026-09-08 に `vocabulary-conventions.md` の表からここへ移した。**表の正本はこのファイル 1 つ**で、
+# 次の 3 か所は**すべてここから生成する**——手で書かない:
+#   1. グローバル `CLAUDE.md` の「頻出の禁止語」（毎セッション読まれる要約）
+#   2. `vocabulary-conventions.md` の「使わない語」の表（人が読む説明つきの表）
+#   3. `~/work/projects/admin/scripts/vocab_check.py` の検査（起動時にこのファイルを読む）
+#
+# **なぜ移したか**: 表が md の中にあると機械が読めず、検査スクリプトへ手で写すことになる。
+# 実際そうなっていて、さらに **CLAUDE.md の要約が 8 語しか挙げていなかった**ため、
+# 表にあるが要約に無い語（掃引）がそのまま使われた。**毎セッション読まれるのは要約の方**なので、
+# 要約が表と食い違うと違反は必ず入る（2026-09-04〜09-08 の 4 日間で 186 件）。
+#
+# 判断則 5 段・検出規則の理屈・残す語・語彙の追加手順は `vocabulary-conventions.md`。
+#
+# rule: "partial"  造語側が開いている（複合語をいくらでも作れる）→ 部分一致 ＋ 少数の除外語
+#       "bounded"  正当語側が開いている（分野の語が今後も増える）→ 境界つき完全一致
+# allow: 除外語。**必要になってから 1 行足す。先回りして作らない。**
+# note:  意味で分ける語の分け方。**1 語に畳まない**——畳むと次に読む人が機械置換して壊す。
+
+[[word]]
+avoid = "発火"
+english = "onset"
+use = "発生"
+rule = "partial"
+note = "森林・茶園の文書で「発火」は山火事に読める。定義語でも規則5の例外にしない。コードは `onset` のまま"
+
+[[word]]
+avoid = "窓"
+english = "window"
+use = "ウィンドウ"
+rule = "partial"
+allow = ["窓関数"]
+note = "部分一致で検出する（造語側が開いている。窓内・窓間・証拠窓・監視窓…）"
+
+[[word]]
+avoid = "帯"
+english = "band"
+use = "意味で分ける"
+rule = "bounded"
+allow = ["帯び"]
+note = "分光は「バンド」、`工事帯`→「工事区域」、値の区間は「区間」「範囲」、距離の区分は「区分」。`帯域` は残す。**機械置換しない**。tea では7通りに割れた——高さの層／値の区間／波長のバンド／階級／帯状の領域／UTM のゾーン／DOY の区分。除外語 `帯び` は動詞「帯びる」（境界つきでも当たる）"
+
+[[word]]
+avoid = "旗"
+english = "flag"
+use = "フラグ"
+rule = "bounded"
+note = "旗率→フラグ率・旗付→フラグ付き"
+
+[[word]]
+avoid = "錨"
+english = "anchor"
+use = "アンカー"
+rule = "bounded"
+note = "錨付・錨実験も同じ"
+
+[[word]]
+avoid = "門"
+english = "gate"
+use = "ゲート"
+rule = "bounded"
+note = "明度門→明度ゲート"
+
+[[word]]
+avoid = "床"
+english = "floor"
+use = "下限／ノイズフロア"
+rule = "partial"
+allow = ["林床", "温床", "高床"]
+note = "床効果・床以下・空間床も同じ。**温室・建物の実物の床は置換しない**（tea の構造物規則がこの語に依存している）"
+
+[[word]]
+avoid = "壁"
+english = "wall"
+use = "制約／限界"
+rule = "bounded"
+note = "`60km の壁`→`60km 離れていること`。paywall は「有料購読」"
+
+[[word]]
+avoid = "篩"
+english = "sieve"
+use = "ふるい／フィルタ"
+rule = "bounded"
+
+[[word]]
+avoid = "層"
+english = "layer"
+use = "レイヤ"
+rule = "none"
+note = "**検査には入れない**（2026-09-08 に実測して外した）。境界つきで 42 件当たり、大半が統計の層別・点群の高さの層（L0〜L7）・データ管理の層（raw/interim/processed）・GeoPackage の `blocks` 層で、どれも残す側だった。置換対象は「ソフトウェアの層」「GIS のレイヤ」だけで、**語では切れない**。林冠層・下層植生・層構造は正しい日本語"
+
+[[word]]
+avoid = "粒度"
+english = "granularity"
+use = "刻み／細かさ／観測単位"
+rule = "partial"
+
+[[word]]
+avoid = "掃引"
+english = "sweep"
+use = "意味で分ける"
+rule = "partial"
+note = "パラメータは「振る」「スイープ」、現地は「全面踏査」（`掃引率`→`踏査率`）。**機械置換しない**"
+
+[[word]]
+avoid = "利得"
+english = "gain / benefit"
+use = "意味で分ける"
+rule = "partial"
+note = "`バンド乗算利得`→「バンド乗算ゲイン」、`運用利得`→「運用上の改善」。**機械置換しない**"
+
+[[word]]
+avoid = "連担"
+english = ""
+use = "連結ブロック"
+rule = "partial"
+note = "行政用語（連たん）由来で難読。行政文書の引用時の「連たん」は残す"
+
+[[word]]
+avoid = "悉皆"
+english = ""
+use = "全数"
+rule = "partial"
+note = "`悉皆調査`→`全数調査`"
+
+[[word]]
+avoid = "上界"
+english = "upper bound"
+use = "上限"
+rule = "partial"
+note = "上界65／上限60で割れていた。**下界と対で使われるので必ず一緒に置換する**"
+
+[[word]]
+avoid = "下界"
+english = "lower bound"
+use = "下限"
+rule = "partial"
+note = "上界と対で使われるので必ず一緒に置換する（片方だけだと「上限・下界」に割れる。2026-09-04 pine-wilt で実際に踏んだ）"
+
+[[word]]
+avoid = "製品"
+english = "(data) product"
+use = "意味で分ける"
+rule = "bounded"
+allow = ["既製品"]
+note = "配布するマスクの変種は「マスクA／マスクB」「配布用マスク」、パイプラインの出力の種類は「成果物」、提供先への納品は「提出物」、ラベルの CSV は「ファイル」。どうしても開けないときだけ「プロダクト」。**機械置換しない**（2026-09-05 pine-wilt で 177 件を 5 通りに分けた）"
+
+[[word]]
+avoid = "看板"
+english = "headline"
+use = "中心の主張／見出し"
+rule = "bounded"
+note = "「看板の主張」→「中心の主張」、「看板であって節ではない」→「見出しであって節ではない」"
+
+# カタカナの長音は落とす（QGIS 日本語 UI と一致・既存リポの多数派）。**ユーザーだけ長音あり。**
+[long_vowel]
+"レイヤー" = "レイヤ"
+"ラスター" = "ラスタ"
+"ベクター" = "ベクタ"
+"クラスター" = "クラスタ"
+"フォルダー" = "フォルダ"
+"パラメーター" = "パラメータ"
