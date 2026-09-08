@@ -28,7 +28,8 @@
 
 **表の正本は `~/dotfiles/claude/.claude/vocabulary.toml`**（上の一覧はそこからの生成物）。
 判断則・検出規則・残す語・語彙の追加手順は `~/dotfiles/claude/.claude/vocabulary-conventions.md`。
-検査は `~/work/projects/admin/scripts/vocab_check.py`（同じ TOML を読む）。
+検査は `~/dotfiles/claude/.claude/vocab_check.py`（同じ TOML を読む）。
+**1 リポずつ・`close-project-session` が呼ぶ。** 全リポ走査は 2026-09-08 に外した。
 
 ## Obsidian Vault
 

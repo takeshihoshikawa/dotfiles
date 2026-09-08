@@ -38,10 +38,13 @@ model: sonnet
 このセッションで書いた場で1回だけ見る。
 
 ```bash
-python3 ~/work/projects/admin/scripts/vocab_check.py --repo /absolute/path/to/repo --all
+python3 ~/dotfiles/claude/.claude/vocab_check.py --repo /absolute/path/to/repo
 ```
 
-`--all` を付けるのは、**3つの状態を区別するため**（`--quiet` だと未参加とOKの区別がつかない）。
+**このスクリプトは1リポずつしか見ない**（2026-09-08。全リポ走査は外した——admin から串刺しにすると
+admin のローカルに clone があるリポしか見えず、gpu 機で書いた文書が検査されないまま
+「全リポ無音」に見える）。**呼ぶ場所はここだけ。** 既定は3つの状態をそのまま出す
+（`--quiet` を付けると違反のときだけ鳴るので、未参加とOKの区別がつかなくなる）。
 
 | 出力 | 意味 |
 |---|---|
