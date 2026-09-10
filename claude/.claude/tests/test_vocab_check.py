@@ -220,5 +220,69 @@ class SingleSourceTest(unittest.TestCase):
         self.assertIn("運用上の改善", table)           # 利得
 
 
+class RenderPreconditionTest(unittest.TestCase):
+    """`--render` の前提条件（`require_in_sync`）。
+
+    **2台で走らせると人が解けない差分になる。** 2026-09 の語彙置換は境界つき 2,243 件・
+    複合語込みで 3,000 件超あり、両方の機械で走れば「どちらを丸ごと採るか」しか残らない。
+    `--render` の書き込み先はグローバル `CLAUDE.md` と規約＝**dotfiles にあり全機に配られる**
+    ので、同じ型に属する。防ぐのは規律ではなく前提条件で、ここで固定するのは
+    **書かずに落ちること**（黙って上書きしないこと）。
+    """
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        base = Path(self._tmp.name)
+        self.origin, self.root = base / "origin", base / "work"
+        subprocess.run(["git", "init", "-q", "-b", "main", "--bare", str(self.origin)],
+                       check=True, capture_output=True)
+        subprocess.run(["git", "clone", "-q", str(self.origin), str(self.root)],
+                       check=True, capture_output=True)
+        self.git("config", "user.email", "t@example.com")
+        self.git("config", "user.name", "t")
+        self.target = self.root / "CLAUDE.md"
+        self.target.write_text("x\n", encoding="utf-8")
+        self.git("add", "-A"); self.git("commit", "-qm", "init")
+        self.git("push", "-q", "-u", "origin", "main")
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def git(self, *args: str) -> None:
+        subprocess.run(["git", "-C", str(self.root), *args], check=True,
+                       capture_output=True)
+
+    def test_clean_and_up_to_date_passes(self) -> None:
+        vocab_check.require_in_sync(self.root, [self.target], force=False)
+
+    def test_uncommitted_change_to_target_refuses(self) -> None:
+        """書き込み先が dirty なら書かない——生成物と手の編集が混ざると後から分けられない。"""
+        self.target.write_text("手で直した\n", encoding="utf-8")
+        with self.assertRaises(SystemExit) as e:
+            vocab_check.require_in_sync(self.root, [self.target], force=False)
+        self.assertIn("未コミットの変更", str(e.exception))
+
+    def test_behind_origin_refuses(self) -> None:
+        """behind なら書かない——古い表から生成して新しい内容を上書きする形が2台運用の本命。"""
+        self.git("commit", "-qm", "ahead", "--allow-empty")
+        self.git("push", "-q")
+        self.git("reset", "-q", "--hard", "HEAD~1")   # origin より 1 つ後ろへ下がる
+        with self.assertRaises(SystemExit) as e:
+            vocab_check.require_in_sync(self.root, [self.target], force=False)
+        self.assertIn("behind", str(e.exception))
+
+    def test_force_skips_every_check(self) -> None:
+        """`--force` は「片方の機械しか使っていないと分かっているとき」の逃げ道。"""
+        self.target.write_text("手で直した\n", encoding="utf-8")
+        vocab_check.require_in_sync(self.root, [self.target], force=True)
+
+    def test_missing_upstream_refuses_rather_than_passing_silently(self) -> None:
+        """判定できないことを「問題なし」に畳まない（無音は検査が死んだ状態と区別できない）。"""
+        self.git("checkout", "-q", "-b", "no-upstream")
+        with self.assertRaises(SystemExit) as e:
+            vocab_check.require_in_sync(self.root, [self.target], force=False)
+        self.assertIn("upstream", str(e.exception))
+
+
 if __name__ == "__main__":
     unittest.main()

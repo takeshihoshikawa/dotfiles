@@ -37,6 +37,24 @@ pine-wilt へ 12 行の違反が入り、人が読んで気づくまで残った
 - **このファイル自身と、規約・移行ノートは対象外**。禁止語を語として並べる場所なので、
   入れると必ず鳴る（受け入れ基準が「無音」である以上、最初から除外に書く）。
 
+## `--render` の前提条件（2026-09-10）
+
+**`--render` は書く前に「手元が最新か」を機械で見る**（`require_in_sync`）。
+書き込み先が dirty か、origin に対して behind か、判定できない（upstream 無し・fetch 不可）なら
+**書かずに落ちる**。`--force` で外せる。
+
+**なぜ**: 追跡ファイルを一括で書き換えるものは、2台で走らせると人が解けない差分になる。
+2026-09 の語彙置換は境界つき 2,243 件・複合語込み 3,000 件超で、両方の機械で走れば
+「どちらを丸ごと採るか」しか残らない（実際に事故が起きている）。`--render` の書き込み先は
+グローバル `CLAUDE.md` と規約＝**dotfiles にあり全機に配られる**ので、同じ型に属する。
+
+**防ぐのは規律ではなく前提条件**。静かな大惨事を、声を上げる拒否に変えるのが目的で、
+admin が vault に対してやっていること（排他ロック・変更前 hash 検査・atomic replace・backup）
+と同じ形を、リポのファイルを書き換える側にも伸ばした。
+
+**判定できないことを「問題なし」に畳まない。** upstream が無い・fetch が通らないときは
+2台目が先に押していても分からない状態なので、無音で通さず落とす。
+
 ## 2 つのモード
 
 - **enforce**（既定）: 表にある語を追加行から探す。**無音が正常**。鳴ったら、
@@ -172,6 +190,56 @@ def run_git(root: Path, *args: str) -> str:
     out = subprocess.run(["git", "-C", str(root), *args],
                          capture_output=True, text=True)
     return out.stdout if out.returncode == 0 else ""
+
+
+def require_in_sync(root: Path, targets: list[Path], force: bool) -> None:
+    """追跡ファイルを一括で書き換える前の前提条件。
+
+    **2台で走らせると人が解けない差分になる。** 2026-09 の語彙置換は境界つきで 2,243 件・
+    複合語を入れて 3,000 件超あり、両方の機械で走ればどちらを採るかしか選べない。
+    `--render` も同じ型——書き込み先（グローバル CLAUDE.md と規約）は dotfiles にあり、
+    **どの機械にも配られる**。
+
+    **防ぐのは規律ではなく前提条件**にする。書く前に「手元が最新か」を機械で見て、
+    そうでなければ書かずに落ちる。静かな大惨事を、声を上げる拒否に変えるのが目的。
+
+    見るのは2つ:
+
+    - **書き込み先に未コミットの変更が無いこと**。あると生成物と手の編集が混ざり、
+      どちらがどちらか後から分けられない。
+    - **origin に対して behind でないこと**。behind のまま生成すると、古い表から作った
+      内容で新しい生成物を上書きする。これが2台運用で最も起きやすい形。
+
+    `--force` で外せる。外すのは「片方の機械しか使っていないと分かっているとき」だけ。
+    """
+    if force:
+        return
+    dirty = [p for p in targets
+             if run_git(root, "status", "--porcelain", "--", str(p)).strip()]
+    if dirty:
+        names = "・".join(p.name for p in dirty)
+        raise SystemExit(
+            f"書き込み先に未コミットの変更がある（{names}）。\n"
+            "  先にコミットするか戻すかしてから再実行する（--force で外せる）。")
+
+    # upstream が無いブランチでは behind を判定できない。判定できないことは黙らせない。
+    upstream = run_git(root, "rev-parse", "--abbrev-ref", "@{upstream}").strip()
+    if not upstream:
+        raise SystemExit(
+            "upstream が無いので origin との差を判定できない。\n"
+            "  ブランチに upstream を設定するか、--force で外す。")
+    try:
+        subprocess.run(["git", "-C", str(root), "fetch", "--quiet"],
+                       capture_output=True, text=True, timeout=20)
+    except (subprocess.TimeoutExpired, OSError):
+        raise SystemExit(
+            "fetch できないので origin との差を判定できない（ネットワークか認証）。\n"
+            "  **2台目が先に押していても分からない状態**なので書かない。--force で外せる。")
+    behind = run_git(root, "rev-list", "--count", f"HEAD..{upstream}").strip()
+    if behind and behind != "0":
+        raise SystemExit(
+            f"{upstream} に対して {behind} コミット behind。\n"
+            "  古い表から生成して新しい内容を上書きしうる。先に pull する（--force で外せる）。")
 
 
 REPO_CONFIG = ".claude/vocab.toml"
@@ -374,6 +442,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--quiet", action="store_true", help="違反が無ければ何も出さない")
     p.add_argument("--render", action="store_true",
                    help="表から生成ブロックを書き直す（グローバル CLAUDE.md と規約の表）")
+    p.add_argument("--force", action="store_true",
+                   help="--render の前提条件（書き込み先が clean・origin に behind でない）を外す")
     return p.parse_args()
 
 
@@ -382,6 +452,7 @@ def main() -> int:
     if a.render:
         here = Path(__file__).resolve().parent
         cl, cv = here / "CLAUDE.md", here / "vocabulary-conventions.md"
+        require_in_sync(git_root(here), [cl, cv], a.force)
         for path, (begin, end, body) in ((cl, (BEGIN_SUMMARY, END_SUMMARY, render_summary())),
                                          (cv, (BEGIN_TABLE, END_TABLE, render_table()))):
             print(f"{path}: {'更新' if write_between(path, begin, end, body) else '変化なし'}")
