@@ -3,6 +3,7 @@
 
 # 大型データ（実体は NAS、data-management-policy 参照）
 data/raw/
+data/external/
 data/interim/
 data/processed/
 data/outputs/
@@ -14,6 +15,10 @@ results/
 
 # 生成物
 proposals/**/output/
+
+# ツールの既定出力先（phase-analysis.md「ツールの既定出力先」）。
+# 本来は results/ へ向けるが、向け忘れが追跡下に入るのを防ぐ保険。
+lightning_logs/
 
 # Papis: ライブラリ実体はリポジトリ外（papis-conventions.md）。
 # 追跡するのは生成された refs.bib のみで、export の中間生成物は除外する

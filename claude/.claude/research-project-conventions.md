@@ -72,6 +72,8 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避す�
 │
 ├── data/                # gitignore（実体は NAS。data-management-policy.md 参照）
 │   ├── raw/             # 読み取り専用・変更禁止
+│   ├── external/        # 再取得可能な外部配布データの作業キャッシュ。
+│   │                    # 免除の条件は data-management-policy.md「re-fetchable raw」
 │   ├── interim/         # 一時領域（消えてよいもののみ、NAS 非同期）
 │   ├── processed/       # 再利用する安定データ（NAS 同期対象）
 │   └── outputs/         # 外部共有・GIS 配布用データ成果物
