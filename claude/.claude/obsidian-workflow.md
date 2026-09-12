@@ -137,4 +137,4 @@ source of truth が二重化して必ず食い違うため、転記しないこ�
 
 ## 定型ワークフローとの分担
 
-daily-report / check-in / morning のような繰り返し処理は各スキル内に obsidian コマンドを直書きする。本ルールは ad-hoc な作業向け。
+daily-report / morning / weekly-review のような繰り返し処理は各スキル内に obsidian コマンドを直書きする。本ルールは ad-hoc な作業向け。

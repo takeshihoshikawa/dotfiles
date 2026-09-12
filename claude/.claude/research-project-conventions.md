@@ -142,4 +142,4 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避す�
 例: `obsidian move file="paper-writing-efficiency" to="projects/archive/"`
 
 `status` の使い分け（`active` / `waiting` / `done`）と `_bases/active-projects.base` の
-ビュー定義は `~/work/projects/admin/CLAUDE.md`「## プロジェクト状態の集約」が正本。
+ビュー定義は `~/work/projects/admin/CLAUDE.md`「## 旧集約CLI（互換）」が正本。
