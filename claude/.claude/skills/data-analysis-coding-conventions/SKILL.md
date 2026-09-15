@@ -63,8 +63,19 @@ project/
 
 ## 環境管理
 
-- R：`renv` で依存パッケージを記録
-- Python：`uv` で依存パッケージを記録
+**これが正本**（2026-09-15 ユーザー決定。`research/phase-analysis.md` とグローバル CLAUDE.md はここを指すだけ）。
+
+**R は `renv`、Python は `uv`。システムの R ライブラリや Python へパッケージを直接入れるのは禁止。**
+
+- R：プロジェクトごとに `renv.lock` を持つ。足すときは `renv::install()` → `renv::snapshot()`。
+  プロジェクトの renv の外で `install.packages()`・`BiocManager::install()` を実行しない
+  - 例外は **renv 本体だけ**（renv を使い始めるために一度だけシステムへ入れる）
+  - コードに現れない依存（例: `lmerTest` の Kenward-Roger が使う `pbkrtest`）は、スクリプトに
+    `requireNamespace()` を書いて `renv::snapshot()` に拾わせる
+- Python：`pyproject.toml` と `uv.lock`。足すときは `uv add`、実行は `uv run`。`pip install` をしない。
+  一時的にだけ要る重いパッケージは `uv run --with pkg==版` のように版を固定して使う
+- **リポジトリに renv／uv が無いときは、パッケージを入れる前に止めてユーザーに確認する**（先に導入する）
+- ライブラリ側のリポジトリにはロックファイルを置かない（`cross-project-technology-layer.md`）
 
 ## AIエージェントとの協働
 

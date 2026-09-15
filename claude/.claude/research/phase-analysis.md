@@ -96,8 +96,8 @@ GUI による手作業を最小化し、再生成可能な状態を維持する�
 
 ## 環境管理
 
-- R: `renv` で依存パッケージを記録
-- Python: `uv`（`pyproject.toml`）で依存パッケージを記録
+- 依存パッケージの管理（**R は renv・Python は uv・システムへ直接入れない**）の正本は
+  `data-analysis-coding-conventions` スキルの「環境管理」
 - 乱数シードを必ず固定する（`set.seed()` / `random.seed()`・`np.random.seed()`）
 
 ## プロジェクト CLAUDE.md に書くこと
