@@ -94,6 +94,21 @@ GUI による手作業を最小化し、再生成可能な状態を維持する�
 **実行機が追跡ファイルを書かないための前提**になる。スクリプトの書き先だけ直しても、
 ツールの既定出力先が残っていれば同じことが起きる。
 
+### 実行機（gpu-remote）ではコードを書かない
+
+**gpu-remote の clone では、追跡ファイルも未追跡の設定ファイルも作らない・直さない。**
+コードと設定は Mac でコミットして push し、gpu-remote では `git checkout --detach <sha>` で
+入れ替えるだけにする。書いてよいのはジョブの出力（`results/` など追跡外）だけ。
+
+- 未追跡の設定ファイルは checkout を止めないので事故に見えないが、それで出した結果は
+  **どのコードから出たかを origin から答えられない**——detached checkout を選んだ理由そのものが崩れる。
+- 実例: forest-instance-annotation で FF3D の推論設定3本（`custom_configs/*_la03.py`）が
+  gpu-remote 上で直接作られ、Mac にも origin にも無いまま使われた（2026-09-24。25日に発見）。
+- 試しに1本だけ回したい設定も、Mac で `scripts/experiments/` か `config/` に置いてコミットしてから運ぶ。
+
+決めた経緯と detached checkout の実測は `~/work/projects/admin/docs/execution-routing.md`
+（2026-09-10「決めたこと」）が正本。
+
 ## 環境管理
 
 - 依存パッケージの管理（**R は renv・Python は uv・システムへ直接入れない**）の正本は
