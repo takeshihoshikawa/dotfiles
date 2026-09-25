@@ -65,10 +65,11 @@ cleanかつbehindのみのリポジトリだけが自動でpull --rebaseされ�
 失敗しても続行する。Todoist 移行の段階1で、タスクの正本はまだ Obsidian にある
 （計画は`~/work/projects/admin/docs/todoist-migration.md`）。
 
-- Obsidian の変更を Todoist へ写す。**Todoist 側の変更は上書きせず報告だけ**される。
-- 報告（Todoist で変更された・完了または削除された・両方で変更された・Todoist にだけある）は
-  「期限切れタスクのトリアージ」で一緒に扱い、承認を得て`academic_ops.py task ...`で Obsidian に反映する。
-  反映した翌朝のミラーで報告は消える。
+- Obsidian の変更を Todoist へ写す。Todoist（voice を含む）で**追加・完了・削除**したタスクは
+  Obsidian に自動で取り込まれる。取り込んだ件数を1行で報告する。
+- **編集（日付・本文・置き場）は取り込まず報告だけ**される。プロジェクトの次の一手の完了・削除も
+  自動では反映されない。これらの報告は「期限切れタスクのトリアージ」で一緒に扱い、承認を得て
+  `academic_ops.py task ...`で Obsidian に反映する。反映した翌朝のミラーで報告は消える。
 - 書き込みがあれば admin の`data/todoist-map.json`が変わる。`chore(todoist): mirror の対応表`で
   コミットして push する（もう1台の Mac が次に実行する前に揃っている必要がある。未コミットや
   upstream 遅れのときミラーは書き込みを拒否する）。
