@@ -59,3 +59,6 @@ codex/.codex/state_*.sqlite
 codex/.codex/state_*.sqlite-shm
 codex/.codex/state_*.sqlite-wal
 codex/.codex/tmp/
+
+# Claude デスクトップアプリが claude.ai のスキルを同期するキャッシュ（~/.claude/skills はここへのリンク）
+claude/.claude/skills/synced/
