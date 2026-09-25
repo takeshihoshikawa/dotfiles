@@ -59,6 +59,20 @@ cleanかつbehindのみのリポジトリだけが自動でpull --rebaseされ�
   （`~/dotfiles/claude/.claude/record-management-policy.md`「機械で見られる範囲／見られない範囲」）。
 - 実在しないのが正しい参照は、当該リポの`.claude/doc-refs.toml`に理由つきで宣言する。
 
+### Todoist ミラー
+
+リポジトリ同期の後に`python3 ~/work/projects/admin/scripts/academic_ops.py todoist mirror --apply`を実行する。
+失敗しても続行する。Todoist 移行の段階1で、タスクの正本はまだ Obsidian にある
+（計画は`~/work/projects/admin/docs/todoist-migration.md`）。
+
+- Obsidian の変更を Todoist へ写す。**Todoist 側の変更は上書きせず報告だけ**される。
+- 報告（Todoist で変更された・完了または削除された・両方で変更された・Todoist にだけある）は
+  「期限切れタスクのトリアージ」で一緒に扱い、承認を得て`academic_ops.py task ...`で Obsidian に反映する。
+  反映した翌朝のミラーで報告は消える。
+- 書き込みがあれば admin の`data/todoist-map.json`が変わる。`chore(todoist): mirror の対応表`で
+  コミットして push する（もう1台の Mac が次に実行する前に揃っている必要がある。未コミットや
+  upstream 遅れのときミラーは書き込みを拒否する）。
+
 ### プロジェクトレーダー
 
 Obsidianを起動し、`~/work/projects/admin/scripts/project_radar.py`を実行する。失敗しても続行し、通常は出力しない。
@@ -184,6 +198,7 @@ Google Calendarから対象日と翌日の予定を別々に取得する。必�
 - 各タスクについて`完了(c) / 延ばす(YYYY-MM-DD) / 削除(d)`をまとめて確認する。
 - 完了は`obsidian task ref="path:line" done`、延期はdue日を編集、削除は該当行を削除する。
 - 優先順位は明示依頼がある場合だけ変更する。
+- Todoist ミラーの報告があれば、同じ確認の中で Obsidian へ反映するかを聞く。
 
 ## ユーザー確認と保存
 
