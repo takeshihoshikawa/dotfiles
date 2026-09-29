@@ -39,7 +39,7 @@ Folder structure:
 - `daily/` — daily notes (`YYYY-MM-DD.md`)
 - `weekly/` — weekly notes (`weekly-YYYY-MM-DD.md`)
 - `courses/registry.md` — 科目マスタ（course_id・科目名・別名・クラス・lecture_dir の対応表）。**科目を参照するときの入口**
-- `courses/{course_id}/sessions/` — 授業セッションノート（`YYYY-MM-DD_科目名.md`）。年度はディレクトリでなくファイル名の日付で表す
+- `courses/{course_id}/sessions/` — 授業セッションノート（`YYYY-MM-DD_科目名.md`）。年度はディレクトリでなくファイル名の日付で表す。**授業後の記録（進行・反応・反省）は書かない。その日の日報の授業の行の下に書く**（`/course-review` が日報から拾う）
 - `courses/{course_id}/qa/` — 授業Q&A（1問1ファイル）
 - `courses/{course_id}/_meta.md` — 科目定義（topics と lecture_folder のマッピング）
 - `meetings/` — meeting notes (`YYYY-MM-DD_タイトル.md`)
