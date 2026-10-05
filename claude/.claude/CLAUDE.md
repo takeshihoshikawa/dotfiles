@@ -204,6 +204,7 @@ sync スクリプトの標準パターン、削除・保持ルールの詳細、
 | `research/phase-proposal.md` | 申請書を書く・提出物を作る |
 | `research/phase-analysis.md` | 解析スクリプトを書く・`scripts/` `config/` `results/` を触る |
 | `research/phase-publication.md` | 論文原稿・投稿用図表を作る |
+| `research/phase-presentation.md` | **研究発表のスライド・図・原稿を作る**（流れ・図は貼る大きさで作り 9 pt 以上・配色・箇条書き・検査） |
 | `manuscript-submission-check.md` | **投稿前チェック・監査をする**（8項目の観点表。項目7・8は原稿の外＝文献の本文・解析スクリプトに当たらないと終わらない） |
 
 ## Obsidian vault の取り扱い
