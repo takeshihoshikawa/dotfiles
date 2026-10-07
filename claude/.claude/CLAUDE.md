@@ -143,6 +143,18 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 
 衝突が起きた場合は force push せず rebase で解消。両端末のどちらが authoritative かを個別判断する。
 
+## 重い計算は gpu-remote（Ubuntu 機）で回す——実行専用
+
+gpu-remote（Tailscale `my-ubuntu`）は**実行するだけで作業しない**（2026-09-10）。上の Git ルールは gpu-remote には当てはめない。
+
+- Claude は Mac だけで起動する。編集・コミット・push は Mac で行い、gpu-remote は追跡ファイルを書かない
+- コードは `/work/projects/{repo}` の clone に、origin へ push 済みの sha を `git checkout --detach` して運ぶ（ブランチで pull しない）
+- ジョブは `~/work/projects/admin/scripts/gpu_run.py` で投げる。素の `ssh` ＋ `systemd-run --scope` や tmux で起動しない
+  （プロジェクトの CLAUDE.md に `--scope` と書いてあっても、こちらを優先する）
+
+理由・実測・NAS への退避経路は `~/work/projects/admin/docs/execution-routing.md`「再検討の結末」が正本。
+**gpu-remote でジョブを回す前に必ず読む。**
+
 ## データ分析コーディング規約
 
 データ分析プロジェクト（R/Python）のコーディング規約は `data-analysis-coding-conventions` スキルを参照（scripts/ や src/ を書くときに自動で読み込まれる）。

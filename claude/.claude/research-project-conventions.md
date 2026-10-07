@@ -49,7 +49,9 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避す�
 ## 計算リソース（EC2）
 
 - 重い処理は EC2 を一時起動 → 結果を S3 に sync → **terminate**（永続させない／ホームは破棄前提）
-- 接続は Tailscale 経由・ユーザー `ubuntu`（パブリックIPは不可）、GitHub push は `ssh -A`
+- 接続は Tailscale 経由・ユーザー `ubuntu`（パブリックIPは不可）
+- **EC2 も実行専用**。編集・コミット・push は Mac で行い、EC2 には origin へ push 済みの sha を
+  checkout して回す（gpu-remote と同じ原則。グローバル CLAUDE.md「重い計算は gpu-remote で回す」）
 
 ## 標準ディレクトリ構造
 
