@@ -19,7 +19,7 @@
     "mode": "hold"
   },
   "theme": "dark",
-  "remoteControlAtStartup": false,
+  "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true
