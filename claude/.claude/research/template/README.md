@@ -107,12 +107,13 @@ python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \
 ### `obsidian-project-note.md.template` と vault のテンプレの関係
 
 vault の `templates/project-note-template.md`（Obsidian から手で作るときに使う）と節・frontmatter の
-キーを揃えている。違いは次の3点で、いずれも init.sh が作るのが **git プロジェクトのノートに限られる**
-ことから来る。
+キーを揃えている。違いは次の2点で、どちらも init.sh が作るのが **git プロジェクトのノートに限られる**
+ことから来る（vault 側は `local_path` の無い会議駆動のノートにも使う）。
 
 - `local_path` を最初から埋める（`academic_ops.py` の生成対象になる）
 - `status` を `waiting` にする（未完了タスクができるまで `active` にしない。`phase-setup.md`）
-- `next_task_id` を持つ（`project-status.yaml` schema 2 の生成キー）
+
+片方の frontmatter のキーや節を変えたら、もう片方も揃える。
 
 frontmatter に `{{VAR}}` を置かない。値が無いときプレースホルダが残り、YAML として読めなくなる
 （`{{` はフローマッピングの開始）。後から分かる値は空の `key:` にしておき、init.sh が埋める。
