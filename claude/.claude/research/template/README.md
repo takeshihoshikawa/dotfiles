@@ -30,16 +30,19 @@
 ~/dotfiles/claude/.claude/research/template/init.sh add-papis-lib \
   --name forest-thermal-normalization
 
-# 4. Obsidian プロジェクトノートを生成
+# 4. GitHub private repo に push（申請書を含むなら必須。提出版の正本がここだけになる）
+cd ~/work/projects/forest-thermal-normalization
+gh repo create --private forest-thermal-normalization --source=. --remote=origin --push
+
+# 5. Obsidian プロジェクトノートを生成（origin の URL が github_url に入る。local_path は常に入る）
 ~/dotfiles/claude/.claude/research/template/init.sh add-obsidian-note \
   --name forest-thermal-normalization \
   --representative "星川 健史" \
-  --affiliation "静岡県立農林環境専門職大学短期大学部" \
-  --phase "申請書執筆"
+  --affiliation "静岡県立農林環境専門職大学短期大学部"
 
-# 5. GitHub private repo に push（申請書を含むなら必須。提出版の正本がここだけになる）
-cd ~/work/projects/forest-thermal-normalization
-gh repo create --private forest-thermal-normalization --source=. --remote=origin --push
+# 6. project-status.yaml と CLAUDE.md の状態ブロックを作る（waiting で作る。phase-setup.md）
+python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \
+  --repo ~/work/projects/forest-thermal-normalization --status waiting --phase "申請書執筆" --apply
 ```
 
 ### 典型例: ChatGPT/Obsidian で先行構築した構想を引き継ぐ
@@ -55,10 +58,10 @@ gh repo create --private forest-thermal-normalization --source=. --remote=origin
 
 | サブコマンド | 役割 |
 |---|---|
-| `adopt` | プロジェクトディレクトリ作成 or 既存補完。CLAUDE.md・README.md・.gitignore・空ディレクトリ・git 初期化 |
+| `adopt` | プロジェクトディレクトリ作成 or 既存補完。CLAUDE.md・README.md・.gitignore・空ディレクトリ・git 初期化（`main` ブランチ） |
 | `add-proposal` | `proposals/{YEAR}-{GRANT_TYPE}/{drafts,様式,figures,refs,budget,output,submitted}/` を追加 |
 | `add-papis-lib` | Papis ライブラリを `~/Documents/papis/{name}/`（**リポジトリ外**）に作成 + `~/Library/Application Support/papis/config` に登録 |
-| `add-obsidian-note` | Vault `projects/{name}.md` を生成 |
+| `add-obsidian-note` | Vault `projects/{name}.md` を生成（`local_path` は常に、`github_url` は `--github-url` か origin から埋める） |
 
 `init.sh --help` で詳細オプション確認。
 
@@ -100,6 +103,19 @@ gh repo create --private forest-thermal-normalization --source=. --remote=origin
 │   └── proposals/{{YEAR}}-{{GRANT_TYPE}}/{drafts,様式,figures,refs,budget,output,submitted}/
 └── obsidian-project-note.md.template   # add-obsidian-note が使う
 ```
+
+### `obsidian-project-note.md.template` と vault のテンプレの関係
+
+vault の `templates/project-note-template.md`（Obsidian から手で作るときに使う）と節・frontmatter の
+キーを揃えている。違いは次の3点で、いずれも init.sh が作るのが **git プロジェクトのノートに限られる**
+ことから来る。
+
+- `local_path` を最初から埋める（`academic_ops.py` の生成対象になる）
+- `status` を `waiting` にする（未完了タスクができるまで `active` にしない。`phase-setup.md`）
+- `next_task_id` を持つ（`project-status.yaml` schema 2 の生成キー）
+
+frontmatter に `{{VAR}}` を置かない。値が無いときプレースホルダが残り、YAML として読めなくなる
+（`{{` はフローマッピングの開始）。後から分かる値は空の `key:` にしておき、init.sh が埋める。
 
 ## 関連
 

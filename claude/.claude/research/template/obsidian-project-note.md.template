@@ -1,20 +1,35 @@
 ---
-status: active
-phase: {{PHASE}}
-updated: {{TODAY}}
+type: project
+# --- status は project-status.yaml の生成物（academic_ops.py が上書き）。手で書かない ---
+#   立ち上げ時は waiting。未完了タスクができてから close-session で active へ移す（phase-setup.md）
+status: waiting
+tags:
+  - project
+# --- gitリポジトリがあるなら必ず両方書く。local_path の有無が academic_ops.py の生成対象を決める ---
+github_url:
+local_path:
+# --- 下4つはスクリプトがvaultのタスクから自動計算・上書き。手で書かない ---
+open_tasks: 0
+overdue_tasks: 0
+waiting_tasks: 0
+last_completion:
+# --- 下5つは project-status.yaml の生成物（academic_ops.py が上書き）。手で書かない ---
+current_phase:
+next_task_id:
+next_action:
+concern:
+last_touched:
 ---
 
 # {{PROJECT_NAME}}
 
+<!-- 状態（現フェーズ・次の一手・懸念）は本文に書かない。
+     リポジトリ直下の project-status.yaml が正本で、frontmatter へ自動転記される。
+     ここに書くと二重管理になり、必ず食い違う。 -->
+
 ## 概要
 
 <!-- TODO: 目的・背景・スコープ（1〜2 段落）。ChatGPT/構想メモから移植 -->
-
-## 現在の状況
-
-- **フェーズ**: {{PHASE}}
-- **ブロッカー**: なし
-- **最終更新**: {{TODAY}}
 
 ## 仮説・方針
 
@@ -25,9 +40,17 @@ updated: {{TODAY}}
 - **{{REPRESENTATIVE}}**（{{AFFILIATION}}）: 代表
 <!-- TODO: 共同研究者・協力者を追記 -->
 
-## マイルストーン
+<!-- マイルストーン・スケジュール・実施計画・研究構想はここに書かない。
+     リポジトリ側（CLAUDE.md・docs/）が正本。
+     vault に残すのは、プロジェクト間で効く文脈（意思決定の記録・関係者・meeting note へのリンク）だけ。 -->
 
-<!-- TODO: フェーズ単位の節目のみ（細かいタスクは Todoist） -->
+## Task Dashboard
+
+```tasks
+not done
+tag includes #project/{{PROJECT_NAME}}
+sort by due
+```
 
 ## 意思決定の記録
 
@@ -41,7 +64,7 @@ updated: {{TODAY}}
 
 ## 文献
 
-- [[references/literature/]] — 関連文献ノートへのリンク
+- papis で管理（設定: `~/Library/Application Support/papis/config`）。使う場合のライブラリ: `{{PROJECT_NAME}}`（`~/Documents/papis/{{PROJECT_NAME}}/`）
 
 ## 企画書・報告書
 
@@ -54,5 +77,5 @@ updated: {{TODAY}}
 ## 関連リソース
 
 - 作業ディレクトリ: `~/work/projects/{{PROJECT_NAME}}/`（提出物も repo 内 `proposals/*/submitted/`）
-- 文献ライブラリ: papis `{{PROJECT_NAME}}`（`~/Documents/papis/{{PROJECT_NAME}}/`）
-- データ: <!-- TODO: 外部 HDD / S3 等のパス -->
+- データ: NAS `/share/Public/projects/{{PROJECT_NAME}}/`（`scripts/utilities/sync_with_nas.sh`）
+- ツール:

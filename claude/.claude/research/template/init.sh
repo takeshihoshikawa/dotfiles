@@ -130,7 +130,7 @@ cmd_adopt() {
   if [[ ! -d "$target/.git" ]]; then
     (
       cd "$target"
-      git init -q
+      git init -q -b main
       git add .
       git commit -q -m "Initial scaffold from research-project template"
     )
@@ -147,10 +147,13 @@ cmd_adopt() {
        $0 add-proposal --name $name --year YYYY --grant-type 種別
   3. Papis ライブラリを使う場合:
        $0 add-papis-lib --name $name
-  4. Obsidian プロジェクトノートを作る場合:
-       $0 add-obsidian-note --name $name
-  5. GitHub private repo に push する（申請書を含むなら必須。提出版の正本がここだけになる）:
+  4. GitHub private repo に push する（申請書を含むなら必須。提出版の正本がここだけになる）:
        cd $target && gh repo create --private $name --source=. --remote=origin --push
+  5. Obsidian プロジェクトノートを作る（origin があれば github_url も埋まる）:
+       $0 add-obsidian-note --name $name
+  6. project-status.yaml と CLAUDE.md の状態ブロックを作る（waiting で作る。phase-setup.md）:
+       python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \\
+         --repo $target --status waiting --phase "フェーズ名" --apply
 
 EOF
 }
@@ -253,14 +256,40 @@ cmd_add_papis_lib() {
 
 # ---------- add-obsidian-note ----------
 
+# frontmatter は YAML なので {{VAR}} を残せない（`{{` はフローマッピングとして解釈される）。
+# 値が分かったときだけ、空の `key:` 行を埋める。
+set_blank_frontmatter() {
+  local file=$1 key=$2 val=$3
+  [[ -z $val ]] && return 0
+  local esc
+  esc=$(printf '%s' "$val" | sed -e 's/[#&\\]/\\&/g')
+  sed -i.bak "s#^${key}:\$#${key}: ${esc}#" "$file"
+  rm -f "$file.bak"
+}
+
+# origin の URL を https 形式で返す（無ければ空）
+github_url_from_origin() {
+  local url
+  url=$(git -C "$1" remote get-url origin 2>/dev/null) || return 0
+  url=${url%.git}
+  case $url in
+    git@github.com:*) url="https://github.com/${url#git@github.com:}" ;;
+  esac
+  printf '%s' "$url"
+}
+
 cmd_add_obsidian_note() {
-  local name= rep= aff= phase=
+  local name= rep= aff= gh_url=
   while [[ $# -gt 0 ]]; do
     case $1 in
       --name)           name=$2; shift 2 ;;
       --representative) rep=$2; shift 2 ;;
       --affiliation)    aff=$2; shift 2 ;;
-      --phase)          phase=$2; shift 2 ;;
+      --github-url)     gh_url=$2; shift 2 ;;
+      --phase)
+        # フェーズは project-status.yaml の生成物で、ノートに手で書く場所が無い
+        printf 'warning: --phase は無視する。project migrate --phase で渡す\n' >&2
+        shift 2 ;;
       *) err "add-obsidian-note: unknown option $1" ;;
     esac
   done
@@ -280,15 +309,22 @@ cmd_add_obsidian_note() {
   local today
   today=$(date +%Y-%m-%d)
 
+  [[ -z $gh_url ]] && gh_url=$(github_url_from_origin "$PROJECTS_ROOT/$name")
+
   cp "$SCRIPT_DIR/obsidian-project-note.md.template" "$note"
   substitute_in_file "$note" \
     PROJECT_NAME "$name" \
     REPRESENTATIVE "$rep" \
     AFFILIATION "$aff" \
-    PHASE "$phase" \
     TODAY "$today"
+  set_blank_frontmatter "$note" github_url "$gh_url"
+  local root=$PROJECTS_ROOT
+  [[ $root == "$HOME"/* ]] && root="~${root#"$HOME"}"
+  set_blank_frontmatter "$note" local_path "$root/$name"
 
   log "added: $note"
+  [[ -z $gh_url ]] && log "github_url は空。gh repo create の後に frontmatter へ書く"
+  return 0
 }
 
 # ---------- usage / dispatch ----------
@@ -301,7 +337,7 @@ Subcommands:
   adopt              --name NAME [--representative "氏名"] [--project-name "正式名"]
   add-proposal       --name NAME --year YYYY --grant-type 種別
   add-papis-lib      --name NAME [--library ライブラリ名]
-  add-obsidian-note  --name NAME [--representative "氏名"] [--affiliation "所属"] [--phase 現フェーズ]
+  add-obsidian-note  --name NAME [--representative "氏名"] [--affiliation "所属"] [--github-url URL]
 
 Environment:
   PROJECTS_ROOT  default: ~/work/projects

@@ -14,10 +14,10 @@ subtree で移設）。規約を変えたらテンプレも同じコミットで
 
 | サブコマンド | 役割 |
 |---|---|
-| `adopt` | プロジェクトディレクトリ作成 or 既存補完。CLAUDE.md・README.md・.gitignore・空ディレクトリ・git 初期化 |
+| `adopt` | プロジェクトディレクトリ作成 or 既存補完。CLAUDE.md・README.md・.gitignore・空ディレクトリ・git 初期化（`main` ブランチ） |
 | `add-proposal` | `proposals/{YEAR}-{GRANT_TYPE}/{drafts,様式,figures,refs,budget,output,submitted}/` を追加 |
 | `add-papis-lib` | papis ライブラリを **`~/Documents/papis/{name}/` に**作成 + `~/Library/Application Support/papis/config` に登録（`papis-conventions.md`） |
-| `add-obsidian-note` | Vault `projects/{name}.md` を生成 |
+| `add-obsidian-note` | Vault `projects/{name}.md` を生成（`local_path` は常に、`github_url` は `--github-url` か origin から埋める） |
 
 ### 設計方針（変更するときはここを壊さないこと）
 
@@ -35,8 +35,10 @@ subtree で移設）。規約を変えたらテンプレも同じコミットで
 ~/dotfiles/claude/.claude/research/template/init.sh adopt --name forest-thermal-normalization --representative "星川 健史"
 ~/dotfiles/claude/.claude/research/template/init.sh add-proposal --name forest-thermal-normalization --year 2027 --grant-type 学術変革B
 ~/dotfiles/claude/.claude/research/template/init.sh add-papis-lib --name forest-thermal-normalization
-~/dotfiles/claude/.claude/research/template/init.sh add-obsidian-note --name forest-thermal-normalization --phase "申請書執筆"
+# GitHub に push してからノートを作ると github_url が origin から埋まる（下記「GitHub remote」）
+~/dotfiles/claude/.claude/research/template/init.sh add-obsidian-note --name forest-thermal-normalization
 # 最後に project migrate で project-status.yaml と CLAUDE.md の生成ブロックを作る（下記「プロジェクト CLAUDE.md の最低構成」）
+# フェーズはここで渡す（add-obsidian-note の --phase は廃止。ノートに手で書く場所が無い）
 
 # 構想メモを持つ既存ディレクトリへの補完（既存 CLAUDE.md・00-構想.md 等は保護される）
 ~/dotfiles/claude/.claude/research/template/init.sh adopt --name my-existing-project
@@ -95,8 +97,9 @@ python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \
 
 ## Obsidian プロジェクトノート
 
-`projects/{kebab-case名}.md` を `templates/project-note-template.md` から作成する
-（`init.sh add-obsidian-note` が生成）。「関連リソース」に作業ディレクトリ・GitHub repo・
+`projects/{kebab-case名}.md` を `init.sh add-obsidian-note` で生成する。雛形は
+`research/template/obsidian-project-note.md.template` で、vault の `templates/project-note-template.md` と
+節・frontmatter のキーを揃えている（違いと理由は同ディレクトリの `README.md`）。「関連リソース」に作業ディレクトリ・GitHub repo・
 papis ライブラリのパスを記載し、Obsidian と Claude Code の両側から相互参照可能にする。
 
 **frontmatter の `local_path` を必ず入れる**。`academic_ops.py` はこれの有無で生成対象を判別する

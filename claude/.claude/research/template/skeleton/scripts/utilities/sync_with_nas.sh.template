@@ -1,14 +1,30 @@
 #!/usr/bin/env bash
 # Run from project root:
-#   bash scripts/utilities/sync_with_nas.sh [check|push|pull] [raw|processed|results|outputs|all] [--dryrun] [--delete] [--no-las]
+#   bash scripts/utilities/sync_with_nas.sh [check|push|pull] [raw|processed|results|outputs|all] [--dryrun] [--delete] [--checksum] [--no-las]
 #
-# NAS (mounted at /Volumes/Public) is the persistent Single Source of Truth
-# for this project's data (see ~/dotfiles/claude/.claude/data-management-policy.md).
+# NAS (QNAP "Public" share) is the persistent Single Source of Truth for this
+# project's data (see ~/dotfiles/claude/.claude/data-management-policy.md).
 # S3 (sync_with_s3.sh) is used only as a transit store when running on EC2,
 # which has no direct NAS access -- do not treat S3 as authoritative.
 #
+# Transfer goes over SSH (rsync -e ssh) directly to the NAS filesystem, NOT
+# through the CIFS/SMB mount. The CIFS mount does not preserve mtime on
+# write, which breaks rsync's mtime-based quick-check and erases when the
+# data was measured/generated. The mount (/Volumes/Public on Mac,
+# /mnt/public on Linux) is fine for browsing (QGIS, Finder) -- not for this
+# script.
+#
+# SSH uses the `qnap` Host alias (~/.ssh/includes/qnap.conf, stowed from
+# dotfiles: HostName via Tailscale, key-based, no password).
+#
+# Comparison is --size-only: the shared NAS raw/ (and anything copied from
+# an older project) may still carry CIFS-era write-time mtimes. Size-only
+# misses an in-place change that keeps the file size (e.g. regenerating
+# under an unchanged filename after a code fix); for a known-changed path,
+# re-run with --checksum scoped to one target.
+#
 # Modes:
-#   check        Show local -> NAS differences only (default; dry-run)
+#   check        Show local <-> NAS differences only (default; dry-run)
 #   push         Sync local -> NAS
 #   pull         Sync NAS -> local
 #
@@ -20,19 +36,23 @@
 #   all          all targets (default)
 #
 # Environment overrides:
-#   {{ENV_PREFIX}}_NAS_ROOT        default: /Volumes/Public
+#   {{ENV_PREFIX}}_NAS_SSH_HOST    default: qnap
+#   {{ENV_PREFIX}}_NAS_SSH_ROOT    default: /share/Public
 #   {{ENV_PREFIX}}_ALLOW_RAW_PUSH  default: false
 #
 # Options:
 #   --dryrun     Preview without copying. Useful with push/pull.
 #   --delete     Delete destination files absent from source.
+#   --checksum   Compare file content instead of size. Slow (reads full
+#                file content on both ends) -- scope to one target.
 #   --no-las     Exclude .las / .laz / .lax files.
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
-NAS_ROOT="${{{ENV_PREFIX}}_NAS_ROOT:-/Volumes/Public}"
+SSH_HOST="${{{ENV_PREFIX}}_NAS_SSH_HOST:-qnap}"
+NAS_ROOT="${{{ENV_PREFIX}}_NAS_SSH_ROOT:-/share/Public}"
 NAS_RAW="${NAS_ROOT}/raw"
 NAS_PROJECT="${NAS_ROOT}/projects/{{PROJECT_NAME}}"
 ALLOW_RAW_PUSH="${{{ENV_PREFIX}}_ALLOW_RAW_PUSH:-false}"
@@ -40,20 +60,26 @@ ALLOW_RAW_PUSH="${{{ENV_PREFIX}}_ALLOW_RAW_PUSH:-false}"
 MODE="check"
 TARGET="all"
 DRYRUN=()
+# macOS の bash 3.2 では set -u 下で空配列の ${#arr[@]} が unbound エラーに
+# なる。dry-run 判定は配列長ではなく本フラグで行う。
+DRYRUN_ACTIVE=false
 DELETE=()
-RSYNC_OPTIONS=(-a --info=stats2,progress2 --exclude ".DS_Store" --exclude ".gitkeep")
+CHECKSUM=()
+# QNAP側のrsyncが古い(3.0.7)ため --info=stats2,progress2 (rsync>=3.1構文) は使えない。
+RSYNC_OPTIONS=(-a --size-only -e ssh --stats --progress --exclude ".DS_Store" --exclude ".gitkeep")
 NO_LAS=()
 
 usage() {
-  sed -n '2,29p' "$0" >&2
+  sed -n '2,48p' "$0" >&2
 }
 
 for arg in "$@"; do
   case "$arg" in
     check|push|pull) MODE="$arg" ;;
     raw|processed|results|outputs|all) TARGET="$arg" ;;
-    --dryrun) DRYRUN=(--dry-run) ;;
+    --dryrun) DRYRUN=(--dry-run); DRYRUN_ACTIVE=true ;;
     --delete) DELETE=(--delete) ;;
+    --checksum) CHECKSUM=(--checksum) ;;
     --no-las) NO_LAS=(--exclude "*.las" --exclude "*.laz" --exclude "*.lax") ;;
     -h|--help) usage; exit 0 ;;
     *) usage; exit 1 ;;
@@ -62,11 +88,13 @@ done
 
 if [[ "$MODE" == "check" ]]; then
   DRYRUN=(--dry-run)
+  DRYRUN_ACTIVE=true
 fi
 
 require_nas() {
-  [[ -d "$NAS_ROOT" ]] || {
-    echo "error: NAS not mounted at ${NAS_ROOT}. Mount smb://192.168.70.241/Public first." >&2
+  ssh -o BatchMode=yes -o ConnectTimeout=5 "$SSH_HOST" "test -d '${NAS_ROOT}'" 2>/dev/null || {
+    echo "error: cannot reach NAS via ssh (${SSH_HOST}:${NAS_ROOT})." >&2
+    echo "Check Tailscale is up and ~/.ssh/includes/qnap.conf is stowed." >&2
     exit 1
   }
 }
@@ -75,17 +103,32 @@ run_sync() {
   local label="$1"
   local source="$2"
   local destination="$3"
-  shift 3
+  local source_is_remote="$4"
+  shift 4
 
   echo "=== ${MODE}: ${label} ==="
-  if [[ ! -d "$source" ]]; then
-    echo "skip: missing source: $source"
-    return
+
+  if [[ "$source_is_remote" == "true" ]]; then
+    ssh -o BatchMode=yes -o ConnectTimeout=5 "$SSH_HOST" "test -d '${source}'" 2>/dev/null || {
+      echo "skip: missing source: ${SSH_HOST}:${source}"
+      return
+    }
+    if [[ "$DRYRUN_ACTIVE" == false ]]; then
+      mkdir -p "$destination"
+    fi
+    rsync "${RSYNC_OPTIONS[@]}" ${CHECKSUM[@]+"${CHECKSUM[@]}"} ${DELETE[@]+"${DELETE[@]}"} ${DRYRUN[@]+"${DRYRUN[@]}"} "$@" \
+      "${SSH_HOST}:${source%/}/" "${destination%/}/"
+  else
+    if [[ ! -d "$source" ]]; then
+      echo "skip: missing source: $source"
+      return
+    fi
+    if [[ "$DRYRUN_ACTIVE" == false ]]; then
+      ssh "$SSH_HOST" "mkdir -p '${destination}'"
+    fi
+    rsync "${RSYNC_OPTIONS[@]}" ${CHECKSUM[@]+"${CHECKSUM[@]}"} ${DELETE[@]+"${DELETE[@]}"} ${DRYRUN[@]+"${DRYRUN[@]}"} "$@" \
+      "${source%/}/" "${SSH_HOST}:${destination%/}/"
   fi
-  if [[ ${#DRYRUN[@]} -eq 0 ]]; then
-    mkdir -p "$destination"
-  fi
-  rsync "${RSYNC_OPTIONS[@]}" ${DELETE[@]+"${DELETE[@]}"} "${DRYRUN[@]}" "$@" "${source%/}/" "${destination%/}/"
 }
 
 sync_pair() {
@@ -95,9 +138,9 @@ sync_pair() {
   shift 3
 
   if [[ "$MODE" == "pull" ]]; then
-    run_sync "$label" "$nas_path" "$local_path" "$@"
+    run_sync "$label" "$nas_path" "$local_path" "true" "$@"
   else
-    run_sync "$label" "$local_path" "$nas_path" "$@"
+    run_sync "$label" "$local_path" "$nas_path" "false" "$@"
   fi
 }
 

@@ -7,11 +7,14 @@
 -->
 
 <!-- 状態（フェーズ・次タスク・懸念）の正本はリポジトリ直下の project-status.yaml。
-     下の空見出しは、立ち上げ時に一度だけ次を実行すると英語ラベルの生成ブロックへ置き換わる:
+     下の空見出しは、立ち上げ時に一度だけ次を実行すると英語ラベルの生成ブロックへ置き換わる
+     （先に init.sh add-obsidian-note で vault のノートを作っておく）:
 
        python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \
-         --repo . --status active --phase "申請書執筆" --apply
+         --repo . --status waiting --phase "申請書執筆" --apply
 
+     active は実在する未完了タスクの --next-task-id を要求する。tasks.md にタスクを立ててから
+     close-session で active へ移す（research/phase-setup.md）。
      以後は手で書かず close-project-session スキルで更新する。ここに状態以外を書かない
      （書くと migrate が失敗する）。migrate 後はこのコメントを削除する。 -->
 

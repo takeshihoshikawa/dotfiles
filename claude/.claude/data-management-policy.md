@@ -111,7 +111,7 @@ AWS利用時は、S3を永続ストレージとの受け渡し用として利用
 >
 > SSH 経由でも「hash・ファイル名を変えずに中身だけ再生成した」場合（コード修正で `REVIEW_CODE_CHANGED` 相当の再解析をしたときなど）はサイズが偶然一致すると `--size-only` でも検知できない。該当パスに絞って `--checksum` を使うか、明示的に強制上書きする。
 >
-> 実装は tree-species-classification の `scripts/utilities/sync_with_nas.sh`（`qnap` エイリアス例つき）を参照。他プロジェクトでも CIFS 経由の同期を使っている場合は同じ問題が起きうるため、順次 SSH 方式へ移行を検討する。vaultの `notes/research-project-setup.md`「データ同期スクリプト」標準パターン側への反映は未実施（Mac からの次回作業で対応予定）。
+> 実装は tree-species-classification の `scripts/utilities/sync_with_nas.sh`（`qnap` エイリアス例つき）を参照。新規プロジェクトの雛形（`research/template/skeleton/scripts/utilities/sync_with_nas.sh.template`）も同じ SSH 方式にした（2026-10-10。それまでは CIFS マウント宛てで、`init.sh adopt` で作ったリポはマウント経由で同期していた）。他プロジェクトでも CIFS 経由の同期を使っている場合は同じ問題が起きうるため、順次 SSH 方式へ移行を検討する。vaultの `notes/research-project-setup.md`「データ同期スクリプト」標準パターン側への反映は未実施（Mac からの次回作業で対応予定）。
 
 ---
 
