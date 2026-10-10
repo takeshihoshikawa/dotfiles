@@ -133,7 +133,7 @@ source of truth が二重化して必ず食い違うため、転記しないこ�
 - [ ] アクション内容 #project/project-name
 ```
 
-テンプレート: `templates/meeting-agenda-template.md`・`templates/project-note-template.md`。
+テンプレート: `templates/meeting-note-template.md`・`templates/project-note-template.md`。
 
 ## 定型ワークフローとの分担
 

@@ -54,7 +54,7 @@ Meeting-originated tasks remain in the meeting note and are not copied to `tasks
 Every official task has a stable ID in the exact format `tsk-` plus 12 lowercase hexadecimal characters. Generate it with `secrets.token_hex(6)` through `~/work/projects/admin/scripts/academic_ops.py`; never invent, reuse, or remove an ID. Completion keeps the ID and adds `[completion:: YYYY-MM-DD]`. Checkboxes in `templates/`, `sources/`, `daily/`, project notes, or `projects/archive/` are not executable tasks and are reported by audit.
 
 Templates:
-- `templates/meeting-agenda-template.md`
+- `templates/meeting-note-template.md`
 - `templates/project-note-template.md`
 
 Workflow reference:

@@ -121,7 +121,7 @@ Claude Code は `rg "#project/X" tasks.md meetings` で横断検索（plugin非�
 
 - Meeting noteのアクションアイテムは「決定した事実」の記録（担当者・アクション・期限）。ステータス管理はしない
 - Project noteはチェックボックス禁止。タスク重複の温床になるため
-- テンプレート: `templates/meeting-agenda-template.md`、`templates/project-note-template.md`
+- テンプレート: `templates/meeting-note-template.md`、`templates/project-note-template.md`
 - 打ち合わせ後の手順（meeting note → project note → リポジトリの状態更新）は
   `~/dotfiles/claude/.claude/obsidian-workflow.md`「打ち合わせ → プロジェクト → タスク」を参照
 
