@@ -63,6 +63,8 @@ Run `academic_ops.py audit --format json`, then show the next two weeks of calen
 
 Ask which proposed tasks to adopt. Apply approved tasks to the locations defined by global `AGENTS.md`; do not duplicate meeting-originated tasks or add checkboxes to project notes.
 
+After the screening and task writes are done, archive old completed lines. Completed lines are never deleted; the only move allowed is `task archive` into `tasks-archive/{完了年}.md` (spec: 「完了済みの行の保管」 in admin `CLAUDE.md`). Run `python3 ~/work/projects/admin/scripts/academic_ops.py task archive` to preview, tell the user the count and destination, and rerun with `--apply` only if they agree. Lines without a completion date move only with `--include-undated`.
+
 Check whether one or two `研究コアブロック` events already exist next week. Suggest 08:00–10:30 weekday slots that avoid holidays and conflicts. Create events only after approval.
 
 ## Phase 4: plan
