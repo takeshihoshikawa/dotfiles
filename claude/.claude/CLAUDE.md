@@ -81,7 +81,7 @@ Folder structure:
 （現在地に状態4項目以外が書いてあると失敗するので、先に作業ログ等へ退避する）。未移行は
 `audit` では warning 止まりで、error にはならない。
 
-yaml のスキーマ・audit の整合規則・`project_mirror.py` / `project_radar.py`（互換CLI として存続）の仕様は
+yaml のスキーマ・audit の整合規則・`project_radar.py`（互換CLI として存続）の仕様は
 `~/work/projects/admin/CLAUDE.md`「## プロジェクト状態の制御（academic_ops.py）」が正本。
 **プロジェクト状態まわりのスクリプトを変更する前に必ず読む。**
 
