@@ -95,6 +95,11 @@ yaml のスキーマ・audit の整合規則・`project_radar.py`（互換CLI �
 | **プロジェクトtask** | `tasks.md`（計画起点）または `meetings/`（会議起点）。転記しない | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]` |
 | **非プロジェクトtask** | `tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD] [priority:: medium]` |
 
+**タスク本文の書き方**（2026-10-11）: 1文目で何をするかを言い切る。カッコで補足を挟まず、補足は後ろに文を足す
+（例: `事業用の GitHub organization を作る。副業申請の後に、名前は事業名で決める`）。
+本文は200字まで。超えたら経緯をリポの文書へ移し、行には次の1手とパスを残す
+（`academic_ops.py task create` は拒否し、audit は `task_too_long` で知らせる）。
+
 **プロジェクトノート（`projects/`）にはチェックボックスを置かない。** 実行管理は `tasks.md` に任せる。
 gitプロジェクトでは**状態（フェーズ・次タスク・懸念）も本文に書かない**（上記の通りリポジトリが正本）。
 プロジェクトノートに残すのは、概要・仮説・関係者・意思決定の記録・ログ・meeting note へのリンクなど、
