@@ -1,49 +1,22 @@
 ---
 name: course-qa
-description: Draft concise answers to student course questions, restore questions from Obsidian, save approved one-question files, and optionally build a verified distribution PDF. Use for course Q&A, student questions, answer review, or prior-Q&A retrieval.
+description: Process cumulative minute papers for participation grading and student Q&A using the courses repository workflow. Use for course questions, answer review, scan grading, or prior-Q&A retrieval.
 ---
 
 # Course Q&A
 
+## Shared teaching workflow
+
+The authoritative entrypoint is `~/work/projects/courses/.agents/skills/course-qa/SKILL.md`. Read it, its shared contract, and its workflow before execution or delegation. The courses workflow governs scanning, grading, approvals, Obsidian Q&A, and handouts in Claude Code, ChatGPT Work, and Codex.
+
+Do not maintain an independent Q&A or PDF workflow here. Approved Q&A lives in the Vault; handouts are exported with the existing courses helper to `QA_YYYYMMDD.qmd` in the distribution session's folder and listed in its existing 印刷.yml. Never fall back to the old standalone PDF output in iCloud.
+
+If the courses checkout or referenced files are missing, report that prerequisite and stop the affected workflow rather than reconstructing it from memory. Teaching writes belong in a local courses project. Read-only question retrieval can run from admin.
+
 ## Codex execution profile
 
-Use `gpt-5.6-terra` with `medium` reasoning effort. When subagent execution is available and this request has not already been routed, delegate the complete workflow exactly once with `fork_turns="none"`, that model and effort, and instructions to read this `SKILL.md` before acting. The child must identify itself as the `academic_course_qa` profile.
+Use `gpt-5.6-terra` with `medium` reasoning effort. When subagent execution is available and this request has not already been routed, delegate the complete workflow exactly once with `fork_turns="none"`, that model and effort, and instructions to read this entrypoint and the courses entrypoint. The child must identify itself as the `academic_course_qa` profile.
 
 If already running as that profile or subagent execution is unavailable, execute locally. Do not recursively delegate or launch a nested CLI process solely to switch models. The parent must not repeat completed child work.
 
----
-
-Read [the shared contract](../../references/secretary-contract.md) and, when writing outputs, [the output format](references/output-format.md).
-
-## Establish scope
-
-Default to the full flow: approve answers, save Obsidian files, then generate the PDF. Explicit user scope overrides it:
-
-- Preview, validation, or simulated completion: write nothing.
-- Answer only: stop after the approved response.
-- No PDF: save approved Obsidian files but do not create or update a PDF.
-
-State the scope once. After a no-save or no-PDF instruction, do not ask to perform that write again.
-
-## Select the course and questions
-
-1. Find the three newest session notes dated today or earlier under `~/vault/courses/*/sessions/` whose `owner:` matches global `AGENTS.md`. Ask the user to select when the course is not already clear.
-2. Read `course_id`, `course`, `topic`, `topic_id`, and `class` from the selected session.
-3. If the user asks to restore questions, search the selected session, matching `qa/*.md`, and related daily notes. Recover `q:` values and bodies rather than asking the user to retype. Ask only when multiple plausible sets remain.
-4. Search the selected course’s prior Q&A by keywords, widening to all courses only when useful. Reuse consistent facts, terminology, and links.
-
-## Draft answers
-
-- Lead with the answer and use concise plain-form Japanese, normally one to three paragraphs.
-- Add context or examples only when they improve understanding.
-- Separate facts from interpretation or opinion.
-- Clarify an ambiguous question by stating the assumed intent and offering a refined question.
-- Verify current, niche, or consequential facts with authoritative sources. Record source titles and direct URLs. Existing course notes alone require no external source entry.
-
-Present all answers together. Revise until approved; never save an unapproved answer.
-
-## Write approved outputs
-
-Follow [the output format](references/output-format.md). Determine the distribution date from the next relevant session, or use today when none exists.
-
-For PDF generation, use the installed PDF workflow and the existing pandoc/xelatex environment. Render and visually verify the result. Do not overwrite an already-returned PDF when the user requested review only.
+Pass the user's selected course, class, dates, scan path, questions, execution scope, exclusions, prior decisions, and approvals to the child. Keep that child across approval phases; relay its question to the user, then resume it with `followup_task` carrying the user's response. Do not replace it or let an approval get lost. Explicit no-save, no-grading, or no-handout scope applies to all phases, including scan copies and task writes.

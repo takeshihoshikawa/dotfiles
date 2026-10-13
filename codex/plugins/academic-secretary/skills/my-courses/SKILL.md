@@ -5,11 +5,6 @@ description: List upcoming course sessions owned by the user from the Obsidian c
 
 # My courses
 
-This skill is read-only. Default to five sessions unless the user gives another count.
+This is a read-only entrypoint to `~/work/projects/courses/.agents/skills/my-courses/SKILL.md`. Read that entrypoint, its shared contract, and its workflow. Claude Code, ChatGPT Work, and Codex use the same owner selection, today-or-later date filter, ascending order, default count of five, and preparation metadata rules.
 
-1. Read the course owner name from global `AGENTS.md`.
-2. Search `~/vault/courses/*/sessions/YYYY-MM-DD_*.md` for dates today or later and matching `owner:`. Sort ascending and keep the requested count.
-3. Read each selected note. Extract `date`, `course`, `class`, `topic`, `prepared`, and a compact summary of the body when present.
-4. Show the results chronologically. Mention missing preparation metadata without inventing a status.
-
-Use the actual `courses/{course_id}/sessions/` structure. Do not search legacy academic-year directories.
+Do not maintain a second listing implementation here. If the courses checkout or referenced workflow is missing, report that prerequisite rather than searching legacy academic-year directories or guessing a substitute workflow. This read-only listing can be used from admin as well as courses.
