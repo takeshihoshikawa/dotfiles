@@ -98,3 +98,13 @@ This script:
 - Links dotfiles via `stow` (ssh, aws, git, zsh, brew, claude, codex, vscode)
 - Registers daily-report reminder (weekdays 16:33, notify only when Mac is awake) via launchd (not stowed — installed directly to `~/.local/bin/` and `~/Library/LaunchAgents/`)
 - Installs R `renv` package
+
+---
+
+## Academic Secretaryの共通手順
+
+朝の計画・日報・週次レビューの正本は [academic-secretaryのreferences](../codex/plugins/academic-secretary/references/) にある `morning-workflow.md` / `daily-report-workflow.md` / `weekly-review-workflow.md`。共通の操作・保存形式はここだけで更新する。
+
+Claudeの `claude/.claude/skills/{morning,daily-report,weekly-review}/SKILL.md` は `~/dotfiles` の同じ正本を読む入口。Work/Codexの `codex/plugins/academic-secretary/skills/` はパッケージ内の同じ正本を読み、実行プロファイルと会話の引継ぎだけを持つ。Claudeを使うマシンではdotfiles全体を取得し、共通手順だけを別の場所へコピーしない。
+
+変更時は入口の形式と参照先を検証する。配布済みプラグインはインストール時点のコピーなので、配布元の更新とアプリ側での更新適用は別の操作。キャッシュを直接編集せず、アプリ側の適用後に配布元と内容を照合する。
