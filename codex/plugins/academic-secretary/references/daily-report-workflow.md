@@ -65,7 +65,7 @@ Read [the shared contract](secretary-contract.md) before acting. This file is th
 
 `~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --date {対象日} --format json`を実行する。cleanかつbehindのみのリポジトリは自動でpull --rebaseされ、対象日のコミットも同時に取得できる。取得失敗は報告して続行する。
 
-`~/work/projects/admin/scripts/session_digest.py --date {対象日} --format json`を実行する（読み取り専用。日付で更新されたファイルだけを開き、約1秒で終わる）。対象日に本人の発言があったセッションを、起動元（claude・work・codex）にかかわらず時刻順に返す。各件の項目は、プロジェクト、勤務時間内の開始・終了、本人の発言数、最初の発言、最後の応答の要約、コミット数、`after_hours`。
+`~/work/projects/admin/scripts/session_digest.py --date {対象日} --format json`を実行する（読み取り専用。日付で更新されたファイルだけを開き、約1秒で終わる）。対象日に本人の発言があったセッションを、起動元（claude・work・codex）にかかわらず時刻順に返す。各件の項目は、プロジェクト、勤務時間内の開始・終了、本人の発言数、最初の発言、**本人の発言すべて（`turns`: 時刻と先頭160字）**、最後の応答の要約、コミット数、`after_hours`。
 
 - `after_hours`が真の件（勤務時間の外だけで行ったセッション）は日報へ入れない。翌朝の`morning`が引継ぎの材料に使う。勤務時間をまたぐ件は、出力が勤務時間内の発言だけで集計している。
 - 自動の承認記録と雑談は件数だけが`omitted`に出る。警告（形式が変わった可能性）があれば報告し、履歴なしで続行する。
@@ -82,6 +82,8 @@ Read [the shared contract](secretary-contract.md) before acting. This file is th
 - 昼休み、早退、体調不良、移動など実績解釈に必要な制約を残す。
 
 #### セッション履歴の取り込み
+
+**質問より先に`turns`を読む。** 期待成果の達成（印刷した、送った、通した）、判断、所感は、最初と最後でなく途中の本人の発言に出る。`計画と結果`の判定、完了、所要時間の言及は、まず`turns`を時刻順に読み、答えが出ていれば質問しない。`turns`の160字で足りない時は、該当セッションのファイル（`file`）を開いて本人の発言を読む。質問するのは、`turns`にも会話にも日中メモにも無いことだけで、1回にまとめる（2026-10-14: 履歴にある報告を聞き直して本人に指摘された）。
 
 `session_digest.py`の各件を、朝の計画・現在の会話・日中メモ・カレンダー・gitから作った内容と突き合わせる。
 
