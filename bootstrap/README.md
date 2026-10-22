@@ -12,39 +12,82 @@
 | `vscode` | mac のみ | VSCode `settings.json` |
 
 > **注**: `~/.claude/settings.local.json` は gitignore 済みのため新マシンでは手動で作成すること（ローカル専用設定を記述）。
+>
+> **Ubuntu（gpu 計算機）は stow を使わない**（2026-10-22 変更）。Mac から ssh で操作する実行専用機で、Claude Code・Codex・エディタのサーバ・dotfiles の clone は置かない。必要な git / ssh / aws の設定は `setup_ubuntu.sh` が実ファイルとして作る。上の表の「全OS」は Mac と EC2 を指す。
 
 ---
 
-## Setup (Ubuntu)
+## Setup (Ubuntu / gpu 計算機)
+
+想定は Windows とのデュアルブート機（Windows 専用 SSD ＋ Ubuntu 用 SSD ＋ 共用 HDD）。実行専用機なので dotfiles は clone せず、Mac から必要なファイルだけ送って流す。
+
+### 1. OS インストール時（手作業）
+
+- Windows の SSD には触らない（パーティション操作の対象から外す。可能なら物理的に外す）。ブートローダは Ubuntu 用 SSD 側の EFI に入れる
+- Ubuntu 用 2TB SSD を分ける: EFI 1GB ／ `/` 約300GB（ext4）／ `/work` 残り全部（ext4、約1.7TB）。OS を入れ直しても作業データが残るよう `/work` を分けておく
+- UEFI で Secure Boot を無効にする（NVIDIA ドライバの MOK 登録は実機の画面前でしかできない）。Windows が BitLocker／デバイス暗号化なら、先に回復キーを控える
+- Windows 側: 高速スタートアップと休止状態を無効化する（共用 HDD の NTFS に汚れフラグが残り、Ubuntu から読み書きできなくなる）。時計のずれを避けるためレジストリ `HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation\RealTimeIsUniversal`（DWORD）を `1` にする
+
+### 2. ディスクを登録（`setup_ubuntu_disks.sh`）
+
+パーティションの作成・フォーマットは**しない**。fstab への登録とマウントだけを行う。
 
 ```bash
-git clone https://github.com/takeshihoshikawa/dotfiles.git ~/dotfiles
-bash ~/dotfiles/bootstrap/setup_ubuntu.sh
+bash setup_ubuntu_disks.sh                                      # 候補の UUID を一覧
+bash setup_ubuntu_disks.sh --work UUID=... --scratch UUID=...   # 追記する内容の確認（dry-run）
+bash setup_ubuntu_disks.sh --work UUID=... --scratch UUID=... --apply
 ```
+
+- `/work`: ext4。`gpu_run.py` の `/work/projects`・`/work/runs`、Docker の bind mount 元はすべてここ
+- `/mnt/scratch`: Windows と共用の HDD（NTFS／exFAT）。**一時データ（interim）専用**で、`/work/tmp` はここへのリンク。Git リポジトリ・`.venv`・Docker のデータは置かない（権限・シンボリックリンク・実行ビットが効かない）。未マウント時に SSD へ書き込む事故を防ぐため、マウントポイントに `chattr +i` を掛ける
+
+### 3. セットアップ本体（Mac から送って実行）
+
+```bash
+rsync -a --exclude .git ~/dotfiles/bootstrap ~/dotfiles/ssh ~/dotfiles/git <host>:/tmp/dotfiles-bootstrap/
+ssh -t <host> bash /tmp/dotfiles-bootstrap/bootstrap/setup_ubuntu.sh
+```
+
+最初に `x86_64`・Ubuntu 24.04・`/work` のマウント・Secure Boot 無効を検査し、満たさなければ何も変更せず止まる。冪等で、入っているものは飛ばす。
 
 This script:
-- Installs system packages (incl. `cifs-utils`, `fonts-noto-cjk`), R (+`renv`), Python `uv`, development libraries
-- Installs Docker + NVIDIA Container Toolkit（GPU コンテナ解析用。reboot 後に `nvidia-ctk runtime configure` が必要、スクリプト末尾の NOTE 参照）
-- Installs Quarto + `texlive-full`（論文原稿の PDF/DOCX レンダリング用。texlive-full は数GB级のダウンロード）
+- Installs system packages (incl. `cifs-utils`, `ntfs-3g`, `fonts-noto-cjk`), R (+`renv`), Python `uv`, development libraries
+- Installs Docker + NVIDIA Container Toolkit（GPU コンテナ解析用）、`gh`、`awscli`、Tailscale
 - Sets `vm.swappiness=10`（解析ワークロードでスワップを避けるチューニング）
-- Sets up `/work/{projects,data,tmp}`
-- Links shared dotfiles via `stow` (git, ssh, claude, codex)
+- Enables linger（`loginctl enable-linger`。`gpu_run.py` が `systemd-run --user` でジョブを切り離すための必須前提）
+- Sets up `/work/{projects,data,runs,tools}` と `~/work -> /work`
+- Writes `~/.gitconfig`・`~/.ssh/config`（GitHub と QNAP のみ）・`~/.aws/config`、この機械専用の SSH 鍵を新規に作る（他の機械の鍵・認証情報は持ち込まない）
 - Sets up NAS CIFS automount via `setup_nas_mount.sh`（下記参照）
+- Installs the recommended NVIDIA driver（版を固定するときは `NVIDIA_DRIVER=nvidia-driver-595-open` のように渡す）
 
-After setup:
+Quarto・`texlive-full`・`pandoc` は入れない（原稿のレンダリングは Mac で行う）。
+
+### 4. 再起動後（手作業・この順）
+
 ```bash
 sudo reboot
-```
-
-After reboot, verify GPU (if applicable):
-```bash
-nvidia-smi
-```
-
-Login to Tailscale:
-```bash
+nvidia-smi                                                                    # GPU の確認
+sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker
 sudo tailscale up
+sudoedit /etc/cifs-tsc.cred                                                   # NAS のパスワードを記入
+gh auth login
+aws login                                                                     # または aws configure
 ```
+
+公開鍵（`~/.ssh/id_ed25519.pub` を GitHub へ、`~/.ssh/id_ed25519_qnap.pub` を QNAP へ）を登録する。Mac 側の `~/.ssh/includes/gpu-remote.conf` には、新機の Tailscale 名で別の `Host` を足す。
+
+### 5. 確認（`verify_ubuntu.sh`）
+
+```bash
+ssh <host> bash -s < ~/dotfiles/bootstrap/verify_ubuntu.sh
+```
+
+読み取り専用。PASS／WARN／FAIL を出し、FAIL があれば終了コード 1。既存機に流して「スクリプトの想定とずれていないか」を見るのにも使う。ずれを見つけたら、機械ではなくスクリプトかこの README を直す。
+
+### デュアルブートの注意
+
+- Windows を起動している間は Tailscale も ssh も落ち、`gpu_run.py` のジョブも止まる。UEFI の起動順は Ubuntu を先頭にし、停電復帰時の自動起動を有効にする。Windows の大型更新で起動順が戻ることがあるので、`verify_ubuntu.sh` の起動順の項目で確かめる
+- 共用 HDD を Windows から使ったあと Ubuntu でマウントできないときは、Windows を「再起動」ではなく「シャットダウン」してから起動し直す
 
 ### NAS mount (`setup_nas_mount.sh`)
 
