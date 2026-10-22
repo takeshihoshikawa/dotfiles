@@ -5,7 +5,9 @@
 #
 # 使い方（Mac から、dotfiles の bootstrap/ と ssh/ だけを送って流す）:
 #   rsync -a --exclude .git ~/dotfiles/bootstrap ~/dotfiles/ssh ~/dotfiles/git <host>:/tmp/dotfiles-bootstrap/
-#   ssh -t <host> bash /tmp/dotfiles-bootstrap/bootstrap/setup_ubuntu.sh
+#   ssh -t <host> NEW_HOSTNAME=arabica bash /tmp/dotfiles-bootstrap/bootstrap/setup_ubuntu.sh
+#
+# 機械の名前は豆系（robusta・arabica。Mac は飲み物系）。ホスト名と Tailscale のマシン名は同じにする。
 #
 # 先に setup_ubuntu_disks.sh で /work（と一時データ用ディスク）を用意しておく。
 # 冪等: 何度実行しても安全（入っているものは飛ばす）。
@@ -19,6 +21,10 @@ REPO="$(cd "$HERE/.." && pwd)"
 . /etc/os-release
 [ "${VERSION_CODENAME:-}" = "noble" ] || { echo "ERROR: Ubuntu 24.04 (noble) 専用（CRAN のリポジトリ名を固定している）"; exit 1; }
 
+NEW_HOSTNAME="${NEW_HOSTNAME:-}"
+[[ "$NEW_HOSTNAME" =~ ^[a-z][a-z0-9-]*$ ]] || {
+  echo "ERROR: NEW_HOSTNAME（小文字英数字とハイフン。例: arabica）を環境変数で渡す。"; exit 1; }
+
 if ! mountpoint -q /work && [ -z "${ALLOW_WORK_ON_ROOT:-}" ]; then
   echo "ERROR: /work がマウントされていない。先に setup_ubuntu_disks.sh を実行する。"
   echo "       ルートのディスクに /work を作ってよいときだけ ALLOW_WORK_ON_ROOT=1 を付ける。"
@@ -31,6 +37,15 @@ if command -v mokutil >/dev/null && mokutil --sb-state 2>/dev/null | grep -qi 'e
   echo "ERROR: Secure Boot が有効。UEFI 設定で無効にしてから再実行する。"
   echo "       MOK 登録を実機の画面で行うと決めてあるときだけ ALLOW_SECURE_BOOT=1 を付ける。"
   exit 1
+fi
+
+# --- ホスト名 ----------------------------------------------------------------------
+# Tailscale のマシン名（MagicDNS 名）の元になる。Mac の ssh 設定の HostName もこの名前。
+sudo hostnamectl set-hostname "$NEW_HOSTNAME"
+if grep -q '^127\.0\.1\.1' /etc/hosts; then
+  sudo sed -i "s/^127\.0\.1\.1.*/127.0.1.1 $NEW_HOSTNAME/" /etc/hosts
+else
+  echo "127.0.1.1 $NEW_HOSTNAME" | sudo tee -a /etc/hosts > /dev/null
 fi
 
 # --- システムパッケージ ------------------------------------------------------------
@@ -204,12 +219,13 @@ NOTE: 以降は手動（この順）。
   1. sudo reboot
   2. nvidia-smi で GPU を確認し、Docker の GPU runtime を設定:
        sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker
-  3. sudo tailscale up
+  3. sudo tailscale up --hostname="$(hostname)"   # マシン名をホスト名と同じにする
   4. sudoedit /etc/cifs-tsc.cred       # password=CHANGE_ME を実パスワードに
   5. 公開鍵を登録（GitHub は ~/.ssh/id_ed25519.pub、QNAP は ~/.ssh/id_ed25519_qnap.pub）
   6. gh auth login
   7. aws login（または aws configure）
   8. Windows 側: 高速スタートアップと休止状態を無効化、RealTimeIsUniversal=1
-  9. bash <dotfiles>/bootstrap/verify_ubuntu.sh で全項目を確認
+  9. Mac の ~/.ssh/includes/gpu-remote.conf を確認し、ssh -o StrictHostKeyChecking=accept-new <名前> true で初回接続
+ 10. bash <dotfiles>/bootstrap/verify_ubuntu.sh で全項目を確認
 EOF
 echo "Setup finished."

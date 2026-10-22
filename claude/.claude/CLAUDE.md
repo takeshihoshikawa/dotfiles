@@ -157,7 +157,8 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 
 ## 重い計算は gpu-remote（Ubuntu 機）で回す——実行専用
 
-gpu-remote（Tailscale `my-ubuntu`）は**実行するだけで作業しない**（2026-09-10）。上の Git ルールは gpu-remote には当てはめない。
+gpu-remote は**実行機という役割名**で、個体は **robusta**（RTX 2080 Ti。改名前の Tailscale 名は `my-ubuntu`）と **arabica**（2台目）。ssh では `gpu-remote` が robusta の別名で、arabica は `ssh arabica` / `gpu_run.py --host arabica`。2026-10-22 に命名した（Mac は飲み物系、GPU 機は豆系）。
+機械は**実行するだけで作業しない**（2026-09-10）。上の Git ルールは gpu-remote（robusta・arabica とも）には当てはめない。
 
 - Claude は Mac だけで起動する。編集・コミット・push は Mac で行い、gpu-remote は追跡ファイルを書かない
 - コードは `/work/projects/{repo}` の clone に、origin へ push 済みの sha を `git checkout --detach` して運ぶ（ブランチで pull しない）

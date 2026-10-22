@@ -45,8 +45,10 @@ bash setup_ubuntu_disks.sh --work UUID=... --scratch UUID=... --apply
 
 ```bash
 rsync -a --exclude .git ~/dotfiles/bootstrap ~/dotfiles/ssh ~/dotfiles/git <host>:/tmp/dotfiles-bootstrap/
-ssh -t <host> bash /tmp/dotfiles-bootstrap/bootstrap/setup_ubuntu.sh
+ssh -t <host> NEW_HOSTNAME=arabica bash /tmp/dotfiles-bootstrap/bootstrap/setup_ubuntu.sh
 ```
+
+`NEW_HOSTNAME` は必須。機械の名前は**豆系**（GPU 機は `robusta`・`arabica`、Mac は飲み物系）で、ホスト名と Tailscale のマシン名を同じにする。`gpu-remote` は実行機という役割名で、`ssh gpu-remote` は robusta の別名（`ssh/.ssh/includes/gpu-remote.conf`）。
 
 最初に `x86_64`・Ubuntu 24.04・`/work` のマウント・Secure Boot 無効を検査し、満たさなければ何も変更せず止まる。冪等で、入っているものは飛ばす。
 
@@ -55,6 +57,7 @@ This script:
 - Installs Docker + NVIDIA Container Toolkit（GPU コンテナ解析用）、`gh`、`awscli`、Tailscale
 - Sets `vm.swappiness=10`（解析ワークロードでスワップを避けるチューニング）
 - Enables linger（`loginctl enable-linger`。`gpu_run.py` が `systemd-run --user` でジョブを切り離すための必須前提）
+- Sets the hostname（`NEW_HOSTNAME`）
 - Sets up `/work/{projects,data,runs,tools}` と `~/work -> /work`
 - Writes `~/.gitconfig`・`~/.ssh/config`（GitHub と QNAP のみ）・`~/.aws/config`、この機械専用の SSH 鍵を新規に作る（他の機械の鍵・認証情報は持ち込まない）
 - Sets up NAS CIFS automount via `setup_nas_mount.sh`（下記参照）
@@ -68,13 +71,13 @@ Quarto・`texlive-full`・`pandoc` は入れない（原稿のレンダリング
 sudo reboot
 nvidia-smi                                                                    # GPU の確認
 sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker
-sudo tailscale up
+sudo tailscale up --hostname="$(hostname)"                                  # マシン名をホスト名と同じにする
 sudoedit /etc/cifs-tsc.cred                                                   # NAS のパスワードを記入
 gh auth login
 aws login                                                                     # または aws configure
 ```
 
-公開鍵（`~/.ssh/id_ed25519.pub` を GitHub へ、`~/.ssh/id_ed25519_qnap.pub` を QNAP へ）を登録する。Mac 側の `~/.ssh/includes/gpu-remote.conf` には、新機の Tailscale 名で別の `Host` を足す。
+公開鍵（`~/.ssh/id_ed25519.pub` を GitHub へ、`~/.ssh/id_ed25519_qnap.pub` を QNAP へ）を登録する。Mac 側は `ssh/.ssh/includes/gpu-remote.conf` に `Host arabica` が入っている。初回接続で `known_hosts` に登録する（`ssh -o StrictHostKeyChecking=accept-new arabica true`）。もう1台の Mac は dotfiles を pull するまで古い設定のまま。
 
 ### 5. 確認（`verify_ubuntu.sh`）
 
@@ -83,6 +86,16 @@ ssh <host> bash -s < ~/dotfiles/bootstrap/verify_ubuntu.sh
 ```
 
 読み取り専用。PASS／WARN／FAIL を出し、FAIL があれば終了コード 1。既存機に流して「スクリプトの想定とずれていないか」を見るのにも使う。ずれを見つけたら、機械ではなくスクリプトかこの README を直す。
+
+### 既存機の改名（旧名 `my-ubuntu` → `robusta`）
+
+ジョブが走っていないこと（`gpu_run.py --status`）を確かめてから、実機のターミナルで:
+
+```bash
+sudo hostnamectl set-hostname robusta && sudo sed -i 's/^127\.0\.1\.1.*/127.0.1.1 robusta/' /etc/hosts && sudo tailscale set --hostname=robusta
+```
+
+続けて Mac で、`ssh/.ssh/includes/gpu-remote.conf` の `HostName my-ubuntu` を `HostName robusta` に直し、`ssh -o StrictHostKeyChecking=accept-new robusta true` で `known_hosts` に登録し、`gpu_run.py --status` と `verify_ubuntu.sh` で確かめる。改名前は `robusta` も `gpu-remote` も `my-ubuntu` へつながる。
 
 ### デュアルブートの注意
 
