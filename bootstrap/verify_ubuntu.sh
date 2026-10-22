@@ -24,8 +24,10 @@ case "$host" in
   robusta|arabica) ok "ホスト名: $host" ;;
   *) warn "ホスト名が想定外: $host（robusta／arabica 以外。改名前なら想定どおり）" ;;
 esac
-ts="$(tailscale status --self --json 2>/dev/null | jq -r '.Self.HostName // empty')"
-if [ -n "$ts" ]; then [ "$ts" = "$host" ] && ok "Tailscale のマシン名 = ホスト名" || warn "Tailscale のマシン名($ts)がホスト名($host)と違う: sudo tailscale set --hostname=$host"; fi
+# ssh で使われるのは MagicDNS 名（DNSName の先頭）。管理画面で名前が固定されていると、
+# tailscale set --hostname だけでは変わらない（2026-10-22 に実機で確認）
+ts="$(tailscale status --self --json 2>/dev/null | jq -r '.Self.DNSName // empty' | cut -d. -f1)"
+if [ -n "$ts" ]; then [ "$ts" = "$host" ] && ok "Tailscale の MagicDNS 名 = ホスト名" || warn "Tailscale の MagicDNS 名($ts)がホスト名($host)と違う: 管理画面でマシン名を直す"; fi
 
 # --- 作業領域 ---
 if mountpoint -q /work; then

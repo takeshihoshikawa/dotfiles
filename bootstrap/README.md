@@ -95,7 +95,7 @@ ssh <host> bash -s < ~/dotfiles/bootstrap/verify_ubuntu.sh
 sudo hostnamectl set-hostname robusta && sudo sed -i 's/^127\.0\.1\.1.*/127.0.1.1 robusta/' /etc/hosts && sudo tailscale set --hostname=robusta
 ```
 
-続けて Mac で、`ssh/.ssh/includes/gpu-remote.conf` の `HostName my-ubuntu` を `HostName robusta` に直し、`ssh -o StrictHostKeyChecking=accept-new robusta true` で `known_hosts` に登録し、`gpu_run.py --status` と `verify_ubuntu.sh` で確かめる。改名前は `robusta` も `gpu-remote` も `my-ubuntu` へつながる。
+次に **Tailscale の管理画面**（Machines → 該当機の `…` → Edit machine name → 「Use OS hostname」か `robusta`）でマシン名を直す。`tailscale set --hostname` だけでは MagicDNS 名が変わらないことがある（2026-10-22 の実機で、OS のホスト名は変わったが DNS 名は `my-ubuntu` のままだった）。`tailscale status` の名前が `robusta` になったのを確かめてから、Mac で `ssh/.ssh/includes/gpu-remote.conf` の `HostName my-ubuntu` を `HostName robusta` に直し、`ssh -o StrictHostKeyChecking=accept-new robusta true` で `known_hosts` に登録し、`gpu_run.py --status` と `verify_ubuntu.sh` で確かめる。改名前は `robusta` も `gpu-remote` も `my-ubuntu` へつながる。
 
 ### デュアルブートの注意
 
