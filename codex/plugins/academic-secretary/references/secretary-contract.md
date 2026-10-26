@@ -21,3 +21,10 @@
 - A preview-only or no-save run of these three workflows is read-only: use `repo_snapshot.py` without `--fetch` or `--pull-safe` (with `--date` if needed), and skip `project_radar.py`, task mutations, note creation, and other projection writes. `academic_ops.py audit` and ordinary reads remain available. Do not run workflow collection commands merely because someone is editing or reviewing this skill.
 - Obtain approval for the concrete draft or task changes required by the workflow; existing explicit authorization remains valid. Phase 6 of weekly review records only the user's answer to the stated life-axis question and does not add a second save confirmation. A no-save instruction still prohibits that write.
 - Use the canonical script operations for tasks even when an older Obsidian CLI example suggests a direct checkbox edit. Respect user scope and active global task/status rules over older examples.
+
+## Recording period and evening closure (2026-10-26)
+
+- Record actual work on its activity date in Asia/Tokyo, including nights and weekends. The wish to work less at night is a planning preference, never an exclusion rule for actuals. Separate the time a report was received from the time the work occurred.
+- Keep the evening reflection as the daily stopping point. The next morning adds only new facts to the relevant daily notes; do not require a second report at night. Count the person's evidenced work, not agent runtime.
+- The daily-report workflow defines next-morning catch-up, checkpoints, and weekly-total refresh. Its confirmed-fact catch-up is authorized by this standing workflow; ask only about unresolved material facts or inferred time. Existing no-save scope still wins; task mutations retain their own approval rules.
+- From the workweek keyed 2026-10-26, weekly actuals cover Saturday through Friday. Weekly note names retain the Monday inside that period. The weekly-review workflow defines selection and transition; do not rename historical notes or silently reinterpret their periods.

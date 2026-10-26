@@ -15,6 +15,6 @@ Keep the same delegated child across phases. Relay its user questions and exact 
 
 ## Shared workflow
 
-Before execution or delegation, read [the shared contract](../../references/secretary-contract.md) and [the complete workflow](../../references/weekly-review-workflow.md). The shared workflow is authoritative for collection, dialogue, saved sections, and approval points in Claude Code, ChatGPT Work, and Codex. Pass its path to any delegated child and require the child to read it.
+Resolve the shared files before execution or delegation. Prefer `~/dotfiles/codex/plugins/academic-secretary/references/secretary-contract.md` and `~/dotfiles/codex/plugins/academic-secretary/references/weekly-review-workflow.md` when both exist; otherwise use [the bundled contract](../../references/secretary-contract.md) and [bundled workflow](../../references/weekly-review-workflow.md). Read both resolved files in full. Pass those exact paths to any child. The resolved workflow is authoritative for collection, dialogue, saved sections, and approval points in both clients; do not use an older cache path from memory.
 
 This entrypoint contains only the execution profile and session handoff. Do not duplicate or maintain a separate workflow here. Natural-language requests use the same workflow as explicit skill selection.
