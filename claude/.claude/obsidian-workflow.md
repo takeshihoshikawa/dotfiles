@@ -135,6 +135,17 @@ source of truth が二重化して必ず食い違うため、転記しないこ�
 
 テンプレート: `templates/meeting-note-template.md`・`templates/project-note-template.md`。
 
+### 会議で受け取った資料（2026-10-26）
+
+会議で受け取った資料・手書きメモ入りの紙は、プロジェクトの有無に関わらず vault の `_assets/` に置く
+（`YYYYMMDD_名前.pdf`。日付はスキャン日でもよい）。**meeting note の `## 配布資料` から
+リンク**し、資料の数値は写さない（資料が正本）。手書きメモが議事の元なら、書き起こしを重ねて置かない。
+プロジェクトが無い会議は `project:` を空にし、立ち上がった時点で追記する（`_assets/` は移動しない）。
+
+解析の入力になるデータ（林班ポリゴン・森林簿・所有者情報など）は対象外で、
+`data-management-policy.md` に従い NAS の `raw` に置く。資料の数値を解析に使うときは CSV に起こして
+`processed` へ置き、出所に PDF のパスを書く。
+
 ## 定型ワークフローとの分担
 
 daily-report / morning / weekly-review のような繰り返し処理は各スキル内に obsidian コマンドを直書きする。本ルールは ad-hoc な作業向け。
