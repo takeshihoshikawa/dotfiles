@@ -155,6 +155,27 @@ This script:
 - Registers daily-report reminder (weekdays 16:33, notify only when Mac is awake) via launchd (not stowed — installed directly to `~/.local/bin/` and `~/Library/LaunchAgents/`)
 - Installs R `renv` package
 
+### 鍵と認証情報（クリーンインストールの後）
+
+Mac の鍵も Ubuntu 機と同じく、**作り直して公開鍵を登録し直す**（2026-10-29 決定）。秘密鍵・`~/.aws/credentials` は dotfiles に入れない。
+例外は lidar_pi の鍵だけで、Apple の「パスワード」アプリにメモとして残す。Pi がパスワードでのログインを切っていると、鍵を無くしたら SD カードを抜くまで入れなくなるため。
+
+| 鍵・認証情報 | 使い道 | 登録し直す先 |
+|---|---|---|
+| `~/.ssh/id_ed25519_lidar_pi` | LiDAR の Raspberry Pi（`lidar-pi`） | 作り直さない。「パスワード」アプリから戻す |
+| `~/.ssh/id_ed25519_qnap` | メイン NAS（`qnap`） | QNAP の管理画面で `authorized_keys` に足す |
+| `~/.ssh/id_ed25519_windows` | Windows 機（`iwata`） | 職場で Windows にログインし、`authorized_keys` に足す |
+| `~/.ssh/harvest_mirror_deploy` | harvest-accessibility の deploy key | GitHub のリポ設定（Deploy keys）で差し替える |
+| `~/.aws/credentials` の `[default]` | AWS | IAM コンソールでアクセスキーを作り直し、古いキーを無効にする（`aws configure`） |
+| GitHub 本体 | HTTPS と `gh` | `gh auth login`（SSH 鍵は使っていない） |
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_qnap -C "$(hostname -s)-qnap"   # windows・harvest_mirror_deploy も名前を変えて同じ
+```
+
+- Pi にパスワードでログインできるかは未確認（2026-10-29）。
+- `ssh/.ssh/includes/github.conf` は実在しない `~/.ssh/id_ed25519` を指している。GitHub は HTTPS なので実害は無い。
+
 ---
 
 ## Academic Secretaryの共通手順
