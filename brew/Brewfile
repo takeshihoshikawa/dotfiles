@@ -23,6 +23,7 @@ brew "tree"
 brew "udunits"   # 何にも依存されないが、R の units・sf のビルドに要る
 cask "chatgpt"
 cask "claude"
+cask "cloudcompare"
 cask "codex"
 cask "deepl"
 cask "font-jetbrains-mono"
