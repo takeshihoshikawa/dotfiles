@@ -60,7 +60,7 @@ cd ~/vault && find . -type f -name "*.md" -not -path "./.obsidian/*" -not -path 
 
 ```bash
 pgrep -x Obsidian >/dev/null || { open -a Obsidian; sleep 2; }
-obsidian append file="tasks" content="- [ ] タスク [due:: YYYY-MM-DD] [priority:: low]"
+obsidian append file="tasks" content="- [ ] タスク [due:: YYYY-MM-DD]"
 ```
 
 ### 一覧（`obsidian tasks` 複数形）
@@ -129,7 +129,7 @@ source of truth が二重化して必ず食い違うため、転記しないこ�
 
 ```markdown
 ## Action Items
-- [ ] アクション内容 #project/project-name [due:: YYYY-MM-DD] [priority:: medium]
+- [ ] アクション内容 #project/project-name [due:: YYYY-MM-DD]
 - [ ] アクション内容 #project/project-name
 ```
 

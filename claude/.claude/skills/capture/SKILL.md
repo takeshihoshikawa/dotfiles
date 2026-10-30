@@ -53,5 +53,5 @@ obsidian append file="tasks" content="- [ ] タスク内容"
 期日・優先度あり（明示された場合）:
 ```bash
 pgrep -x Obsidian >/dev/null || { open -a Obsidian; sleep 2; }
-obsidian append file="tasks" content="- [ ] タスク内容 [due:: YYYY-MM-DD] [priority:: medium]"
+obsidian append file="tasks" content="- [ ] タスク内容 [due:: YYYY-MM-DD]"
 ```

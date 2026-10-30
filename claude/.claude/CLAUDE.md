@@ -97,8 +97,8 @@ yaml のスキーマ・audit の整合規則・`project_radar.py`（互換CLI �
 
 | 系統 | 場所 | 記法 |
 |------|------|------|
-| **プロジェクトtask** | `tasks.md`（計画起点）または `meetings/`（会議起点）。転記しない | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD] [priority:: medium]` |
-| **非プロジェクトtask** | `tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD] [priority:: medium]` |
+| **プロジェクトtask** | `tasks.md`（計画起点）または `meetings/`（会議起点）。転記しない | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD]` |
+| **非プロジェクトtask** | `tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD]` |
 
 **タスク本文の書き方**（2026-10-11）: 1文目で何をするかを言い切る。カッコで補足を挟まず、補足は後ろに文を足す
 （例: `事業用の GitHub organization を作る。副業申請の後に、名前は事業名で決める`）。
