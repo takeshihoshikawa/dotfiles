@@ -100,6 +100,9 @@ yaml のスキーマ・audit の整合規則・`project_radar.py`（互換CLI �
 | **プロジェクトtask** | `tasks.md`（計画起点）または `meetings/`（会議起点）。転記しない | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD]` |
 | **非プロジェクトtask** | `tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD]` |
 
+**優先度（`priority::`）は付けない**（2026-10-30）。high を「重要」の意味で使っていたが一貫せず、全部外した。
+使う場面が具体化したら、そのとき意味を決めて使い始める。
+
 **タスク本文の書き方**（2026-10-11）: 1文目で何をするかを言い切る。カッコで補足を挟まず、補足は後ろに文を足す
 （例: `事業用の GitHub organization を作る。副業申請の後に、名前は事業名で決める`）。
 1文目は30字前後を目安にする（dashboard で1行に見える長さ。2026-10-12）。
