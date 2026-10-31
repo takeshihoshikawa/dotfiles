@@ -31,7 +31,7 @@ python3 ~/dotfiles/claude/.claude/vocab_check.py --repo "$PWD"
 | `status` | 今の `project-status.yaml` |
 | `since_status_commit` | 前回締めた後のコミット一覧（このセッションでやったことの材料） |
 | `next_task` / `open_tasks` | 今の次タスクの本文と、そのプロジェクトの未完了タスク（ID・本文・期日・waiting） |
-| `ledgers` | `docs/contribution.md`・`docs/lessons.md` があるか（どちらも既存のリポだけが持つ。新しく作らない） |
+| `ledgers` | `CLAIM-MAP.md`・`docs/contribution.md`・`docs/decision-log.md`・`docs/lessons.md` があるか（contribution と lessons は既存のリポだけが持つ。新しく作らない） |
 | `signal_lines` | 前回締めた後に足された `.md` の行のうち、訂正シグナル語（訂正・解除・前提が変わ・覆っ・撤回）を含むもの |
 | `close_command` | 今の値を埋めた `close-session` の引数列（`--apply` なし）。**`--help` で引数を調べ直さない** |
 
