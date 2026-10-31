@@ -31,7 +31,7 @@ python3 ~/dotfiles/claude/.claude/vocab_check.py --repo "$PWD"
 | `status` | 今の `project-status.yaml` |
 | `since_status_commit` | 前回締めた後のコミット一覧（このセッションでやったことの材料） |
 | `next_task` / `open_tasks` | 今の次タスクの本文と、そのプロジェクトの未完了タスク（ID・本文・期日・waiting） |
-| `ledgers` | `docs/contribution.md`・`docs/lessons.md` があるか |
+| `ledgers` | `docs/contribution.md`・`docs/lessons.md` があるか（どちらも既存のリポだけが持つ。新しく作らない） |
 | `signal_lines` | 前回締めた後に足された `.md` の行のうち、訂正シグナル語（訂正・解除・前提が変わ・覆っ・撤回）を含むもの |
 | `close_command` | 今の値を埋めた `close-session` の引数列（`--apply` なし）。**`--help` で引数を調べ直さない** |
 
@@ -51,12 +51,14 @@ python3 ~/dotfiles/claude/.claude/vocab_check.py --repo "$PWD"
 
 このセッションで出た結果について、3つだけ問う。
 
-1. **どの主張の判定・根拠が変わったか**（`docs/contribution.md`型の台帳。無いリポは飛ばす）
+1. **どの主張の判定・根拠が変わったか**（`CLAIM-MAP.md` か `docs/contribution.md` の台帳。無いリポは飛ばす）
 2. **失効した前提に依存していた計画・タスクはあるか**。`signal_lines` の各行と `open_tasks` を並べ、
    影響しそうな組み合わせについて「このタスクの記述はまだ有効か」を**1つずつ問う**。記憶に頼って
    思い出さない（2026-09-02 portable-lidar-forest-slam: UBEC の要否判定が同日中に発注確定→保留へ
    覆ったのに、対応するタスク`tsk-da7d204712bc`の文言が旧判定のまま残った事例で発覚）
-3. **新しい教訓はあるか**（`docs/lessons.md`）
+3. **判断が変わったか、誤りが見つかったか**。経緯は `docs/decision-log.md` に、本人の判断を「本人」と
+   書いて残す。検査にできるものはテストにする。`docs/lessons.md` を持つリポ（pine-wilt・tea）は従来どおり
+   そこにも書いてよい。それ以外のリポでは lessons を新しく作らない（2026-10-31。記録管理ポリシー原則1）
 
 - **3つとも「無し」で正しいことが多い。** 無理に埋めない。`signal_lines` が空で、会話にも結果が
   無ければ「台帳: 変更なし」と1行で済ませる。
@@ -106,7 +108,7 @@ gpu-remote など計算専用の機体はこちらを使う。**状態は書か�
    （フェーズの進み・次の一手・懸念）を書いておく。**これが引き継ぎの器になる。**
 3. ユーザーへ「状態は未更新。Mac 側の次のセッションで締める」と明示して終える。
    締め忘れは Mac の `/morning` が `status_stale` で拾う（`chore:` のコミットは作業に数えない）。
-4. 台帳の点検（ステップ2）は**この機体でもやる**。`docs/` の論点ファイル・`docs/lessons.md` は
+4. 台帳の点検（ステップ2）は**この機体でもやる**。`docs/` の論点ファイル・`docs/decision-log.md` は
    リポ内にあり、admin も vault も要らない。結果が出た場に残すのが原則3の趣旨で、
    状態が書けないことと台帳を放置してよいことは別。
 
