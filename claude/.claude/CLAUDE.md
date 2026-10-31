@@ -91,7 +91,7 @@ yaml のスキーマ・audit の整合規則・`project_radar.py`（互換CLI �
 **プロジェクト状態まわりのスクリプトを変更する前に必ず読む。**
 
 記録の置き場と失効の管理（何をどこに書くか・結果が出たら台帳を更新する）は
-`~/dotfiles/claude/.claude/record-management-policy.md` が正本。**2026-09-25 まで移行期間。**
+`~/dotfiles/claude/.claude/record-management-policy.md` が正本。
 
 タスク管理は2系統：
 
