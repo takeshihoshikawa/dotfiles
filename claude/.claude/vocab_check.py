@@ -91,9 +91,9 @@ BASELINE_TAG = "vocab-baseline"
 EXTENSIONS = (".md", ".qmd", ".tex", ".py", ".yaml", ".yml")
 PROSE = (".md", ".qmd", ".tex")
 
-# 規約と移行ノートは dotfiles にあるので既定では当たらないが、リポへ写した場合に備える。
+# 規約は dotfiles にあるので既定では当たらないが、リポへ写した場合に備える。
 # 自分自身と表そのものを必ず外す——docstring と表に禁止語が並ぶため。
-EXEMPT_NAMES = ("vocabulary-conventions.md", "vocabulary-migration.md",
+EXEMPT_NAMES = ("vocabulary-conventions.md",
                 "vocabulary.toml", "vocab_check.py", "test_vocab_check.py")
 
 # **語の表の正本は 1 か所だけ**（2026-09-08）。以前はここに dict で写していたが、
