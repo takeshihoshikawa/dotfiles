@@ -2,7 +2,7 @@
 
 研究データの**保存・同期・ストレージ運用**のルールを定める正本。
 
-プロジェクトのディレクトリ構造・解析ワークフローは Obsidian vault の `notes/research-project-setup.md`・`notes/research-project-workflow.md` を参照。2026-07 の NAS-SSoT 移行の経緯・調査記録は vault の `notes/storage-migration-plan.md`（凍結済み）、残作業は `notes/storage-migration-backlog.md` を参照。
+プロジェクトのディレクトリ構造は `research-project-conventions.md`、解析の進め方は `research/phase-analysis.md` が正本。NAS-SSoT 移行の経緯と調査記録は vault の `notes/storage-migration-plan.md`、残作業は `notes/storage-migration-backlog.md` にある。
 
 ## 基本方針
 
@@ -32,7 +32,7 @@
 
 現在の運用では QNAP NAS（SMB マウント `/Volumes/Public`）を永続ストレージとする。
 
-AWS EC2等のクラウド環境を利用する場合は、必要なデータのみS3へ同期し、解析終了後に永続ストレージへ反映する。**S3 は EC2 利用時の受け渡し専用であり、正本として扱わない**（過去に「S3 is authoritative」という前提がコードに残り、古いデータを復元しかけた事例あり。詳細は vaultの `notes/storage-migration-plan.md` Phase 5）。
+AWS EC2等のクラウド環境を利用する場合は、必要なデータのみS3へ同期し、解析終了後に永続ストレージへ反映する。**S3 は EC2 利用時の受け渡し専用であり、正本として扱わない。** コードに「S3 が正本」という前提を書かない（古いデータを S3 から復元する経路になる）。
 
 #### 例外：公開用バケットは S3 が正本でよい
 
@@ -41,19 +41,17 @@ AWS EC2等のクラウド環境を利用する場合は、必要なデータの�
 | バケット | 位置づけ | 掃除してよいか |
 |---|---|---|
 | `takeshi-research-data` | EC2 利用時の受け渡し領域。使い捨て | よい（NAS と突合のうえ） |
-| `takeshi-research-public` | **公開用。ここが正本**（2026-07-28 判断） | **だめ** |
+| `takeshi-research-public` | **公開用。ここが正本** | **だめ** |
 
 > [!warning] 掃除するときに公開用バケットを巻き込まない
 > `takeshi-research-public/download_virtual_shizuoka/data.gpkg`（図郭グリッド 563MB）は
 > `lidar-fetch` の `virtual_shizuoka.py` が `VS_GRID_URL` として `/vsicurl/` で直接参照する現役の正本。
 > 匿名 HTTP 読みのため**バケットの公開設定も意図的**で、閉じると `lidar-fetch` が動かない。
-> 統合元リポ `download_virtual_shizuoka` が削除済みなことから 2026-07-28 に一度「孤児かもしれない」と
-> 誤判定しかけた。**ストレージを消す前に、参照している側のコードを grep すること**
-> （リポジトリの削除履歴は、そのリポが持っていたデータの不要を意味しない）。
+> **ストレージを消す前に、参照している側のコードを grep すること**
+> （統合元のリポ `download_virtual_shizuoka` が削除済みでも、そのリポが持っていたデータは不要にならない）。
 
-> [!warning] バックアップの現状リスク（既知・未解消）
+> [!warning] NAS は単一拠点
 > NAS は RAID 構成だが**単一拠点**であり、火災・盗難・広域災害に対しては単一障害点（3-2-1 ルール未達）。
-> オフサイトバックアップ（重要 raw の S3 Glacier Deep Archive 等）の導入は検討タスクとして `tasks.md` に登録済み。
 
 ---
 
@@ -88,12 +86,12 @@ raw のうち「正本が配布元側にある re-fetchable raw」（条件は�
 
 AWS利用時は、S3を永続ストレージとの受け渡し用として利用する。
 
-同期は各プロジェクトの `scripts/utilities/sync_with_nas.sh`・`sync_with_s3.sh` で行う（標準パターンは vaultの `notes/research-project-setup.md` の「データ同期スクリプト」を参照。`check` デフォルト・`push raw` 拒否等の安全設計を含む）。
+同期は各プロジェクトの `scripts/utilities/sync_with_nas.sh`・`sync_with_s3.sh` で行う（雛形は `research/template/skeleton/scripts/utilities/` の `.template`。`check` デフォルト・`push raw` 拒否等の安全設計を含む）。
 
 > [!warning] `sync_with_nas.sh` は CIFS/SMB マウント経由の rsync を使わない
-> CIFS 越しに書き込んだファイルは mtime が保持されず「書き込んだ瞬間の時刻」に上書きされる。これにより rsync のデフォルト差分判定（サイズ+mtime）が既存ファイルまで「変更あり」と誤検知し続ける（2026-07-11、tree-species-classification で発覚：CIFS 経由 push 直後のファイルの NAS 側 mtime が push 実行時刻と一致していた）。
+> CIFS 越しに書き込んだファイルは mtime が保持されず「書き込んだ瞬間の時刻」に上書きされる。これにより rsync のデフォルト差分判定（サイズ+mtime）が既存ファイルまで「変更あり」と誤検知し続ける。
 >
-> **★マウント側で確認すると「保たれている」ように見える。転送方法を問わない**（2026-09-10、gpu-remote の `/mnt/public` で実測）。同じファイル（mtime `2025-08-26 14:16`）を3通りで書いて、CIFS クライアントと NAS サーバの両方から見た:
+> **★マウント側で確認すると「保たれている」ように見える。転送方法を問わない。** 同じファイルを3通りで書いて、CIFS クライアントと NAS サーバの両方から見たときの mtime:
 >
 > | 方法 | クライアント（直後） | クライアント（数十秒後） | **サーバの実体** |
 > |---|---|---|---|
@@ -107,11 +105,11 @@ AWS利用時は、S3を永続ストレージとの受け渡し用として利用
 >
 > 対策：`sync_with_nas.sh` の実転送は **SSH 経由の rsync（`rsync -e ssh`）** で行う。NAS 上に SSH ログイン可能なユーザー（QNAP なら SSH サービスを有効化し、鍵認証で `ssh-agent` に登録）を用意し、`~/.ssh/config` にホストエイリアス（例: `qnap`）を切る。CIFS/SMB マウントは QGIS・Finder 等の閲覧用途に残してよいが、**転送先には使わない**（rsync に限らない）。
 >
-> **マウントがあることは SSH が要らない理由にならない。** gpu-remote は `/mnt/public` を `rw` で持っているが、退避は Mac 経由の SSH で行った（2026-09-10）。mtime が失われると「いつ計測・生成したデータか」が正本の側から消える。
+> **マウントがあることは SSH が要らない理由にならない。** gpu-remote は `/mnt/public` を `rw` で持っているが、退避は Mac 経由の SSH で行う。mtime が失われると「いつ計測・生成したデータか」が正本の側から消える。
 >
 > SSH 経由でも「hash・ファイル名を変えずに中身だけ再生成した」場合（コード修正で `REVIEW_CODE_CHANGED` 相当の再解析をしたときなど）はサイズが偶然一致すると `--size-only` でも検知できない。該当パスに絞って `--checksum` を使うか、明示的に強制上書きする。
 >
-> 実装は tree-species-classification の `scripts/utilities/sync_with_nas.sh`（`qnap` エイリアス例つき）を参照。新規プロジェクトの雛形（`research/template/skeleton/scripts/utilities/sync_with_nas.sh.template`）も同じ SSH 方式にした（2026-10-10。それまでは CIFS マウント宛てで、`init.sh adopt` で作ったリポはマウント経由で同期していた）。他プロジェクトでも CIFS 経由の同期を使っている場合は同じ問題が起きうるため、順次 SSH 方式へ移行を検討する。vaultの `notes/research-project-setup.md`「データ同期スクリプト」標準パターン側への反映は未実施（Mac からの次回作業で対応予定）。
+> 雛形（`research/template/skeleton/scripts/utilities/sync_with_nas.sh.template`）は SSH 方式で書いてある。CIFS マウント宛てに同期しているプロジェクトは SSH 方式へ移す。
 
 ---
 
@@ -134,8 +132,7 @@ Public/
 
 - `projects/{name}/` 直下は **`data/` 層を挟まないフラット形**を標準とする（`processed/`・`results/`・`outputs/`）。
 - **例外**: プロジェクト固有の raw（トップレベル `raw/` に置けない事情があるもの。例: compare-lidar の ishikiri 正規化済み点群＝S3 由来の正本で、`original_z` 属性を持つ派生形）は `projects/{name}/raw/` に置いてよい。例外である理由を当該プロジェクトの README 等に記録する。
-- プロジェクト名は作業ディレクトリ・GitHub repo と同じ **kebab-case**（vaultの `notes/research-project-setup.md` の命名規約）。
-- 旧構成（`data/raw/`・`data/project/`・`results/`・`tools/`）からの仕分けは vaultの `notes/storage-migration-backlog.md` で管理する。
+- プロジェクト名は作業ディレクトリ・GitHub repo と同じ **kebab-case**（`research-project-conventions.md` の命名規約）。
 
 ### archive/ の定義
 
@@ -144,7 +141,7 @@ Public/
 - **完了プロジェクト**: 報告書・論文提出済みで再開予定がないもの（例: `archive/search-stem/`）
 - **記録メディア**: 現地調査写真・動画等（`archive/photos/`、`archive/videos/`）
 
-`projects/` → `archive/` への移行基準: プロジェクトが「完全完了」（vaultの `notes/research-project-setup.md` の完了プロジェクト基準と同じ）になった時点で、Obsidian プロジェクトノートのアーカイブと合わせて NAS 側も移動する。移動は非破壊（NAS 内 `mv`）で行い、移動先を Obsidian プロジェクトノートに記録する。
+`projects/` → `archive/` への移行基準: プロジェクトが「完全完了」（`research-project-conventions.md`「完了プロジェクトの扱い」と同じ基準）になった時点で、Obsidian プロジェクトノートのアーカイブと合わせて NAS 側も移動する。移動は非破壊（NAS 内 `mv`）で行い、移動先を Obsidian プロジェクトノートに記録する。
 
 ### プロジェクト（ローカル作業領域）
 
@@ -157,7 +154,7 @@ Public/
     outputs/
 ```
 
-プロジェクト全体の構造（`scripts/`・`config/`・`results/` 等を含む）はvaultの `notes/research-project-setup.md` が正本。
+プロジェクト全体の構造（`scripts/`・`config/`・`results/` 等を含む）は `research-project-conventions.md` が正本。
 
 `raw` は永続ストレージからプロジェクト単位でコピーして使用する。
 
@@ -184,7 +181,7 @@ Public/
 
 > [!note] 間引き・正規化等の処理を経たデータは raw ではない
 > 間引き（thinning）バリエーション・高さ正規化済み点群などの派生データは `processed` に属する。
-> NAS の `raw/` に混入させない（2026-07 移行時に akiha の間引き 360 ファイルを `projects/` 側へ再分類した経緯あり）。
+> NAS の `raw/` に混入させない。
 
 #### 正本が配布元側にある raw（re-fetchable raw）
 
@@ -198,8 +195,7 @@ JAXA・NIED・GSJ・AMGSD 等、公的機関・組織が恒久的に配布して
 > - 配布元が恒久的な公的・組織的アーカイブである（自分だけが持つ現地調査データ等は対象外、通常の raw 扱い）
 >
 > いずれかを満たさない場合（例: ダウンロード URL 未記録、手順も スクリプトもない）は、通常の raw と同様に NAS へバックアップする。
->
-> 経緯: satellite-thermal プロジェクトで `data/external/` を「再取得可能だからバックアップ不要」として運用していたところ、点検で NIED 地すべりデータの取得元 URL・再取得手順が未記録なことが判明した（JAXA LULC は URL・バージョンとも記録済みで免除条件を満たしていた）。この非対称に気づいたことが本項追加のきっかけ。
+
 
 ---
 
@@ -279,7 +275,7 @@ yyyymmdd_region_name
 
 ### raw データセットの README（必須）
 
-`raw/yyyymmdd_region_name/` 直下に `README.md` を置き、最低限以下を記録する（新規データセットは取得時に作成。既存 67 件への遡及整備は vaultの `notes/storage-migration-backlog.md` の仕分け作業と合わせて実施）。
+`raw/yyyymmdd_region_name/` 直下に `README.md` を置き、最低限以下を記録する（取得時に作成する）。
 
 - 取得日・場所（地名、可能なら緯度経度または図郭）
 - 計測機材・センサー（例: VUX-1LR、機体、飛行高度）
@@ -288,13 +284,13 @@ yyyymmdd_region_name
 - 取得者・委託元・利用条件（あれば）
 - 関連プロジェクト（`projects/{name}` へのポインタ）
 
-背景: 2026-07 移行時、Z 値が絶対標高か正規化済みかがヘッダー検証をするまで判別できなかった（vaultの `notes/storage-migration-plan.md` 4.2(b-2)）。README があれば防げた。
+Z 値が絶対標高か正規化済みかは、README が無いとヘッダーを検証するまで判別できない。
 
 ---
 
 ## 削除・保持ルール
 
-移行・整理でデータを削除する場合は以下に従う（2026-07 移行で確立した運用の一般化）。
+移行・整理でデータを削除する場合は以下に従う。
 
 1. **非破壊が原則**: コピー・移動は「元を残したまま」行い、上書きしない。
 2. **検証してから完了とみなす**: コピー後にファイル数・合計サイズ（必要ならサンプルチェックサム）で一致を確認する。
@@ -334,17 +330,17 @@ NAS
 
 S3は永続ストレージではなく、クラウド解析時の受け渡し領域として利用する（`takeshi-research-data`）。公開用バケット（`takeshi-research-public`）はこの流れの外にあり、S3 が正本。上記「例外：公開用バケットは S3 が正本でよい」を参照。
 
-作業が終わったら受け渡し用バケットは空にする。放置すると容量課金が積み上がるうえ、中断した巨大ファイルのアップロード断片（未完了マルチパートアップロード）は `aws s3 ls` に出ないまま課金され続ける（2026-07-28 に 142 GiB・15件を検出・中止）。受け渡し用バケットにはライフサイクルルール `AbortIncompleteMultipartUpload`（7日）を設定しておく。
+作業が終わったら受け渡し用バケットは空にする。放置すると容量課金が積み上がるうえ、中断した巨大ファイルのアップロード断片（未完了マルチパートアップロード）は `aws s3 ls` に出ないまま課金され続ける。受け渡し用バケットにはライフサイクルルール `AbortIncompleteMultipartUpload`（7日）を設定しておく。
 
 ### 実装パターン（sync スクリプト）
 
-各プロジェクトの `scripts/utilities/` に `sync_with_nas.sh`（NAS直接同期）・`sync_with_s3.sh`（S3経由・EC2向け）を揃える標準パターンをvaultの `notes/research-project-setup.md` に記載（2026-07-07確定、tree-species-classification・forest-instance-annotationで実装済み）。
+各プロジェクトの `scripts/utilities/` に `sync_with_nas.sh`（NAS直接同期）・`sync_with_s3.sh`（S3経由・EC2向け）を揃える。雛形は `research/template/skeleton/scripts/utilities/`。
 
 ---
 
 ## 関連
 
-- vaultの `notes/research-project-setup.md` — プロジェクト構造・セットアップ・sync スクリプト標準
-- vaultの `notes/research-project-workflow.md` — 解析・論文執筆フェーズの運用
-- vaultの `notes/storage-migration-plan.md` — 2026-07 NAS-SSoT 移行の記録（凍結）
+- `research-project-conventions.md` — プロジェクト構造・命名・完了時の扱い
+- `research/phase-analysis.md` — 解析フェーズの運用
+- vaultの `notes/storage-migration-plan.md` — NAS-SSoT 移行の記録（凍結）
 - vaultの `notes/storage-migration-backlog.md` — 移行の残作業バックログ
