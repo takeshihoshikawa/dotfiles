@@ -40,7 +40,7 @@ project/
 └── src/              # 再利用可能な関数（R / Python）
 ```
 
-旧分類 `explore/`→`experiments/`、`paper/`→`publication/`（2026-07-07 統一）。既存プロジェクトのディレクトリは遡及リネームしない。
+旧分類（`explore/`・`paper/`）を持つ既存プロジェクトのディレクトリは遡及リネームしない。
 
 ## スクリプト命名
 
@@ -63,7 +63,7 @@ project/
 
 ## 環境管理
 
-**これが正本**（2026-09-15 ユーザー決定。`research/phase-analysis.md` とグローバル CLAUDE.md はここを指すだけ）。
+**これが正本**（`research/phase-analysis.md` とグローバル CLAUDE.md はここを指すだけ）。
 
 **R は `renv`、Python は `uv`。システムの R ライブラリや Python へパッケージを直接入れるのは禁止。**
 

@@ -3,7 +3,7 @@
 引用文献の正本は papis ライブラリ。**ライブラリはリポジトリの外**に置き、
 リポジトリに入るのは papis から生成した `refs.bib` だけ。
 
-基準実装は `~/work/projects/nfi-understory-disturbance`（2026-07-28 に移設・`src/nfi/refs.py`・
+基準実装は `~/work/projects/nfi-understory-disturbance`（`src/nfi/refs.py`・
 `scripts/utilities/export_refs_from_papis.py`）。新規プロジェクトはこれを踏襲する。
 **参照実装であって依存先ではない**（このリポジトリが無くても本規約は成立する。実装を写すときの見本）。
 
@@ -25,9 +25,6 @@
 出版社版 PDF を含むため、**リポジトリに入れるとコード公開時に著作物の再配布になる**。
 `.gitignore` で PDF を除外するだけでは足りない。ライブラリがワークツリー内にある限り、
 公開のたびに除外判断が要り、`git archive` や zip 配布で混入する経路が残る。**置き場所で解決する。**
-
-（`nfi-understory-disturbance` は当初 `refs/papis-lib/` に置いており、公開準備の段階で
-出版社版 PDF/HTML 9 ファイルの混入が判明して移設した。`nfi/docs/public-release-plan.md` に実物リスト）
 
 ## 2. リポジトリに置くのは `refs.bib` だけ
 

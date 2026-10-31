@@ -2,8 +2,6 @@
 
 「同じロジックを別プロジェクトでまた書きそうになった」時に参照する判断フィルタ。単一プロジェクトの構造はObsidian vaultの`notes/research-project-setup.md`が正本、本ノートは複数プロジェクト間の再利用を扱う。
 
-実例: pine-wilt-shizuoka プロジェクトでの `lidar-toolkit`/`lidar-toolkit-r` 切り出し（2026-07-09）。
-
 ## いつこれを思い出すか
 
 - 新しいプロジェクトを書いていて「これ、前にも書いた気がする」と思ったら

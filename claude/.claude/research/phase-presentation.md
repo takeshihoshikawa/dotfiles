@@ -1,7 +1,7 @@
 # フェーズ: 研究発表のスライド
 
-学会・研究会の口頭発表のスライド・図・原稿を作るときの標準（2026-10-05 制定）。
-見本は pine-wilt-shizuoka の中部森林学会（2026-10-24）の発表
+学会・研究会の口頭発表のスライド・図・原稿を作るときの標準。
+見本は pine-wilt-shizuoka の中部森林学会の発表
 （`~/work/projects/pine-wilt-shizuoka/outputs/presentations/2026-10-24_chubu-forestry/`）。
 論文原稿・投稿用図表は `phase-publication.md`、XeLaTeX を通る組版（日本語フォントの太さ・検証）は
 `~/dotfiles/claude/.claude/quarto-manuscript-rendering-patterns.md` が正本。**ここに写さない。**

@@ -20,8 +20,7 @@ proposals/{YYYY}-{種別}/submitted/{YYYYMMDD}_{種別}_{略称}.docx   ← git 
 **markdown が真のソース。** Word は最終出力としてのみ生成する。共同研究者と Word で授受する
 場合も、md → docx 変換を都度回す（Word 側で直接編集した内容を md へ戻す運用にしない）。
 
-**提出物もリポジトリで完結させる**（2026-07-29 変更。以前は `~/Documents/grant/` へ iCloud
-アーカイブしていた）。`output/` はビルドのたびに変わるので、提出した事実を残すには別ディレクトリが要る。
+**提出物もリポジトリで完結させる。** `output/` はビルドのたびに変わるので、提出した事実を残すには別ディレクトリが要る。
 git に残るのは `drafts/` の md、`figures/`・`refs/`・`budget/`、そして `submitted/`。
 
 ## AI の使い分け

@@ -14,7 +14,7 @@ Claude 専用のコマンドやスキルは、Codex では利用可能な対応�
 
 英語の技術概念に、日本語として存在しない訳語を当てない。**書く文すべてに掛かる。**
 
-1. **英単語に漢字1〜2字を当てはめかけたら止まる**（gate→門、floor→床、onset→発火 はこの形で生まれた）
+1. **英単語に漢字1〜2字を当てはめかけたら止まる**（例: gate→門、floor→床、onset→発火）
 2. 一般的な訳語・カタカナ表記があるか確認する
 3. あっても読み手がその語だけで意味を取れないなら、具体語に開く（訳語の実在は合格条件ではない）
 4. 無ければ英語のまま。初出だけ `gate（ゲート）` と併記し、以降はカタカナ
@@ -34,7 +34,7 @@ Claude 専用のコマンドやスキルは、Codex では利用可能な対応�
 **表の正本は `~/dotfiles/claude/.claude/vocabulary.toml`**（上の一覧はそこからの生成物）。
 判断則・検出規則・残す語・語彙の追加手順は `~/dotfiles/claude/.claude/vocabulary-conventions.md`。
 検査は `~/dotfiles/claude/.claude/vocab_check.py`（同じ TOML を読む）。
-**1 リポずつ・`close-project-session` が呼ぶ。** 全リポ走査は 2026-09-08 に外した。
+**1 リポずつ・`close-project-session` が呼ぶ。**
 
 ## Obsidian Vault
 
@@ -80,7 +80,7 @@ Folder structure:
 - `local_path` を持たないプロジェクトノート（会議駆動・未クローン）は従来どおり frontmatter が状態の正本。
   `next_task_id` を必ず持たせる
 
-**移行中**（2026-08-10〜）: `project-status.yaml` があるリポが新方式、無いリポは旧方式の手書き `## 現在地`
+**移行中**: `project-status.yaml` があるリポが新方式、無いリポは旧方式の手書き `## 現在地`
 （`**現フェーズ**:` `**次の一手**:` `**懸念**:` `**更新**:`）のまま。読み手は当面この日本語ラベルも受理する。
 旧方式のリポを移すのは `academic_ops.py project migrate --repo ... --phase ... --apply` を1回
 （現在地に状態4項目以外が書いてあると失敗するので、先に作業ログ等へ退避する）。未移行は
@@ -100,12 +100,12 @@ yaml のスキーマ・audit の整合規則・`project_radar.py`（互換CLI �
 | **プロジェクトtask** | `tasks.md`（計画起点）または `meetings/`（会議起点）。転記しない | `- [ ] 内容 #project/{kebab-case} [due:: YYYY-MM-DD]` |
 | **非プロジェクトtask** | `tasks.md`（inbox/admin/teaching） | `- [ ] 内容 [due:: YYYY-MM-DD]` |
 
-**優先度（`priority::`）は付けない**（2026-10-30）。high を「重要」の意味で使っていたが一貫せず、全部外した。
+**優先度（`priority::`）は付けない。**
 使う場面が具体化したら、そのとき意味を決めて使い始める。
 
-**タスク本文の書き方**（2026-10-11）: 1文目で何をするかを言い切る。カッコで補足を挟まず、補足は後ろに文を足す
+**タスク本文の書き方**: 1文目で何をするかを言い切る。カッコで補足を挟まず、補足は後ろに文を足す
 （例: `事業用の GitHub organization を作る。副業申請の後に、名前は事業名で決める`）。
-1文目は30字前後を目安にする（dashboard で1行に見える長さ。2026-10-12）。
+1文目は30字前後を目安にする（dashboard で1行に見える長さ）。
 本文は200字まで。超えたら経緯をリポの文書へ移し、行には次の1手とパスを残す
 （`academic_ops.py task create` は拒否し、audit は `task_too_long` で知らせる）。
 本文に `#番号` を書かない（`#7b` はタグになり、dashboard の組と本文の切り出しが崩れる）。番号は `#` を付けずに書く。
@@ -160,8 +160,8 @@ Course owner name: 星川（coursesディレクトリのフロントマター `o
 
 ## 重い計算は gpu-remote（Ubuntu 機）で回す——実行専用
 
-gpu-remote は**実行機という役割名**で、個体は **robusta**（RTX 2080 Ti。改名前の Tailscale 名は `my-ubuntu`）と **arabica**（2台目）。ssh では `gpu-remote` が robusta の別名で、arabica は `ssh arabica` / `gpu_run.py --host arabica`。2026-10-22 に命名した（Mac は飲み物系、GPU 機は豆系）。
-機械は**実行するだけで作業しない**（2026-09-10）。上の Git ルールは gpu-remote（robusta・arabica とも）には当てはめない。
+gpu-remote は**実行機という役割名**で、個体は **robusta**（RTX 2080 Ti。改名前の Tailscale 名は `my-ubuntu`）と **arabica**（2台目）。ssh では `gpu-remote` が robusta の別名で、arabica は `ssh arabica` / `gpu_run.py --host arabica`。機体名は Mac が飲み物系、GPU 機が豆系。
+機械は**実行するだけで作業しない**。上の Git ルールは gpu-remote（robusta・arabica とも）には当てはめない。
 
 - Claude は Mac だけで起動する。編集・コミット・push は Mac で行い、gpu-remote は追跡ファイルを書かない
 - コードは `/work/projects/{repo}` の clone に、origin へ push 済みの sha を `git checkout --detach` して運ぶ（ブランチで pull しない）
@@ -175,7 +175,7 @@ gpu-remote は**実行機という役割名**で、個体は **robusta**（RTX 2
 
 データ分析プロジェクト（R/Python）のコーディング規約は `data-analysis-coding-conventions` スキルを参照（scripts/ や src/ を書くときに自動で読み込まれる）。
 
-**R は `renv`、Python は `uv`。システムへパッケージを直接入れない**（2026-09-15。入れる判断は解析の途中で急に来るのでここに置く）。
+**R は `renv`、Python は `uv`。システムへパッケージを直接入れない**（入れる判断は解析の途中で急に来るのでここに置く）。
 リポジトリに無ければ入れる前に止めて確認する。正本は同スキルの「環境管理」。
 
 ## データ管理ポリシー
@@ -217,7 +217,7 @@ sync スクリプトの標準パターン、削除・保持ルールの詳細、
 
 作業領域（ソース・git）は `~/work/projects/{kebab-case名}/`（**非 iCloud**。iCloud と git/.claude/ は
 相性が悪い）。**提出物もリポジトリで完結させる**（`proposals/{YYYY}-{種別}/submitted/` に git 追跡。
-2026-07-29 変更。以前の `~/Documents/grant/` は残すが、新規の提出物はそちらへ置かない）。
+`~/Documents/grant/` へは新規の提出物を置かない）。
 
 場所の使い分け・標準ディレクトリ構造・命名規約・EC2 の使い方・.gitignore 雛形・完了時の扱いは
 `~/dotfiles/claude/.claude/research-project-conventions.md` が正本。
@@ -245,7 +245,7 @@ Vault: `~/vault`（実体は iCloud 上の vault へのシンボリックリン�
 | 移動・リネーム・削除・テンプレ作成・daily・properties・tag 操作 | **必ず `obsidian` CLI 経由**（wikilink 保護） |
 
 **vault 内で `mv` / `rm` / `rmdir` を直接使わない**（wikilink が壊れる）。
-以前は PreToolUse hook がブロックしていたが 2026-08-06 に廃止したため、**自動では止まらない**。
+hook では止めていないので、**自動では止まらない**。
 `obsidian` は起動中の Obsidian アプリのリモコン。未起動時のみ起動する
 （`pgrep -x Obsidian >/dev/null || { open -a Obsidian; sleep 2; }`）。
 

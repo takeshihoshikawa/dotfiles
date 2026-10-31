@@ -24,8 +24,7 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避す�
 | 3 | データ実体（巨大ファイル） | NAS・外部 HDD・S3 等 | `data-management-policy.md` に従う |
 | 4 | 文献ライブラリ（papis） | `~/Documents/papis/{kb\|project}/` | iCloud（`papis-conventions.md`） |
 
-**提出物もリポジトリで完結させる**（2026-07-29 変更。以前は `~/Documents/grant/` へ iCloud
-アーカイブしていた）。提出版は `proposals/{YYYY}-{種別}/submitted/` に置いて git 追跡する:
+**提出物もリポジトリで完結させる。** 提出版は `proposals/{YYYY}-{種別}/submitted/` に置いて git 追跡する:
 
 | | 内容 | git |
 |---|---|---|
@@ -103,11 +102,8 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避す�
 `research/phase-analysis.md` を参照。小規模プロジェクトでは不要なディレクトリを作らなくてよい
 （必要になった時点で追加する）。
 
-**旧構成からの変更（2026-07-07）**: ルート直下の `reports/`・`papers/` は `outputs/reports/`・
-`outputs/papers/` に統合。`scripts/` の分類は旧 `pipeline/explore/paper` から
-`pipeline/experiments/publication/utilities` に統一した。**既存プロジェクト
-（kawane-als-dbh・portable-lidar-forest-slam 等）は遡及リネームしない。** 新規プロジェクトと
-大規模改修時のみ新分類を適用する。
+**旧構成のプロジェクトは遡及リネームしない。** ルート直下の `reports/`・`papers/` や `scripts/` の旧分類
+（`pipeline/explore/paper`）を持つプロジェクトは、大規模改修のときだけ上の構成へ移す。
 
 ## 命名規約
 
@@ -121,8 +117,7 @@ Claude Code 最適化を前提とし、iCloud と git の不整合を回避す�
 ## .gitignore 雛形
 
 **正本は `research/template/skeleton/.gitignore`**（`init.sh adopt` が配置するもの）。
-ここに写しを置かない。規約とテンプレに同じ内容を 2 か所持つと必ず片方が腐る
-（実際、papis 規則・`data/interim/`・`results/` が規約側にだけ無い状態が発生していた）。
+ここに写しを置かない。規約とテンプレに同じ内容を 2 か所持つと必ず片方が腐る。
 
 既存プロジェクトを標準構成へ引き上げるときも、skeleton の内容を正として差分を当てる。
 

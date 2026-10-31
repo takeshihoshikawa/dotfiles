@@ -82,8 +82,7 @@ GUI による手作業を最小化し、再生成可能な状態を維持する�
 上の表は「自分で置き場を選ぶとき」の規則だが、書き先を決めるのが自分とは限らない。
 既定のまま走らせると、そのライブラリが選んだ場所——多くはリポジトリのルート——に落ちる。
 
-- 実例: pine-wilt-shizuoka の `lightning_logs/`（PyTorch Lightning の既定）がルート直下に
-  でき、`.gitignore` に無いまま**追跡下に入っていた**（2026-09-10 に発見）。
+- PyTorch Lightning は既定で `lightning_logs/` をルート直下に作る。
 - **Hydra は特に危ない**——既定の出力先が `./outputs/` で、**標準構成の追跡下 `outputs/` と
   衝突する**。落ちた場所が「正しそうに見える」ので、置き場を間違えたことに気づけない。
   `hydra.run.dir` を `results/` 配下へ向ける。
@@ -102,12 +101,10 @@ GUI による手作業を最小化し、再生成可能な状態を維持する�
 
 - 未追跡の設定ファイルは checkout を止めないので事故に見えないが、それで出した結果は
   **どのコードから出たかを origin から答えられない**——detached checkout を選んだ理由そのものが崩れる。
-- 実例: forest-instance-annotation で FF3D の推論設定3本（`custom_configs/*_la03.py`）が
-  gpu-remote 上で直接作られ、Mac にも origin にも無いまま使われた（2026-09-24。25日に発見）。
 - 試しに1本だけ回したい設定も、Mac で `scripts/experiments/` か `config/` に置いてコミットしてから運ぶ。
 
 決めた経緯と detached checkout の実測は `~/work/projects/admin/docs/execution-routing.md`
-（2026-09-10「決めたこと」）が正本。
+「決めたこと」が正本。
 
 ## 環境管理
 
