@@ -38,7 +38,7 @@ Read [the shared contract](secretary-contract.md) before acting. This file is th
 
 ### リポジトリ同期
 
-`~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --format json`を実行する。
+`~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --format summary`を実行する（同期済みは件数だけで、ずれのあるリポだけ載る。詳細が要るときだけ`--format json`）。
 cleanかつbehindのみのリポジトリだけが自動でpull --rebaseされる。
 
 - pullしたリポジトリだけ簡潔に報告する。
@@ -86,7 +86,7 @@ Obsidianが未起動の場合だけ起動し、`~/work/projects/admin/scripts/pr
 
 ### 予定
 
-Google Calendarから対象日と翌日の予定を別々に取得する。必ず明示的な日付境界と`Asia/Tokyo`を指定し、開始時刻順に整理する。
+Google Calendarから対象日と翌日の予定を別々に取得する。必ず明示的な日付境界（`timeMin`／`timeMax`。範囲を省くと数日先まで全件返って重い）と`Asia/Tokyo`を指定し、開始時刻順に整理する。
 
 ### タスクとGitHub Issues
 
