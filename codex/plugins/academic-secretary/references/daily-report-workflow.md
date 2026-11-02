@@ -76,7 +76,7 @@ Read [the shared contract](secretary-contract.md) before acting. This file is th
 - 現在の会話と、委任時に渡されたセッション引継ぎにある本人の明示時刻、体調、判断、指示、成果。朝の計画が会話で修正されていれば最新の明示的な確定内容を使い、保存済み計画との差を保持する。
 - 対象日のセッション履歴の要約（Claude・ChatGPT Work・Codex）。下の`session_digest.py`で取得する。この要約以外の他チャットや別エージェントの履歴が自動的に見えるとは仮定しない。
 
-`~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --date {対象日} --format json`を実行する。cleanかつbehindのみのリポジトリは自動でpull --rebaseされ、対象日のコミットも同時に取得できる。取得失敗は報告して続行する。
+`~/work/projects/admin/scripts/repo_snapshot.py --fetch --pull-safe --date {対象日} --format summary`を実行する（ずれのあるリポと対象日のコミットだけが短く出る。詳細が要るときだけ`--format json`）。cleanかつbehindのみのリポジトリは自動でpull --rebaseされ、対象日のコミットも同時に取得できる。取得失敗は報告して続行する。
 
 `~/work/projects/admin/scripts/session_digest.py --date {対象日} --format json`を実行する（読み取り専用）。対象日の00:00〜翌日00:00未満の発言を、起動元にかかわらず時刻順に返す。`turns`は発言時刻と先頭160字で、40件を超える場合は先頭20件・末尾20件を残し、`turns_omitted`へ省略数が出る。省略がある場合は`file`の該当部分を読む。`scan_started_at`は収集開始時点。
 
