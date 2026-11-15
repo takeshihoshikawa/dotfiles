@@ -17,9 +17,9 @@
 ## Shared planning and reporting workflows
 
 - `morning-workflow.md`, `daily-report-workflow.md`, and `weekly-review-workflow.md` in this directory are the sole maintained workflow bodies. Both clients read them; the skill entrypoints retain only discovery metadata and client execution details.
-- Morning plans are saved under `## 朝の計画` in the target daily note after approval. The current session can carry later explicit revisions and work reports; do not require the user to retype them at recap time.
+- Morning plans are saved under `## 朝の計画` in the target daily note without asking for approval (it runs as a scheduled task; the user reviews the saved note and requests changes in a separate chat). Task mutations are not made during the run; candidates go in the note. The current session can carry later explicit revisions and work reports; do not require the user to retype them at recap time.
 - A preview-only or no-save run of these three workflows is read-only: use `repo_snapshot.py` without `--fetch` or `--pull-safe` (with `--date` if needed), and skip `project_radar.py`, task mutations, note creation, and other projection writes. `academic_ops.py audit` and ordinary reads remain available. Do not run workflow collection commands merely because someone is editing or reviewing this skill.
-- Obtain approval for the concrete draft or task changes required by the workflow; existing explicit authorization remains valid. Phase 6 of weekly review records only the user's answer to the stated life-axis question and does not add a second save confirmation. A no-save instruction still prohibits that write.
+- Except for the morning plan (saved without approval, see above), obtain approval for the concrete draft or task changes required by the workflow; existing explicit authorization remains valid. Phase 6 of weekly review records only the user's answer to the stated life-axis question and does not add a second save confirmation. A no-save instruction still prohibits that write.
 - Use the canonical script operations for tasks even when an older Obsidian CLI example suggests a direct checkbox edit. Respect user scope and active global task/status rules over older examples.
 
 ## Recording period and evening closure (2026-10-26)
