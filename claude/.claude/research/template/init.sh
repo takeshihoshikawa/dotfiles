@@ -57,6 +57,22 @@ copy_template_file() {
   log "added: $dst"
 }
 
+# place_vocab_config TARGET BASELINE NOTE
+# 語彙検査の参加宣言 .claude/vocab.toml を置く（vocabulary-conventions.md）。
+# 置いたら 0、既にあれば 1 を返す
+place_vocab_config() {
+  local target=$1 baseline=$2 note=$3
+  local dst="$target/.claude/vocab.toml"
+  [[ -e $dst ]] && { log "skip (exists): $dst"; return 1; }
+  copy_template_file "$SCRIPT_DIR/skeleton/.claude/vocab.toml.template" "$dst" \
+    BASELINE "$baseline" BASELINE_NOTE "$note"
+}
+
+# .claude/vocab.toml が .gitignore で除外されているか
+vocab_config_ignored() {
+  git -C "$1" check-ignore -q .claude/vocab.toml
+}
+
 # ---------- adopt ----------
 
 cmd_adopt() {
@@ -135,8 +151,36 @@ cmd_adopt() {
       git commit -q -m "Initial scaffold from research-project template"
     )
     log "git: initialized + initial commit"
+    # 語彙検査の参加宣言。baseline は初期コミット＝scaffold と先行メモは対象外。
+    # 自分の sha を指せないので、初期コミットとは別のコミットにする
+    local root_sha
+    root_sha=$(git -C "$target" rev-parse HEAD)
+    if place_vocab_config "$target" "$root_sha" \
+         "init.sh adopt の初期コミット（$(date +%Y-%m-%d)）。scaffold と先行メモは対象外"; then
+      if vocab_config_ignored "$target"; then
+        log "warning: .claude/vocab.toml が .gitignore で除外されている。コミットしていない"
+      else
+        git -C "$target" add .claude/vocab.toml
+        git -C "$target" commit -q -m "chore: 語彙検査に参加する（baseline は初期コミット）"
+        log "git: committed .claude/vocab.toml"
+      fi
+    fi
   else
     log "git: already initialized (preserved)"
+    # 既存リポはコミットしない。baseline は adopt 時点の HEAD（それ以前の文書は対象外）
+    local head_sha
+    if head_sha=$(git -C "$target" rev-parse --verify --quiet HEAD); then
+      if place_vocab_config "$target" "$head_sha" \
+           "init.sh adopt を既存リポに掛けた時点の HEAD（$(date +%Y-%m-%d)）。それ以前の文書は対象外"; then
+        log "未コミット: .claude/vocab.toml を確かめてからコミットする"
+      fi
+    else
+      log "skip: コミットが無いので .claude/vocab.toml を置かない（baseline にする ref が無い）"
+    fi
+    if [[ -e "$target/.claude/vocab.toml" ]] && vocab_config_ignored "$target"; then
+      log "warning: .claude/vocab.toml が .gitignore で除外されている。skeleton/.gitignore の"
+      log "         「# Claude Code」節に合わせて、.claude/ 丸ごとの除外を外す"
+    fi
   fi
 
   cat <<EOF

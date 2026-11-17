@@ -39,4 +39,8 @@ __pycache__/
 renv/library/
 
 # Claude Code
-.claude/
+# `.claude/` は丸ごと除外しない。リポ固有の宣言（`vocab.toml`＝語彙検査の参加宣言、
+# `doc-refs.toml`＝文書参照の検査、`rules/*.md`）は追跡する。除外するのは端末ごとの状態だけ
+.claude/settings.local.json
+.claude/worktrees/
+.claude/local/

@@ -104,8 +104,16 @@ Claude が書いた文書に「周囲に合わせて書く」指示が掛かる�
   `情報利得`（ML）のような正当な複合語が出たら、その時に語レベルの除外として TOML に書く
 - **追加行だけを見る。** 全文検査すると、直さないと決めた既存の行から数千件出て、
   毎回出るノイズは読まれなくなり検査そのものが死ぬ
-- 範囲指定は `--since` ではなく**リポごとの baseline タグ**（`git diff vocab-baseline..HEAD`）。
-  2台運用で rebase が頻繁なため、コミット日ベースだと書いていない行がウィンドウに再入する
+- 範囲指定は `--since` ではなく**リポごとの baseline**（`git diff <baseline>..HEAD`）。
+  2台運用で rebase が頻繁なため、コミット日ベースだと書いていない行がウィンドウに再入する。
+  baseline は `.claude/vocab.toml` の `baseline` に書く（タグ `vocab-baseline` は、ファイルを置く前に
+  参加した 2 リポのためのフォールバック）
+- **新しいリポは `init.sh adopt` が参加させる。** baseline は**初期コミットの sha**で、
+  `vocab.toml` は 2 本目のコミットにする（初期コミットに含めると自分の sha を指せない）。
+  初期コミットに入る scaffold と先行メモは対象外になる。rebase で書き換わらないのは
+  root コミットだけなので、sha を直書きしてよい。既存リポに adopt を掛けたときは、
+  その時点の HEAD を baseline にして置くだけで、コミットはしない。
+  skeleton の `.gitignore` は `.claude/` を丸ごと除外しない（除外すると宣言を追跡できない）
 - **`doc_refs.py` とは別スクリプトにする。** doc_refs は追記式の記録（worklog・ideas・decision-log）を
   既定で除外するが、語彙では逆で、**追記され続ける記録こそが対象**
 - **本ファイル自身と `vocabulary.toml` は検査の対象外にする。** 禁止語を語として並べる

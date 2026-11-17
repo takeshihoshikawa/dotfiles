@@ -1,0 +1,10 @@
+# 語彙検査（`~/dotfiles/claude/.claude/vocab_check.py`）への参加宣言。
+# 検査は `close-project-session` が 1 リポずつ呼ぶ。
+# 検査器と語の表（`~/dotfiles/claude/.claude/vocabulary.toml`）の正本は外にあり、
+# ここには「このリポでしか知りえない事実」＝**どの時点から見るか**だけを置く。
+#
+# **このファイルがあるリポだけが検査される。** 外したいときはこのファイルを消す。
+
+# この ref 以降に追加された行を検査する。
+baseline = "{{BASELINE}}"
+note = "{{BASELINE_NOTE}}"

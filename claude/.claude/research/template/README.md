@@ -58,7 +58,7 @@ python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \
 
 | サブコマンド | 役割 |
 |---|---|
-| `adopt` | プロジェクトディレクトリ作成 or 既存補完。CLAUDE.md・README.md・.gitignore・空ディレクトリ・git 初期化（`main` ブランチ） |
+| `adopt` | プロジェクトディレクトリ作成 or 既存補完。CLAUDE.md・README.md・.gitignore・空ディレクトリ・git 初期化（`main` ブランチ）・語彙検査の参加宣言 `.claude/vocab.toml`（初期コミットを baseline にした 2 本目のコミット） |
 | `add-proposal` | `proposals/{YEAR}-{GRANT_TYPE}/{drafts,様式,figures,refs,budget,output,submitted}/` を追加 |
 | `add-papis-lib` | Papis ライブラリを `~/Documents/papis/{name}/`（**リポジトリ外**）に作成 + `~/Library/Application Support/papis/config` に登録 |
 | `add-obsidian-note` | Vault `projects/{name}.md` を生成（`local_path` は常に、`github_url` は `--github-url` か origin から埋める） |
@@ -93,7 +93,8 @@ python3 ~/work/projects/admin/scripts/academic_ops.py project migrate \
 ├── skeleton/                    # adopt が使うトップレベル雛形
 │   ├── CLAUDE.md.template
 │   ├── README.md.template
-│   ├── .gitignore
+│   ├── .gitignore               # .claude/ は端末ごとの状態だけ除外（宣言は追跡）
+│   ├── .claude/vocab.toml.template  # 語彙検査の参加宣言（{{BASELINE}} は adopt が埋める）
 │   ├── scripts/utilities/sync_with_{nas,s3}.sh.template  # NAS/S3 同期スクリプト雛形
 │   └── data/{raw,interim,processed,outputs}/、src/、notebooks/、
 │       scripts/{pipeline,experiments,publication,utilities}/、

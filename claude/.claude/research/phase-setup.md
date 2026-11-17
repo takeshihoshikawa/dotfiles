@@ -13,7 +13,7 @@
 
 | サブコマンド | 役割 |
 |---|---|
-| `adopt` | プロジェクトディレクトリ作成 or 既存補完。CLAUDE.md・README.md・.gitignore・空ディレクトリ・git 初期化（`main` ブランチ） |
+| `adopt` | プロジェクトディレクトリ作成 or 既存補完。CLAUDE.md・README.md・.gitignore・空ディレクトリ・git 初期化（`main` ブランチ）・語彙検査の参加宣言 `.claude/vocab.toml`（baseline は初期コミット。`vocabulary-conventions.md`） |
 | `add-proposal` | `proposals/{YEAR}-{GRANT_TYPE}/{drafts,様式,figures,refs,budget,output,submitted}/` を追加 |
 | `add-papis-lib` | papis ライブラリを **`~/Documents/papis/{name}/` に**作成 + `~/Library/Application Support/papis/config` に登録（`papis-conventions.md`） |
 | `add-obsidian-note` | Vault `projects/{name}.md` を生成（`local_path` は常に、`github_url` は `--github-url` か origin から埋める） |
@@ -26,6 +26,10 @@
   後から別サブコマンドで埋められる
 - **中途引き継ぎ対応**: ChatGPT・Obsidian・FS で構想を先行構築した状態のディレクトリにも、
   不足分のみ補完できる
+
+`.claude/` は丸ごと除外しない。`vocab.toml`・`doc-refs.toml`・`rules/*.md` はリポ固有の宣言なので
+追跡し、端末ごとの状態（`settings.local.json`・`worktrees/`・`local/`）だけを除外する
+（正本は `template/skeleton/.gitignore`）。
 
 ### 典型例
 
